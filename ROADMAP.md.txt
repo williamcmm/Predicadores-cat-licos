@@ -1,0 +1,715 @@
+PROMPT COMPLETO PARA DESARROLLO DE SERMONCRAFT
+Aplicación Profesional para Preparación de Sermones Católicos
+________________________________________
+INSTRUCCIONES FUNDAMENTALES PARA IA (GPT-4, Claude-4, etc.)
+OBJETIVO PRINCIPAL: Crear una aplicación web profesional con arquitectura modular, escalable, mantenible y de nivel empresarial desde el primer día de desarrollo.
+________________________________________
+1. REGLAS DE ESTRUCTURA Y ORGANIZACIÓN OBLIGATORIAS
+LÍMITES DE LÍNEAS POR ARCHIVO (FLEXIBLES SEGÚN CONTEXTO)
+•	COMPONENTES: Máximo 200 líneas (ideal 100-150)
+•	SERVICIOS: Máximo 250 líneas (pueden ser más largos por lógica de negocio)
+•	HOOKS: Máximo 150 líneas
+•	UTILS: Máximo 100 líneas por función
+•	CONFIGURACIÓN: Sin límite estricto (archivos de config pueden ser extensos)
+•	PÁGINAS: Máximo 150 líneas (deben ser principalmente composición)
+REGLA DE ORO: Si un archivo es difícil de entender de un vistazo, dividirlo inmediatamente.
+ESTRUCTURA DE CARPETAS OBLIGATORIA
+proyecto/
+├── src/
+│   ├── components/              # Componentes reutilizables
+│   │   ├── ui/                 # Botones, inputs, modales, loading, etc.
+│   │   ├── forms/              # Formularios específicos
+│   │   ├── layout/             # Header, footer, sidebar, navigation
+│   │   └── feature/            # Componentes específicos de funcionalidades
+│   ├── pages/                  # Páginas principales (solo composición)
+│   ├── hooks/                  # Custom hooks para lógica reutilizable
+│   ├── services/               # Lógica de negocio y APIs
+│   │   ├── api/               # Llamadas HTTP específicas
+│   │   ├── auth/              # Autenticación y autorización
+│   │   ├── database/          # Operaciones de base de datos
+│   │   └── external/          # Servicios externos (payment, maps, etc.)
+│   ├── utils/                  # Funciones utilitarias puras
+│   │   ├── formatters/        # Formateo de datos
+│   │   ├── validators/        # Validaciones
+│   │   ├── helpers/           # Funciones auxiliares
+│   │   └── constants/         # Constantes de la aplicación
+│   ├── types/                  # Definiciones TypeScript/PropTypes
+│   ├── store/                  # Estado global (Redux, Zustand, Context)
+│   ├── styles/                 # Estilos organizados
+│   │   ├── components/        # Estilos por componente
+│   │   ├── pages/             # Estilos por página
+│   │   ├── themes/            # Temas y variables
+│   │   └── globals/           # Estilos globales
+│   ├── assets/                 # Imágenes, iconos, fuentes
+│   ├── config/                 # Configuraciones de la app
+│   └── __tests__/             # Tests organizados por feature
+├── public/
+├── docs/                       # Documentación del proyecto
+└── .vscode/                   # Configuración del editor
+________________________________________
+2. CONVENCIONES DE NOMENCLATURA (OBLIGATORIAS)
+ARCHIVOS Y CARPETAS
+•	Componentes: PascalCase → UserProfile.jsx, DataTable.tsx
+•	Páginas: PascalCase → HomePage.jsx, UserDashboard.jsx
+•	Hooks: camelCase + use → useUserData.js, useFormValidation.js
+•	Servicios: camelCase + Service → userService.js, paymentService.js
+•	Utils: camelCase → dateHelpers.js, stringValidators.js
+•	Constantes: UPPER_CASE → API_ENDPOINTS.js, ERROR_MESSAGES.js
+•	Estilos: kebab-case → user-profile.css, data-table.scss
+VARIABLES Y FUNCIONES
+•	Variables: camelCase → userData, isLoading, errorMessage
+•	Funciones: camelCase + verbo → getUserData, validateForm, handleSubmit
+•	Constantes: UPPER_CASE → MAX_RETRY_ATTEMPTS, DEFAULT_TIMEOUT
+•	Componentes: PascalCase → <UserCard />, <LoadingSpinner />
+CONVENCIONES ESPECÍFICAS
+•	Eventos: handle + Acción → handleClick, handleSubmit, handleInputChange
+•	Estados booleanos: is/has/can + Descripción → isLoading, hasError, canEdit
+•	Arrays: Plural → users, products, errorMessages
+•	Objetos: Singular → user, product, configuration
+________________________________________
+3. DOCUMENTACIÓN Y COMENTARIOS OBLIGATORIOS
+HEADER DE CADA ARCHIVO
+/**
+ * @fileoverview [Descripción breve del archivo]
+ * @author AI Generated - [Fecha]
+ * @version 1.0.0
+ *
+ * @description
+ * [Descripción detallada de qué hace este archivo,
+ * por qué existe y cómo se relaciona con otros archivos]
+ *
+ * @dependencies
+ * - [Lista de dependencias principales]
+ *
+ * @usage
+ * [Ejemplo básico de cómo usar este archivo/componente]
+ */
+COMENTARIOS PARA COMPONENTES
+/**
+ * UserProfile - Componente para mostrar información del usuario
+ *
+ * @param {Object} user - Datos del usuario
+ * @param {string} user.name - Nombre completo
+ * @param {string} user.email - Email del usuario
+ * @param {Function} onEdit - Callback cuando se edita el usuario
+ * @param {boolean} isEditable - Si el perfil puede editarse
+ *
+ * @returns {JSX.Element} Componente de perfil de usuario
+ *
+ * @example
+ * <UserProfile
+ *   user={{ name: "Juan", email: "juan@email.com" }}
+ *   onEdit={handleEdit}
+ *   isEditable={true}
+ * />
+ */
+COMENTARIOS PARA FUNCIONES
+/**
+ * Valida formato de email
+ *
+ * @param {string} email - Email a validar
+ * @returns {boolean} true si es válido, false si no
+ *
+ * @example
+ * validateEmail("test@email.com") // returns true
+ * validateEmail("invalid-email") // returns false
+ */
+________________________________________
+4. MANEJO DE ERRORES ESTANDARIZADO
+ESTRUCTURA DE ERROR GLOBAL
+// utils/errorHandler.js
+export const ErrorTypes = {
+  NETWORK: 'NETWORK_ERROR',
+  VALIDATION: 'VALIDATION_ERROR',
+  AUTH: 'AUTHENTICATION_ERROR',
+  PERMISSION: 'PERMISSION_ERROR',
+  SERVER: 'SERVER_ERROR',
+  UNKNOWN: 'UNKNOWN_ERROR'
+};
+
+export const handleError = (error, context = '') => {
+  // Lógica centralizada de manejo de errores
+  console.error(`[${context}] Error:`, error);
+  // Aquí se puede integrar con servicios de logging
+  // como Sentry, LogRocket, etc.
+  
+  return {
+    type: determineErrorType(error),
+    message: getUserFriendlyMessage(error),
+    originalError: error,
+    context,
+    timestamp: new Date().toISOString()
+  };
+};
+USO EN SERVICIOS
+// Cada función de servicio debe manejar errores consistentemente
+export const userService = {
+  async getUsers() {
+    try {
+      const response = await apiClient.get('/users');
+      return response.data;
+    } catch (error) {
+      throw handleError(error, 'userService.getUsers');
+    }
+  }
+};
+________________________________________
+5. CONFIGURACIÓN DE HERRAMIENTAS (OBLIGATORIO)
+ESLint Configuration (.eslintrc.js)
+module.exports = {
+  extends: ['eslint:recommended', 'react-hooks'],
+  rules: {
+    'max-lines': ['error', { max: 200, skipComments: true }],
+    'max-lines-per-function': ['error', { max: 50 }],
+    'complexity': ['error', 10],
+    'no-console': 'warn',
+    'prefer-const': 'error',
+    'no-unused-vars': 'error'
+  }
+};
+Prettier Configuration (.prettierrc)
+{
+  "semi": true,
+  "trailingComma": "es5",
+  "singleQuote": true,
+  "printWidth": 80,
+  "tabWidth": 2,
+  "useTabs": false
+}
+________________________________________
+6. PATRONES DE DESARROLLO OBLIGATORIOS
+COMPOSICIÓN SOBRE HERENCIA
+•	Crear componentes pequeños y reutilizables
+•	Usar composición para crear componentes complejos
+•	Evitar componentes monolíticos
+PRINCIPIO DE RESPONSABILIDAD ÚNICA
+•	Cada archivo/función/componente hace UNA cosa bien
+•	Si describes su función con "Y" probablemente necesita dividirse
+•	Ejemplo: "Este componente muestra datos Y los valida Y los envía" → DIVIDIR
+SEPARACIÓN DE CONCERNS
+•	UI Components: Solo presentación y eventos
+•	Custom Hooks: Lógica de estado y efectos
+•	Services: Lógica de negocio y comunicación externa
+•	Utils: Funciones puras sin efectos secundarios
+________________________________________
+7. MANEJO DE ESTADO Y PERFORMANCE
+ESTADO LOCAL VS GLOBAL
+// Estado local para UI simple
+const [isOpen, setIsOpen] = useState(false);
+
+// Estado global para datos compartidos
+const { user, updateUser } = useUserStore();
+
+// Estado derivado con useMemo
+const filteredUsers = useMemo(() => 
+  users.filter(user => user.active), [users]
+);
+OPTIMIZACIONES AUTOMÁTICAS
+•	Usar React.memo para componentes puros
+•	Implementar lazy loading para rutas
+•	Optimizar imágenes automáticamente
+•	Implementar debounce en búsquedas
+________________________________________
+8. TESTING Y CALIDAD DE CÓDIGO
+ESTRUCTURA DE TESTS
+__tests__/
+├── components/
+├── hooks/
+├── services/
+├── utils/
+└── integration/
+COBERTURA MÍNIMA REQUERIDA
+•	Components: Test de renderizado y eventos principales
+•	Hooks: Test de estados y efectos
+•	Services: Test de todas las funciones públicas
+•	Utils: Test de todos los casos edge
+________________________________________
+9. DESCRIPCIÓN COMPLETA DE LA APLICACIÓN: SERMONCRAFT
+DESCRIPCIÓN GENERAL
+SermonCraft es una aplicación web integral diseñada para asistir a sacerdotes, diáconos, catequistas y predicadores católicos en la preparación de sermones y homilías de alta calidad, utilizando inteligencia artificial y acceso a recursos doctrinales oficiales de la Iglesia Católica.
+OBJETIVO PRINCIPAL
+Facilitar la creación de sermones católicos estructurados, doctrinalmente sólidos y pastoralmente efectivos, proporcionando herramientas de investigación, redacción asistida por IA y presentación optimizada para diferentes audiencias.
+USUARIOS OBJETIVO
+Primarios:
+•	Sacerdotes diocesanos y religiosos
+•	Diáconos permanentes
+•	Catequistas y formadores
+•	Estudiantes de seminario
+Secundarios:
+•	Directores espirituales
+•	Coordinadores de pastoral
+•	Líderes de grupos de oración
+TIPOS DE SERMONES SOPORTADOS
+1. Sermones por Necesidad Pastoral
+•	Problemas comunitarios específicos: División, conflictos, crisis morales
+•	Situaciones sociales: Pobreza, injusticia, violencia, desempleo
+•	Crisis espirituales: Pérdida de fe, desánimo, tentaciones
+•	Momentos especiales: Celebraciones comunitarias, tragedias, bendiciones
+2. Sermones Litúrgicos (Homilías)
+•	Domingos del Año: Ciclos A, B, C con lecturas correspondientes
+•	Tiempos Fuertes: Adviento, Navidad, Cuaresma, Pascua
+•	Fiestas del Señor: Epifanía, Transfiguración, Cristo Rey, etc.
+•	Fiestas Marianas: Inmaculada, Asunción, Guadalupe, etc.
+•	Santos del Calendario: Fiestas obligatorias y memorias opcionales
+•	Ceremonias Especiales: Bodas, funerales, bautizos, confirmaciones
+3. Sermones Doctrinales
+•	Dogmas Fundamentales: Trinidad, Encarnación, Redención, Resurrección
+•	Moral Católica: Mandamientos, virtudes, pecado, gracia
+•	Sacramentos: Naturaleza, efectos, disposiciones necesarias
+•	Eclesiología: Naturaleza de la Iglesia, autoridad, misión
+•	Mariología: Papel de María en la salvación
+•	Escatología: Muerte, juicio, cielo, infierno, purgatorio
+4. Sermones Expositivos
+•	Análisis Textual: Versículo por versículo de pasajes bíblicos
+•	Análisis por Capítulos: Estudio completo de libros bíblicos
+•	Análisis Temático: Seguimiento de temas a través de las Escrituras
+•	Comentarios Patrísticos: Interpretación de los Padres de la Iglesia
+•	Exégesis Católica: Hermenéutica según el Magisterio
+5. Sermones Catequéticos
+•	Iniciación Cristiana: Bautismo, Confirmación, Primera Comunión
+•	Formación Permanente: Educación continua en la fe
+•	Preparación Sacramental: Matrimonio, Orden Sacerdotal
+•	Educación por Edades: Niños, jóvenes, adultos, adultos mayores
+•	Evangelización: Primer anuncio, conversión, crecimiento espiritual
+6. Sermones Narrativos (Tradición Católica)
+•	Vidas de Santos: Ejemplos de santidad y virtud
+•	Parábolas de Jesús: Enseñanzas a través de historias
+•	Relatos Bíblicos: Historias del Antiguo y Nuevo Testamento
+•	Testimonios de Conversión: Experiencias de encuentro con Dios
+•	Milagros Eucarísticos: Historias de fe y devoción
+AUDIENCIAS ESPECÍFICAS
+Por Edad:
+•	Niños (6-12 años): Lenguaje simple, ejemplos concretos, narrativa
+•	Adolescentes (13-18 años): Relevancia actual, desafíos juveniles
+•	Jóvenes adultos (19-35 años): Aplicación práctica, vida profesional/familiar
+•	Adultos (36-65 años): Profundidad teológica, responsabilidades familiares
+•	Adultos mayores (65+ años): Sabiduría acumulada, esperanza cristiana
+Por Formación:
+•	Principiantes: Fundamentos básicos, vocabulario simple
+•	Intermedios: Conceptos teológicos moderados, referencias bíblicas
+•	Avanzados: Profundidad doctrinal, referencias patrísticas y magisteriales
+________________________________________
+10. FUNCIONALIDADES PRINCIPALES
+1. ASISTENTE INTELIGENTE DE SELECCIÓN
+•	Cuestionario guiado para determinar tipo de sermón óptimo
+•	Análisis de audiencia objetivo
+•	Sugerencias basadas en contexto litúrgico
+•	Recomendaciones según necesidades pastorales
+2. MOTOR DE INVESTIGACIÓN CATÓLICA
+Recursos Oficiales Integrados:
+•	Vatican.va: Documentos pontificios, encíclicas, constituciones apostólicas
+•	Catecismo de la Iglesia Católica: Texto completo con búsqueda semántica avanzada
+•	Código de Derecho Canónico: Referencia completa para cuestiones canónicas
+•	Liturgia de las Horas: Textos litúrgicos oficiales y ciclos completos
+•	Lecturas dominicales: Ciclos A, B, C con comentarios patrísticos
+•	Documentos del Vaticano II: Constituciones, decretos y declaraciones
+•	Compendio de Doctrina Social: Enseñanza social completa de la Iglesia
+•	Acta Apostolicae Sedis: Boletín oficial de la Santa Sede
+Bibliotecas Digitales Católicas:
+•	Biblioteca Virtual Dominicana: Suma Teológica de Santo Tomás completa
+•	Biblioteca EWTN: Documentos católicos oficiales organizados
+•	Mercabá - Enciclopedia Digital: Vasta colección de textos católicos
+•	Textos Patrísticos: San Agustín, San Juan Crisóstomo, San Jerónimo, etc.
+•	Vidas de Santos: Biografías oficiales y escritos espirituales
+•	Escritos de Santos Doctores: Santo Tomás, San Buenaventura, etc.
+Recursos Específicos para Sermones:
+•	Lecturas bíblicas comentadas: Exégesis patrística y magisterial
+•	Homilías de Santos: Modelos de predicación católica histórica
+•	Documentos sobre Homilética: Directorio Homilético oficial
+•	Calendarios litúrgicos: Fiestas, santos del día, tiempos litúrgicos
+Biblioteca Personal:
+•	Carga de libros propios en PDF
+•	Organización por categorías y etiquetas
+•	Búsqueda de texto completo
+•	Anotaciones y marcadores personales
+3. EDITOR COLABORATIVO INTELIGENTE CON IA
+Funcionalidades de Edición Completa:
+•	Editor de Texto Rico: Formateo completo con estilos católicos predefinidos
+•	Escritura Libre: El predicador puede escribir completamente desde cero
+•	Edición de Contenido IA: Modificar, borrar y reescribir cualquier sugerencia de la IA
+•	Modo Híbrido: Combinar contenido propio con sugerencias de IA
+•	Historial de Versiones: Deshacer/rehacer ilimitado con snapshots automáticos
+Control Total del Predicador:
+•	Aceptar/Rechazar Sugerencias: La IA propone, el predicador decide
+•	Edición en Tiempo Real: Modificar cualquier párrafo, H1, H2 o disparador mental
+•	Reescritura Asistida: Seleccionar texto y pedir a la IA que lo mejore manteniendo la esencia
+•	Notas Personales: Agregar comentarios privados que no aparecen en el modo predicación
+•	Marcadores Personalizados: El predicador define sus propios códigos y referencias
+Flujo de Trabajo Colaborativo IA-Predicador:
+1.	IA Sugiere → Predicador Evalúa → Predicador Modifica/Acepta
+2.	Predicador Escribe → IA Analiza → IA Sugiere Mejoras
+3.	Predicador Pide Ayuda → IA Investiga → IA Presenta Opciones
+4.	Predicador Selecciona Estilo → IA Adapta → Predicador Refina
+Herramientas de Escritura Avanzadas:
+•	Autocompletado Inteligente: Sugerencias de frases basadas en contexto católico
+•	Corrección Gramatical Especializada: Adaptada a terminología religiosa
+•	Sinónimos Teológicos: Alternativas para evitar repetición de conceptos
+•	Verificación de Citas: Validación automática de referencias bíblicas y magisteriales
+•	Contador de Palabras/Tiempo: Análisis en tiempo real de duración estimada
+4. MODOS DE TRABAJO
+Modo Preparación (Contenido Extenso):
+•	Desarrollo completo: Párrafos extensos y detallados
+•	Referencias documentadas: Citas precisas con fuentes
+•	Notas exegéticas: Comentarios bíblicos y patrísticos
+•	Aplicaciones pastorales: Sugerencias de implementación
+•	Material de estudio: Contenido para profundización personal
+5. SISTEMA DE DISPARADORES MENTALES Y COACH HOMILÉTICO INTELIGENTE
+Estructura Jerárquica Avanzada:
+•	H1 (Puntos Principales): Temas centrales del sermón con duración estimada
+•	H2/H3 (Subpuntos): Ideas que desarrollan cada punto principal
+•	Viñetas/Disparadores: Resumen condensado de párrafos extensos para memorización
+•	Análisis de Flujo: Verificación de coherencia y transiciones entre puntos
+Coach Homilético con IA:
+Para cada nivel (H1, H2, H3), la IA sugiere:
+Opciones de Presentación:
+•	💭 "Esto lo puedes explicar con un ejemplo práctico de la vida cotidiana"
+•	❓ "Aquí podrías hacer una pregunta retórica para involucrar a la audiencia"
+•	👥 "Esta idea se fortalece con un testimonio personal o de feligrés"
+•	😊 "Considera agregar humor apropiado para conectar emocionalmente"
+•	✊ "Preséntalo como afirmación categórica para generar convicción"
+•	🤔 "Mejor guía a la audiencia a que ellos mismos concluyan esto"
+•	📖 "Apóyate en una historia bíblica que ilustre este punto"
+•	🎭 "Utiliza una metáfora visual para que sea memorable"
+Generador Inteligente de Disparadores:
+Para cada párrafo extenso, la IA ofrece:
+•	3-4 versiones diferentes del disparador mental
+•	Análisis de efectividad según audiencia objetivo
+•	Sugerencias de formato: 
+o	Pregunta: "¿Qué significa realmente amar?"
+o	Afirmación: "Amor → Sacrificio → Entrega"
+o	Ejemplo: "Como madre protege a su hijo"
+o	Testimonio: "Juan superó su adicción"
+Análisis de Tiempo y Estructura:
+•	Duración por sección: "Este H1 está tomando 12 minutos, considera condensar"
+•	Equilibrio general: "Tu sermón dura 38 minutos, muy largo para esta audiencia juvenil"
+•	Ritmo de predicación: "Muy denso conceptualmente, necesita más ejemplos"
+•	Sugerencias de ajuste: "Mueve este testimonio al inicio para captar atención"
+Características del Sistema:
+•	Condensación Automática: IA convierte párrafos extensos en frases clave memorables
+•	Tooltips Expandibles: 
+o	Hover/touch revela contenido completo del párrafo original
+o	Click cierra la expansión automáticamente
+o	Transición suave sin perder el lugar en el bosquejo
+•	Códigos de Color: Diferentes tipos de contenido (exégesis, aplicación, transición, humor)
+•	Marcadores de Progreso: Indicador visual del avance durante la predicación
+Tipos de Disparadores Optimizados:
+•	Conceptuales: Ideas teológicas principales condensadas
+•	Narrativos: Secuencias de historias o parábolas en pasos
+•	Aplicativos: Llamadas a la acción específicas y memorables
+•	Transicionales: Puentes naturales entre temas
+•	Climáticos: Momentos cumbre del sermón claramente señalizados
+•	Interactivos: Preguntas que generan reflexión en la audiencia
+6. PROCESADOR DE TRANSCRIPCIONES
+•	Carga de archivos: Soporte para múltiples formatos de audio/video
+•	Transcripción automática: Conversión de voz a texto
+•	Generación de bosquejos: Extracción automática de ideas principales
+•	Identificación de temas: Categorización inteligente del contenido
+•	Creación de disparadores: Generación automática de frases clave
+________________________________________
+11. FUNCIONALIDADES INNOVADORAS ADICIONALES
+1. ASISTENTE DE SELECCIÓN DE TIPO DE SERMÓN
+Algoritmo Inteligente de Recomendación:
+•	Análisis de Contexto Litúrgico: Fecha, tiempo del año, lecturas del día
+•	Evaluación de Audiencia: Nivel educativo, edad promedio, contexto social
+•	Identificación de Necesidades: Cuestionario pastoral para detectar problemáticas
+•	Recomendaciones Automáticas: Sugerencia del tipo de sermón más efectivo
+Preguntas Guía del Sistema:
+1.	"¿Cuál es la ocasión principal?" (Domingo ordinario, festividad, situación especial)
+2.	"¿Quién es tu audiencia principal?" (Niños, jóvenes, adultos, mixta)
+3.	"¿Qué nivel de formación religiosa tienen?" (Básico, intermedio, avanzado)
+4.	"¿Hay alguna situación especial en la comunidad?" (Crisis, celebración, conflicto)
+5.	"¿Cuál es tu objetivo principal?" (Enseñar, consolar, exhortar, evangelizar)
+2. PROCESADOR AVANZADO DE TRANSCRIPCIONES
+Capacidades de IA:
+•	Transcripción Automática: Conversión de audio/video a texto con alta precisión
+•	Identificación de Temas: Análisis semántico para extraer ideas principales
+•	Generación de Estructura: Creación automática de introducción, desarrollo, conclusión
+•	Extracción de Citas: Identificación automática de referencias bíblicas y magisteriales
+•	Creación de Índice: Organización temática del contenido transcrito
+Formatos Soportados:
+•	Audio: MP3, WAV, M4A, AAC
+•	Video: MP4, AVI, MOV, WMV
+•	Documentos: PDF, DOCX, TXT
+•	Integración Directa: Grabación desde la aplicación
+3. SISTEMA DE VERIFICACIÓN DOCTRINAL
+Funcionalidades de Ortodoxia:
+•	Análisis Automático: Verificación contra Catecismo y Magisterio
+•	Alertas de Contenido: Notificación de posibles inexactitudes doctrinales
+•	Sugerencias de Corrección: Alternativas ortodoxas para contenido problemático
+•	Referencias de Apoyo: Citas automáticas de documentos oficiales que respaldan afirmaciones
+4. BIBLIOTECA PERSONAL INTELIGENTE
+Gestión Avanzada de Recursos:
+•	OCR Automático: Reconocimiento de texto en documentos escaneados
+•	Etiquetado Inteligente: Categorización automática por temas y autores
+•	Búsqueda Semántica: Encontrar conceptos similares, no solo palabras exactas
+•	Sincronización Multipantalla: Acceso desde cualquier dispositivo
+•	Anotaciones Colaborativas: Compartir notas con otros predicadores
+5. GENERADOR DE AYUDAS VISUALES
+Creación Automática de Materiales:
+•	Esquemas Visuales: Gráficos automáticos para conceptos complejos
+•	Líneas de Tiempo: Para eventos bíblicos e históricos
+•	Mapas Interactivos: Geografía bíblica y eclesiástica
+•	Infografías Doctrinales: Representación visual de enseñanzas católicas
+________________________________________
+12. CARACTERÍSTICAS TÉCNICAS Y DE INTERFAZ
+Compatibilidad Multiplataforma Total:
+•	Computadores: Windows, macOS, Linux (aplicación web responsiva)
+•	Dispositivos iOS: iPhone, iPad (app nativa + web)
+•	Dispositivos Android: Smartphones y tablets Android (app nativa + web)
+•	Sincronización Universal: Trabajo fluido entre todos los dispositivos
+Modo Predicación - Interfaz Optimizada:
+Pantalla Completa para Predicación:
+•	Modo Fullscreen: Aprovecha toda la pantalla eliminando distracciones
+•	Controles Gestuales: Navegación por swipe/deslizamiento entre secciones
+•	Zoom Dinámico: Controles táctiles para aumentar/disminuir tamaño de texto
+•	Jerarquía Visual Clara: 
+o	H1 (Puntos Principales): Texto grande, negrita, color distintivo
+o	H2/H3 (Subpuntos): Texto mediano, identación clara
+o	Viñetas/Disparadores: Texto destacado con iconos intuitivos
+o	Contenido Expandible: Tooltip con párrafo completo
+Controles de Predicación en Tiempo Real:
+•	Slider de Tamaño de Texto: Ajuste inmediato sin perder posición
+•	Modo Nocturno/Día: Cambio rápido según iluminación del lugar
+•	Indicador de Progreso: Barra visual del avance en el sermón
+•	Timer Inteligente: Alertas discretas de tiempo transcurrido/restante
+•	Marcadores de Sección: Navegación rápida a cualquier H1/H2
+Funcionalidades Específicas por Dispositivo:
+En Tablets (Ideal para predicación):
+•	Orientación Dual: Vertical para preparación, horizontal para predicación
+•	Gestos de Tablets: Pinch to zoom, swipe para navegar
+•	Botones Físicos: Uso de volumen para avanzar/retroceder
+•	Modo Atril: Interfaz optimizada para sostener la tablet
+En Smartphones:
+•	Navegación por Secciones: Vista compacta con acceso rápido
+•	Modo Una Mano: Controles accesibles con pulgar
+•	Vibración Discreta: Alertas de tiempo sin sonido
+En Computadores:
+•	Atajos de Teclado: Navegación completa sin mouse
+•	Ventanas Múltiples: Preparación y vista de predicación simultáneas
+•	Presenter Mode: Proyección optimizada para pantallas externas
+Interfaz de Usuario Avanzada:
+Diseño Responsivo y Accesible:
+•	Material Design 3: Estética moderna y familiar
+•	Alto Contraste: Legibilidad perfecta en cualquier iluminación
+•	Tipografía Optimizada: Fuentes diseñadas para lectura a distancia
+•	Navegación Intuitiva: Sin curva de aprendizaje para predicadores
+Personalización de Interfaz:
+•	Temas Visuales: Claro, oscuro, alto contraste, sepia
+•	Configuración de Fuentes: Tamaño, familia, espaciado personalizable
+•	Layout Adaptable: El usuario define qué elementos ver durante predicación
+•	Perfiles de Uso: Configuraciones diferentes para preparación vs predicación
+Funcionalidades de Accesibilidad:
+•	Compatibilidad con Lectores de Pantalla: Para predicadores con discapacidad visual
+•	Navegación por Voz: Control vocal discreto durante predicación
+•	Modo Daltonismo: Colores optimizados para diferentes tipos de daltonismo
+•	Texto Grande: Escalabilidad hasta 300% sin perder funcionalidad
+Tecnologías de Integración:
+Conectividad y Sincronización:
+•	Trabajo Offline: Funcionalidad completa sin internet
+•	Sincronización Automática: Backup en tiempo real cuando hay conexión
+•	Cloud Storage: Google Drive, iCloud, OneDrive, Dropbox
+•	Exportación Universal: PDF, DOCX, HTML, texto plano
+Integración con Hardware:
+•	Presentadores Bluetooth: Soporte para control remoto de presentaciones
+•	Micrófonos Externos: Grabación de alta calidad para transcripciones
+•	Proyectores/Pantallas: Salida optimizada para proyección
+•	Apple Pencil/S Pen: Anotaciones en tiempo real durante predicación
+________________________________________
+13. FLUJO DE TRABAJO TÍPICO
+1. Inicio de Sesión
+•	Acceso al dashboard personal
+•	Vista de sermones recientes y próximos eventos litúrgicos
+2. Selección de Tipo de Sermón
+•	Cuestionario inteligente para determinar enfoque óptimo
+•	Análisis de contexto (fecha, audiencia, ocasión)
+3. Investigación Asistida
+•	Búsqueda automática en recursos católicos
+•	Sugerencias de lecturas relevantes
+•	Compilación de material de referencia
+4. Desarrollo del Contenido
+•	Creación asistida por IA del contenido extenso
+•	Estructuración lógica con introducción, desarrollo y conclusión
+•	Integración de citas bíblicas y magisteriales
+5. Generación de Bosquejo
+•	Conversión automática a disparadores mentales
+•	Organización visual para presentación
+•	Tooltips con contenido expandido
+6. Desarrollo y Escritura Colaborativa
+•	Escritura desde cero: Complete libertad para crear contenido original
+•	Integración selectiva de IA: El predicador decide cuándo y cómo usar las sugerencias
+•	Edición completa: Modificar, borrar, reescribir cualquier parte del sermón
+•	Múltiples borradores: Experimentar con diferentes enfoques del mismo tema
+•	Colaboración opcional: Compartir con otros predicadores para feedback
+•	Autoría preservada: El contenido final refleja completamente la visión del predicador
+7. Refinamiento y Personalización
+•	Estilo personal: La IA aprende el estilo particular de cada predicador
+•	Preferencias guardadas: Recordar formato, estructura y enfoques preferidos
+•	Biblioteca personal integrada: Acceso inmediato a sermones anteriores para reutilizar ideas
+•	Plantillas personalizadas: Crear estructuras base según el estilo propio
+•	Configuraciones avanzadas: Ajustar nivel de asistencia de IA según experiencia
+8. Modo Predicación en Tiempo Real
+•	Transición fluida del modo preparación al modo presentación
+•	Controles gestuales para navegación sin interrumpir el flujo
+•	Zoom inteligente que mantiene la proporción y legibilidad
+•	Indicadores discretos de tiempo y progreso
+•	Acceso rápido a notas expandidas sin perder el lugar
+9. Revisión y Optimización Final
+•	Verificación doctrinal automática con referencias al Magisterio
+•	Análisis de duración y sugerencias de ajuste temporal
+•	Optimización de audiencia según perfil demográfico seleccionado
+•	Generación de resumen ejecutivo para revisión rápida
+•	Exportación multipropósito (predicación, estudio, archivo)
+________________________________________
+14. BENEFICIOS ÚNICOS
+Para el Predicador:
+•	Ahorro de tiempo: Reducción significativa en tiempo de preparación
+•	Calidad mejorada: Acceso a recursos de alta calidad doctrinal
+•	Consistencia: Estructura uniforme y profesional
+•	Flexibilidad: Adaptación rápida a diferentes audiencias
+Para la Comunidad:
+•	Sermones más ricos: Mayor profundidad bíblica y doctrinal
+•	Relevancia aumentada: Mejor conexión con necesidades actuales
+•	Formación sólida: Contenido ortodoxo y bien fundamentado
+Para la Iglesia:
+•	Calidad homilética: Elevación del nivel general de predicación
+•	Unidad doctrinal: Consistencia en la enseñanza católica
+•	Formación continua: Herramienta de crecimiento para predicadores
+________________________________________
+15. DESCRIPCIÓN TÉCNICA PARA LA INTEGRACIÓN CON IA
+Arquitectura de IA Propuesta:
+Integración con Google Cloud y Gemini:
+•	Gemini Pro: Para análisis de texto, generación de contenido y sugerencias homiléticas
+•	Gemini Vision: Para procesamiento de documentos PDF escaneados y imágenes
+•	Cloud Translation: Para recursos en latín, griego y otros idiomas
+•	Speech-to-Text API: Para transcripciones de alta calidad
+•	Cloud Storage: Para biblioteca personal y sincronización
+Funcionalidades Específicas de IA:
+1.	Análisis Contextual Inteligente:
+o	Comprensión del calendario litúrgico católico
+o	Identificación automática de temas centrales en lecturas
+o	Sugerencias de conexiones entre Antiguo y Nuevo Testamento
+2.	Generación de Contenido Homilético:
+o	Creación de introductions que capten atención
+o	Desarrollo de puntos principales con estructura lógica
+o	Generación de conclusiones que llamen a la acción
+3.	Optimización de Audiencia:
+o	Ajuste automático de vocabulario según edad y formación
+o	Sugerencias de ejemplos culturalmente relevantes
+o	Adaptación de duración según contexto (misa, retiro, catequesis)
+4.	Verificación de Ortodoxia:
+o	Comparación automática con Catecismo de la Iglesia Católica
+o	Alertas sobre posibles inconsistencias doctrinales
+o	Sugerencias de citas magisteriales de apoyo
+Requisitos Técnicos Mínimos:
+Para Desarrollo:
+•	Framework: React Native (multiplataforma) + PWA
+•	Backend: Node.js con Google Cloud Functions
+•	Base de Datos: Firestore para sincronización en tiempo real
+•	APIs: Google Cloud AI Platform, Vatican.va API (si disponible)
+•	Autenticación: Firebase Auth con soporte para cuentas institucionales
+Para Usuarios Finales:
+•	Dispositivos Móviles: iOS 12+, Android 8+ (API level 26+)
+•	Tablets: iPad (iOS 12+), Android tablets (8+)
+•	Computadores: Navegadores modernos (Chrome 90+, Firefox 88+, Safari 14+, Edge 90+)
+•	Conectividad: Funcionalidad offline con sincronización cuando hay internet
+•	Almacenamiento: 2GB mínimo para biblioteca básica, 8GB recomendado
+________________________________________
+16. PLAN DE DESARROLLO SUGERIDO
+Fase 1: MVP (Mínimo Producto Viable)
+1.	Interfaz básica de preparación de sermones
+2.	Integración con Gemini para generación de contenido
+3.	Sistema básico de disparadores mentales
+4.	Modo predicación con zoom y navegación
+5.	Acceso a Catecismo y lecturas dominicales
+Fase 2: Funcionalidades Core
+1.	Procesador de transcripciones
+2.	Biblioteca personal con carga de PDFs
+3.	Sistema completo de verificación doctrinal
+4.	Coach homilético con sugerencias de IA
+5.	Sincronización en la nube
+Fase 3: Características Avanzadas
+1.	Integración completa con recursos del Vaticano
+2.	Biblioteca digital católica completa
+3.	Análisis avanzado de audiencia
+4.	Herramientas de colaboración
+5.	Exportación avanzada y APIs para terceros
+Fase 4: Optimización y Expansión
+1.	Análisis de uso y optimización de IA
+2.	Nuevos recursos y bibliotecas
+3.	Funcionalidades solicitadas por usuarios
+4.	Integración con sistemas diocesanos
+5.	Expansión a otros idiomas y ritos
+________________________________________
+17. CRITERIOS DE CALIDAD PARA VALIDAR
+EL CÓDIGO ES BUENO CUANDO:
+✅ Cualquier desarrollador puede entender un archivo en 2 minutos ✅ Agregar una nueva feature no requiere modificar código existente ✅ Los errores se muestran de forma consistente en toda la app ✅ Los componentes son reutilizables en diferentes contextos ✅ El estado se maneja de forma predecible ✅ Las funciones hacen exactamente lo que su nombre indica ✅ Los estilos están organizados y no se repiten
+EL CÓDIGO NECESITA REFACTORING CUANDO:
+❌ Un archivo es difícil de entender rápidamente ❌ Hay código duplicado en múltiples lugares ❌ Modificar una cosa rompe funcionalidades no relacionadas ❌ Los nombres de variables/funciones no son descriptivos ❌ Los errores se manejan diferente en cada lugar ❌ Hay componentes que hacen múltiples cosas diferentes
+________________________________________
+18. INSTRUCCIONES ESPECÍFICAS PARA IA (GPT-4, CLAUDE-4)
+AL CREAR CUALQUIER ARCHIVO:
+1.	SIEMPRE incluir el header de documentación
+2.	SIEMPRE seguir las convenciones de nomenclatura
+3.	SIEMPRE manejar errores con el sistema centralizado
+4.	SIEMPRE comentar funciones complejas
+5.	NUNCA crear archivos con múltiples responsabilidades
+AL ESTRUCTURAR LA APLICACIÓN:
+1.	COMENZAR con la estructura de carpetas completa
+2.	CREAR archivos de configuración (ESLint, Prettier)
+3.	IMPLEMENTAR el sistema de manejo de errores
+4.	ESTABLECER el patrón de estado desde el inicio
+5.	CONFIGURAR el sistema de routing
+AL ESCRIBIR CÓDIGO:
+1.	PRIORIZAR legibilidad sobre brevedad
+2.	PREFERIR funciones pequeñas y específicas
+3.	USAR nombres descriptivos para variables y funciones
+4.	IMPLEMENTAR validación de datos en fronteras
+5.	AGREGAR logs informativos en puntos clave
+CONSIDERACIONES ESPECIALES PARA SERMONCRAFT:
+Funcionalidades de IA que DEBES implementar:
+1.	Sistema de sugerencias inteligentes que respete la autoría del predicador
+2.	Búsqueda semántica en recursos católicos oficiales
+3.	Generación de disparadores mentales automática pero editable
+4.	Verificación doctrinal contra Catecismo y Magisterio
+5.	Optimización de audiencia según perfil demográfico
+Integraciones OBLIGATORIAS:
+1.	Google Cloud AI Platform para procesamiento de IA
+2.	Firebase para autenticación y base de datos
+3.	Cloud Storage para sincronización de archivos
+4.	Speech-to-Text para transcripciones
+5.	APIs de recursos católicos (Vatican.va, etc.)
+Características de UI CRÍTICAS:
+1.	Modo predicación fullscreen con controles gestuales
+2.	Tooltips expandibles para contenido detallado
+3.	Zoom dinámico que mantenga legibilidad
+4.	Sincronización multiplataforma perfecta
+5.	Trabajo offline con sincronización automática
+________________________________________
+19. INSTRUCCIONES FINALES
+ORDEN DE DESARROLLO RECOMENDADO:
+1.	Crear estructura completa de carpetas según especificaciones
+2.	Implementar archivos de configuración (ESLint, Prettier, package.json)
+3.	Desarrollar sistema de manejo de errores centralizado
+4.	Crear componentes base y sistema de diseño
+5.	Implementar autenticación y estado global
+6.	Desarrollar funcionalidades core una por una
+7.	Integrar servicios de IA progresivamente
+8.	Optimizar performance y experiencia de usuario
+9.	Documentar todo el código completamente
+RECORDATORIOS CRÍTICOS:
+•	CALIDAD y MANTENIBILIDAD sobre velocidad de desarrollo
+•	Documentación completa en cada archivo desde el primer día
+•	Testing automático para funciones críticas
+•	Código modular que permita escalabilidad futura
+•	Experiencia de usuario fluida en todos los dispositivos
+•	Respeto por la tradición católica en toda la aplicación
+TECNOLOGÍAS ESPECÍFICAS A USAR:
+•	Frontend: React Native + PWA para máxima compatibilidad
+•	Backend: Node.js + Google Cloud Functions
+•	Base de Datos: Firestore + Cloud Storage
+•	IA: Google Cloud AI Platform (Gemini Pro/Vision)
+•	Autenticación: Firebase Auth
+•	UI Framework: Material Design 3 adaptado
+•	Estado: Context API + useReducer (escalable a Redux si necesario)
+Recuerda: Este es un proyecto que servirá a la Iglesia Católica y a predicadores de todo el mundo. La calidad, ortodoxia doctrinal y experiencia de usuario deben ser excepcionales desde el primer día de desarrollo.
+

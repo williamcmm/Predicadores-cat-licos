@@ -1,0 +1,23 @@
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: var(--bg-color);
+  color: var(--text-color);
+  margin: 0;
+  padding: 0;
+}
+:root {
+  --bg-color: #f9f9f9;
+  --text-color: #222;
+  --primary: #1976d2;
+  --secondary: #43a047;
+}
+[data-theme="dark"] {
+  --bg-color: #181818;
+  --text-color: #f9f9f9;
+  --primary: #90caf9;
+  --secondary: #66bb6a;
+}
+button {
+  font-family: inherit;
+  font-size: 1rem;
+}
