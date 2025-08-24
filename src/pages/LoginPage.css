@@ -1,0 +1,88 @@
+.login-bg {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #4285F4 0%, #34a853 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-card {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  padding: 48px 32px 32px 32px;
+  min-width: 340px;
+  max-width: 380px;
+  text-align: center;
+  animation: fadeIn 0.7s ease;
+}
+
+.login-title {
+  font-family: 'Montserrat', 'Roboto', Arial, sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 18px;
+  color: #222;
+}
+
+.login-link {
+  display: inline-block;
+  margin-bottom: 24px;
+  color: #4285F4;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.login-link:hover {
+  color: #34a853;
+}
+
+.login-google-btn {
+  background: #4285F4;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 12px 24px;
+  font-size: 1.1rem;
+  font-family: 'Montserrat', 'Roboto', Arial, sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(66,133,244,0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background 0.2s, transform 0.2s;
+}
+.login-google-btn:hover {
+  background: #357ae8;
+  transform: translateY(-2px) scale(1.04);
+}
+.google-icon {
+  width: 22px;
+  height: 22px;
+  background: url('https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg') no-repeat center/contain;
+  display: inline-block;
+}
+
+.login-error {
+  color: #d32f2f;
+  margin-top: 18px;
+  font-size: 1rem;
+  font-family: 'Roboto', Arial, sans-serif;
+}
+.login-error-detail {
+  color: #b71c1c;
+  font-size: 0.95em;
+  margin-top: 8px;
+  background: #fff0f0;
+  border-radius: 6px;
+  padding: 8px;
+  font-family: 'Fira Mono', 'Consolas', monospace;
+  word-break: break-all;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: none; }
+}
