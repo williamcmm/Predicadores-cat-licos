@@ -1,0 +1,869 @@
+# ESPECIFICACIONES TÉCNICAS: EL PREDICADOR CATÓLICO
+## Aplicación Web para Creación de Sermones Católicos
+# Descripciones Funcionales
+
+Este documento registra, de forma secuencial y clara, cada función, componente o parte relevante desarrollada en la aplicación "El Predicador Católico" durante la Fase 1 y siguientes. No contiene código, solo explicaciones funcionales.
+
+---
+
+## Fase 1: Cimientos y Estructura Principal
+
+### 2025-08-24
+
+**Inicialización del proyecto React**
+Se creó la estructura base del proyecto utilizando React, estableciendo el punto de partida para el desarrollo de la aplicación.
+
+**Instalación de dependencias principales**
+Se instalaron las dependencias esenciales: `firebase` para la autenticación y base de datos, y `tailwindcss` para el diseño visual.
+
+**Creación del layout principal**
+Se diseñó el layout con dos paneles redimensionables y un encabezado superior, permitiendo la navegación y organización de los modos de trabajo.
+
+**Implementación de pestañas de modos**
+Se añadieron pestañas para alternar entre los tres modos principales: Edición, Estudio y Predicación.
+
+---
+
+A partir de aquí, cada nueva función o componente desarrollado será documentado en este archivo, siguiendo el mismo formato.
+
+**Componente PanelResizer**
+Se desarrolló el componente PanelResizer, encargado de permitir al usuario ajustar el tamaño de los paneles principales del layout mediante arrastre, mejorando la experiencia de organización y visualización de los modos de trabajo.
+
+**Componente Header**
+Se creó el componente Header para mostrar el encabezado principal de la aplicación con el título "El Predicador Católico" y estilos visuales destacados. Este componente modulariza la estructura y facilita futuras personalizaciones del encabezado.
+
+**Componente Sidebar**
+Se desarrolló el componente Sidebar para mostrar el panel lateral de modos de trabajo (Inicio, Estudio, Predicación). Permite al usuario alternar entre los diferentes modos de la aplicación de forma visual y accesible, siguiendo el diseño modular y facilitando futuras extensiones.
+
+**Componente SermonEditor**
+Se creó el componente SermonEditor para el panel central de edición de sermones. Permite al usuario crear y editar el título y contenido del sermón, y servirá como base para añadir más herramientas de edición y estructuración en futuras fases.
+
+**Componente ResourcePanel**
+Se desarrolló el componente ResourcePanel para el panel derecho de materiales y recursos. Permite buscar recursos y muestra los resultados y materiales encontrados, sirviendo como base para la integración futura del buscador y la gestión de recursos.
+
+**Componente IdeaEditor**
+Se creó el componente IdeaEditor, integrado dentro de SermonEditor, para permitir al usuario añadir y visualizar ideas del sermón. Facilita la estructuración y organización de los puntos principales del mensaje, mejorando la experiencia de edición.
+
+**Componente SermonTypeSelector**
+Se desarrolló el componente SermonTypeSelector, integrado en el editor de sermones, para seleccionar el tipo de sermón (Homilía, Meditación, Catequesis, Reflexión). Permite personalizar la estructura y enfoque del mensaje desde el inicio de la edición.
+
+**Componente SermonBuilder**
+Se creó el componente SermonBuilder para mostrar la vista previa del sermón en tiempo real, incluyendo el tipo, título, contenido y las ideas agregadas. Permite al usuario visualizar cómo quedará el mensaje antes de guardarlo o presentarlo.
+
+**Componente SermonSaveButton**
+Se desarrolló el componente SermonSaveButton, integrado en el editor de sermones, para permitir guardar el sermón creado. Por ahora muestra una alerta de confirmación, y servirá como base para la futura lógica de persistencia en base de datos.
+
+**Persistencia de sermones en Firestore**
+Se implementó la lógica para guardar los sermones creados en la base de datos Firestore, permitiendo almacenar el tipo, título, contenido, ideas y fecha de creación. El usuario recibe una confirmación al guardar exitosamente o un mensaje de error si ocurre algún problema.
+---
+
+## 1. VISIÓN GENERAL DEL PROYECTO
+
+### 1.1 Propósito
+Recrear y mejorar la aplicación web "El Predicador Católico" - una herramienta especializada para la creación, edición y presentación de sermones católicos con integración de Inteligencia Artificial (Gemini) para búsqueda de recursos.
+
+### 1.2 Arquitectura General
+- **Tipo:** Single Page Application (SPA)
+- **Framework:** React.js con TypeScript
+- **Hosting:** Firebase Hosting
+- **Estilos:** Tailwind CSS
+- **Base de datos:** Firebase Firestore (opcional para persistencia)
+- **IA Integration:** Google Gemini API
+
+### 1.3 Responsive Design
+- Desktop First (pantalla principal)
+- Tablet compatible
+- Mobile responsive para consulta
+
+---
+
+## 2. ESTRUCTURA DE LA INTERFAZ
+
+### 2.1 Layout Principal
+La aplicación debe tener un layout de **dos paneles principales redimensionables**:
+
+#### Panel Izquierdo (60% ancho inicial): "Preparador de Sermones"
+- Color de fondo: Blanco (#FFFFFF)
+- Padding interno: 24px
+- Scroll vertical independiente
+
+#### Panel Derecho (40% ancho inicial): "Buscador de Recursos"
+- Color de fondo: Gris claro (#F8F9FA)
+- Padding interno: 20px
+- Scroll vertical independiente
+
+#### Separador Redimensionable
+- **Funcionalidad:** Drag & drop horizontal para redimensionar paneles
+- **Rango de redimensión:** 10% hasta 90% para cualquier panel
+- **Visual:** Línea vertical de 4px de ancho, color gris (#D1D5DB)
+- **Cursor:** `col-resize` en hover
+- **Comportamiento:**
+  - Hover: cambiar a color azul (#3B82F6)
+  - Drag activo: mostrar indicador visual de porcentaje
+  - Double-click: resetear a 60/40 por defecto
+- **Persistencia:** Guardar tamaños en localStorage
+- **Responsive:** En mobile/tablet, ignorar redimensión y usar layout apilado
+
+#### Header Global
+- Color de fondo: Degradado púrpura (#6B46C1 a #8B5CF6)
+- Altura: 64px
+- Título: "El Predicador Católico" (color blanco, font-weight bold)
+- **Integración Litúrgica** (lado izquierdo del header):
+  - Texto pequeño: "Hoy: [Fecha litúrgica actual]" 
+  - Ejemplo: "Hoy: III Domingo de Adviento - Ciclo A"
+  - Color: blanco opaco (#FFFFFF80)
+- **Acceso a Biblioteca** (lado derecho del header):
+  - Icono de carpeta + "Mi Biblioteca" (clickeable)
+  - Botón fullscreen mantenido en esquina superior derecha
+
+### 2.2 Panel Izquierdo - Detalle de Componentes
+
+#### 2.2.1 Tabs de Modo de Trabajo
+Tres tabs horizontales inmediatamente debajo del header:
+- **"Modo Edición"** (azul activo #3B82F6)
+- **"Modo Estudio"** (gris inactivo #6B7280)
+- **"Modo Predicación"** (gris inactivo #6B7280)
+
+Solo el tab activo debe mostrar color azul y text-white.
+
+#### 2.2.2 Secciones del Sermón (Modo Edición)
+**REFERENCIA VISUAL:** Ver Imagen 1 y 2 - formulario completo del sermón
+
+Cada sección debe ser un componente independiente con dos comportamientos según la elección del usuario:
+
+**COMPORTAMIENTO A: Generación Automática por IA (Opción 1)**
+- Todos los campos se llenan automáticamente con contenido real basado en las categorías encontradas
+- Contenido completamente editable después de generado
+
+**COMPORTAMIENTO B: Creación Manual Guiada (Opción 2)**
+- Los campos muestran placeholders guía tenues que el usuario puede borrar y reemplazar
+- Usuario construye el sermón tomando contenido de las categorías a su gusto
+
+**A. TÍTULO DEL SERMÓN**
+- Label: "TÍTULO DEL SERMÓN" (mayúsculas, font-semibold)
+- Input tipo text, width completo
+- **Opción 1:** IA llena título basado en tema y recursos
+- **Opción 2:** Placeholder tenue: "Escriba aquí un título atractivo para su sermón"
+
+**B. INTRODUCCIÓN**
+- Label: "INTRODUCCIÓN" (mayúsculas, font-semibold)
+- Subsecciones expandibles:
+
+  **B.1 Presentación del Tema**
+  - Label: "Presentación del Tema"
+  - Textarea, 3 rows mínimo
+  - **Opción 1:** IA llena con presentación contextualizada
+  - **Opción 2:** Placeholder tenue: "Ponga aquí cómo va a presentar el tema a la audiencia"
+
+  **B.2 Motivación Inicial**  
+  - Label: "Motivación Inicial"
+  - Textarea, 3 rows mínimo
+  - **Opción 1:** IA llena con motivación específica
+  - **Opción 2:** Placeholder tenue: "Ponga aquí texto que genere expectativa e interés en los oyentes"
+
+**C. IDEAS PRINCIPALES**
+**REFERENCIA VISUAL:** Ver Imagen 1 y 2 - estructura completa de ideas desarrolladas
+
+**Configuración Inicial:**
+- **Sermón sugerido automáticamente:** 5-6 Ideas Principales por defecto
+- **Expansibilidad:** Botón "Añadir Nueva Idea" permite crear infinitas ideas adicionales
+- **Función:** Cada idea debe reforzar y desarrollar el título principal del sermón
+
+**C.1 Estructura Completa por Idea Principal**
+
+**NIVEL 1: H1 (Idea Central)**
+- **Función:** Frase que refuerza directamente el título del sermón
+- **Ejemplo:** Si título es "El Amor de Dios", H1 podría ser "El amor de Dios es incondicional"
+- **Input text, una línea**
+- **Visible en:** Modo Edición, Modo Estudio, Modo Predicación
+
+**NIVEL 2: Elemento de Apoyo (Texto Base Sagrado)**
+- **Función:** Texto completo que fundamenta la Idea Central (H1)
+- **Fuentes:** Cita bíblica completa, documento de la Iglesia, enseñanza papal
+- **REGLA CRÍTICA:** Nunca reducir, siempre texto COMPLETO - "tiene valor de ley"
+- **Dropdown selector de tipo:**
+  - "Cita Bíblica Completa"
+  - "Cita del Catecismo Completa"
+  - "Documento Pontificio"
+  - "Enseñanza de la Iglesia"
+  - "Testimonio Doctrinal"
+- **Textarea grande para texto completo**
+- **Visible en:** Modo Edición, Modo Estudio, Modo Predicación
+
+**NIVEL 3: Sistema de Disparadores Mentales + Párrafos**
+- **Cantidad por Idea:** 4 disparadores mentales por defecto (expandible)
+- **Función:** Explicar, desmenuzar y profundizar el Elemento de Apoyo en relación al H1
+
+**Estructura Visual por Disparador (Modo Edición):**
+```
+[Disparador Mental - Cuadro delgado]
+1-2 líneas máximo - frase que resume el párrafo de abajo
+
+[Párrafo Explicativo - Cuadro grande]
+Párrafo completo que desarrolla y explica el disparador mental
+Conecta el Elemento de Apoyo con la Idea Central H1
+2-4 párrafos de contenido profundo
+```
+
+**Comportamiento por Disparador:**
+- **Input text delgado:** Disparador mental (1-2 líneas máximo)
+- **Textarea grande:** Párrafo completo explicativo
+- **Función disparador:** Recordar al predicador qué contiene el párrafo
+- **Relación:** Disparador → Párrafo (1:1)
+- **Botón:** "Eliminar Disparador" (X roja)
+- **Botón:** "Agregar Disparador" al final de cada idea
+
+**C.2 Gestión Dinámica de Ideas**
+- **Botón "Añadir Nueva Idea Principal"** al final de todas las ideas
+- **Funcionalidad:** Crear H1, H2, H3, H4, H5, H6... indefinidamente
+- **Estructura nueva idea:** H1 + Elemento de Apoyo + 4 disparadores iniciales
+- Drag and drop para reordenar ideas completas
+- Numeración automática (H1, H2, H3...)
+- **Botón "Eliminar Idea Completa"** (X roja, esquina superior derecha de cada idea)
+- **Visible solo en Modo Edición**
+
+**D. IMPERATIVOS**
+- Label: "IMPERATIVOS" (mayúsculas, font-semibold)
+- Textarea, 4 rows mínimo
+- **Opción 1:** IA llena con acciones concretas basadas en el tema
+- **Opción 2:** Placeholder: "Ponga aquí acciones concretas que deben tomar (conclusión lógica, no moralismo)"
+
+#### 2.2.3 Modo Estudio
+**REFERENCIA VISUAL:** Ver Imagen 3 y 5 - vista de lectura completa para memorización
+**PROPÓSITO:** Predicador lee y memoriza todo el contenido completo para recordarlo en predicación
+
+**Funcionalidad:**
+Mostrar **TODO el contenido del sermón** en formato de lectura profesional:
+- **Título del sermón** (heading principal)
+- **Introducción completa** (Presentación + Motivación)
+- **Por cada Idea Principal:**
+  - **H1 (Idea Central)** - destacada como subheading
+  - **Elemento de Apoyo COMPLETO** - texto íntegro bíblico/doctrinal en formato destacado
+  - **Todos los disparadores mentales** - visibles como frases cortas
+  - **Todos los párrafos completos** - contenido íntegro desarrollado
+- **Imperativos** - sección final
+
+**Características técnicas:**
+- **Sin campos editables:** Solo texto en formato de lectura
+- **Typography profesional:** Headings diferenciados, párrafos bien espaciados, citas destacadas
+- **Jerarquía visual clara:** H1 → Elemento de Apoyo → Disparador → Párrafo
+- **Sin botones de edición:** No mostrar "Añadir Nueva Idea" ni controles de edición
+- **Scroll suave** para lectura continua
+
+**Controles de Presentación (Imagen 3 - esquina inferior derecha):**
+- **Botón Configuración:** Ícono de engranaje, al hacer clic despliega panel
+- **Panel Desplegable con:**
+  - **Slider "Tamaño de Letra":** 1.0em a 2.0em (como muestra Imagen 3)
+  - **Slider "Ancho de Contenido":** 60% a 100% de pantalla (como muestra Imagen 3)
+- **Comportamiento:** Después de configurar, panel se oculta automáticamente
+- **Persistencia:** Guardar configuración en localStorage
+
+#### 2.2.4 Modo Predicación  
+**REFERENCIA VISUAL:** Estructura minimalista basada en Imagen 3 y 5 pero solo elementos esenciales
+**PROPÓSITO:** Predicador usa solo elementos clave para recordar contenido memorizado en Modo Estudio
+
+**Nueva ventana fullscreen** con contenido minimalista:
+- **Fondo blanco limpio**
+- **Título del sermón** (heading principal)
+- **Por cada Idea Principal mostrar ÚNICAMENTE:**
+  - **H1 (Idea Central)** - subheading destacado
+  - **Elemento de Apoyo COMPLETO** - texto íntegro bíblico/doctrinal (NUNCA reducido)
+  - **Solo los 4 disparadores mentales** - frases de 1-2 líneas
+- **Imperativos** - sección final
+- **NO mostrar:** Párrafos largos (predicador los recuerda por los disparadores)
+
+**Controles de Presentación** (esquina inferior derecha):
+- **Slider "Tamaño de Letra":** 1.0em a 2.0em
+- **Slider "Ancho de Contenido":** 60% a 90%
+- **Botón "Cerrar Predicación"** (esquina superior derecha)
+
+**Flujo de Uso:**
+1. **Modo Edición:** Crear/editar sermón completo
+2. **Modo Estudio:** Leer y memorizar todo el contenido (párrafos completos)
+3. **Modo Predicación:** Solo disparadores + textos sagrados → predicador recuerda párrafos
+
+### 2.3 Panel Derecho - Detalle de Componentes
+
+#### 2.3.1 Header del Buscador
+- Título: "Buscar temas y recursos para predicación"
+- Color: texto gris oscuro (#374151)
+
+#### 2.3.2 Barra de Búsqueda
+- Input search con placeholder: "La Eucaristía como fuente y culmen de la vida cristiana"
+- Botón "Buscar" (azul #3B82F6)
+- Text helper debajo:
+  - "Forma 1: Escribe un tema y haz clic en Buscar."
+  - "Forma 2: Haz clic en Buscar (sin escribir nada) para obtener sugerencias."
+
+#### 2.3.3 Sección de Inicio Rápido
+**Cuando NO hay búsqueda activa, mostrar:**
+
+**A. Mensaje de Bienvenida**
+- Fondo verde claro (#F0FDF4)
+- Border verde (#16A34A) 
+- Contenido:
+  - "¿Listo para empezar?"
+  - "Usa los recursos encontrados para generar un borrador."
+  - **Botón "✨ Sugerir Sermón"** (verde, centrado)
+
+#### 2.3.4 Sistema de Búsqueda Inteligente
+**REFERENCIA VISUAL:** Ver Imagen 4 y 6 del proyecto - muestran las dos fases del sistema de búsqueda
+
+**FASE 1: Búsqueda vacía (Imagen 4)**
+**Trigger:** Campo de búsqueda vacío + clic en "Buscar"
+**Resultado:** Mostrar sugerencias inteligentes contextuales
+
+**A. Texto instructivo:**
+- "Forma 1: Escribe un tema y haz clic en Buscar."
+- "Forma 2: Haz clic en Buscar (sin escribir nada) para obtener sugerencias."
+
+**B. Sección de Contexto Litúrgico** (nueva - prioritaria)
+- **Header:** "Sugerencias para hoy - [Fecha Litúrgica Actual]"
+- **Fondo:** Verde muy claro (#F0FDF4) con borde verde
+- **Contenido:**
+  - Fecha litúrgica específica (ej: "III Domingo de Adviento - Ciclo A")
+  - 3 sugerencias temáticas basadas en lecturas del día
+  - Botón: "Ver lecturas completas de hoy"
+  - Ejemplo: "La espera vigilante del Señor", "Juan Bautista, voz en el desierto", "Alegría en la esperanza cristiana"
+
+**C. Lista de Sugerencias Generales (10+ títulos clickeables):**
+Cada clic en "Buscar" (campo vacío) debe mostrar 10 títulos DIFERENTES que no sean repetidos, por ejemplo:
+- "El llamado a la santidad en la vida cotidiana"
+- "La Eucaristía como fuente y culmen de la vida cristiana"  
+- "El perdón y la reconciliación: sanando heridas del pasado"
+- "María, modelo de fe, esperanza y caridad"
+- "La oración como diálogo íntimo con Dios"
+- "El servicio al prójimo como expresión del amor cristiano"
+- "La justicia social a la luz del Evangelio"
+- "El discernimiento vocacional: descubriendo el plan de Dios"
+- "El valor del sufrimiento y la cruz en la vida cristiana"
+- "La esperanza cristiana ante los desafíos del mundo actual"
+
+**D. Comportamiento de las Sugerencias:**
+- **Prioridad:** Sugerencias litúrgicas aparecen primero
+- Al hacer clic en cualquier sugerencia: se copia automáticamente al campo de búsqueda
+- Se ejecuta búsqueda automática inmediatamente
+- Pasa directamente a FASE 2
+
+**FASE 2: Búsqueda con tema específico (Imagen 1 y 8)**
+**Trigger:** Campo con texto + clic "Buscar" (manual o automático desde sugerencia)
+**Resultado:** Llenar todas las categorías con recursos
+
+**A. Estado de Búsqueda**
+- "Buscando..." (con spinner) durante la búsqueda
+- Mostrar término buscado en el campo
+
+**B. Sección "Generar Sermón" (Imagen 1 - recuadro verde)**
+**REFERENCIA VISUAL:** Ver Imagen 1 - recuadro verde después de búsqueda exitosa
+- **Ubicación:** Inmediatamente después del campo de búsqueda
+- **Fondo verde claro** (#F0FDF4)
+- **Border verde** (#16A34A)
+- **Contenido:**
+  - "¿Cómo quieres continuar?"
+  - **Opción 1:** "Pedir a la IA que te sugiera un sermón" [Botón Verde]
+  - **Opción 2:** "Crear el sermón tú mismo con los recursos proporcionados" [Botón Verde Outline]
+- **Comportamiento:** 
+  - Solo visible cuando hay resultados de búsqueda exitosos
+  - **Opción 1:** IA llena todos los campos automáticamente con contenido de las categorías
+  - **Opción 2:** Campos aparecen con placeholders guía editables
+
+**C. Categorías de Recursos Dinámicas (Imagen 1 y 8)**
+**REFERENCIA VISUAL:** Ver Imagen 1 - categorías con números dinámicos (1), (8), (5), etc.
+
+Sistema de acordeón expandible con contadores que se llenan dinámicamente según resultados:
+
+1. **DOCTRINA CATÓLICA** (número entre paréntesis)
+2. **CATECISMO** (número entre paréntesis)
+3. **SANTORAL CATÓLICO** (número entre paréntesis)
+4. **CITAS BÍBLICAS RELEVANTES** (número entre paréntesis)
+5. **REFLEXIONES SOBRE EL TEMA** (número entre paréntesis)
+6. **EJEMPLOS PRÁCTICOS** (número entre paréntesis)
+7. **TESTIMONIOS Y EXPERIENCIAS** (número entre paréntesis)
+8. **DATOS CIENTÍFICOS/HISTÓRICOS** (número entre paréntesis)
+9. **VIDEOS DE YOUTUBE** (número entre paréntesis)
+10. **REFERENCIAS DOCTRINALES** (número entre paréntesis)
+11. **DOCUMENTOS OFICIALES DE LA IGLESIA** (número entre paréntesis)
+
+**Comportamiento de Categorías:**
+- Click en categoría: expande/contrae contenido
+- Mostrar ▶ cuando colapsada, ▼ cuando expandida
+- Contenido de cada categoría: lista de recursos con:
+  - Título del recurso (clickeable)
+  - Descripción breve (2-3 líneas)
+  - Botones: "Leer más" | "Copiar"
+
+---
+
+## 3. INTEGRACIÓN CON GEMINI AI
+
+### 3.1 Configuración del Prompt Maestro
+La aplicación debe integrar completamente el prompt especializado proporcionado como **instrucciones base** para Gemini. Este prompt define:
+- Identidad como asistente católico especializado
+- Estructura del sermón ("CHIFONIER")
+- Fuentes autorizadas de conocimiento
+- Criterios de exclusión absolutos
+- Metodología por tipo de mensaje
+
+### 3.2 Flujo de Búsqueda de Recursos
+
+#### 3.2.1 Integración con Calendario Litúrgico
+**Fuentes de Datos Litúrgicos:**
+- **API primaria:** Vatican.va (lecturas oficiales)
+- **APIs secundarias:** USCCB.org, ACI Prensa (lecturas en español)
+- **Fallback local:** Base de datos local con fechas litúrgicas principales
+
+**Funcionalidades de Integración:**
+- **Detección automática de fecha:** Al abrir aplicación, mostrar contexto litúrgico actual
+- **Sugerencias contextuales:** Generar temas apropiados para la liturgia del día
+- **Lecturas del día:** Acceso directo a lecturas completas (Primera, Salmo, Segunda, Evangelio)
+- **Ciclo litúrgico:** Identificación automática de Ciclo A/B/C y temporada
+- **Fechas especiales:** Reconocimiento de solemnidades, fiestas y memorias
+
+#### 3.2.2 Generación de Sugerencias Litúrgicas
+**Trigger:** Sistema automático al cargar aplicación + búsqueda vacía
+**Request a Gemini:**
+```
+Prompt Maestro + "Genera exactamente 3 sugerencias específicas de temas para sermón basadas en el contexto litúrgico actual:
+
+CONTEXTO LITÚRGICO:
+Fecha: [FECHA_ACTUAL]
+Tiempo Litúrgico: [TEMPORADA_ACTUAL]
+Nombre Litúrgico: [NOMBRE_ESPECIFICO] (ej: III Domingo de Adviento)
+Ciclo: [CICLO_A_B_C]
+
+LECTURAS DEL DÍA:
+Primera Lectura: [TEXTO_PRIMERA_LECTURA]
+Salmo Responsorial: [TEXTO_SALMO]
+Segunda Lectura: [TEXTO_SEGUNDA_LECTURA] (si aplica)
+Evangelio: [TEXTO_EVANGELIO]
+
+Genera 3 temas que conecten directamente con las lecturas y el contexto litúrgico. Cada tema debe ser específico, atractivo y apropiado para la celebración del día.
+
+Formato: lista simple, un tema por línea, máximo 80 caracteres por tema."
+```
+
+#### 3.2.3 Generación de Sugerencias Generales (Campo Vacío)
+**Trigger:** Usuario hace clic en "Buscar" sin texto en el campo
+**REFERENCIA VISUAL:** Ver Imagen 6 - muestra sugerencias desplegadas
+
+**Request a Gemini:**
+```
+Prompt Maestro + "Genera exactamente 10 sugerencias DIFERENTES de temas para sermones católicos. Cada sugerencia debe ser específica, relevante para la liturgia actual, y adecuada para predicación. 
+
+IMPORTANTE: Las sugerencias deben ser completamente diferentes a las anteriores generadas. Varía temas, enfoques y estilos.
+
+Formato: lista simple, un tema por línea, máximo 80 caracteres por tema."
+```
+
+**Procesamiento:**
+- Cada click debe generar 10 sugerencias completamente NUEVAS
+- Guardar las últimas 50 sugerencias para evitar repetición
+- Al hacer clic en una sugerencia: copiar al campo + ejecutar búsqueda automática
+
+#### 3.2.4 Búsqueda de Recursos por Tema
+**Trigger:** Campo con texto + clic "Buscar" (manual o automático desde sugerencia clickeada)
+**REFERENCIA VISUAL:** Ver Imagen 1 - resultado exitoso con categorías llenas
+
+**Request a Gemini:**
+```
+Prompt Maestro + "Busca recursos católicos para el tema específico: '[TEMA_EXACTO]'. 
+
+Organiza los resultados en estas categorías exactas y cuenta cuántos recursos válidos encontraste en cada una:
+
+1. DOCTRINA CATÓLICA - Enseñanzas oficiales del Magisterio
+2. CATECISMO - Referencias del Catecismo de la Iglesia Católica
+3. SANTORAL CATÓLICO - Santos relacionados, festividades, ejemplos de vida
+4. CITAS BÍBLICAS RELEVANTES - Versículos aplicables (solo Biblias católicas)
+5. REFLEXIONES SOBRE EL TEMA - Meditaciones y profundizaciones teológicas
+6. EJEMPLOS PRÁCTICOS - Aplicaciones concretas para la vida diaria
+7. TESTIMONIOS Y EXPERIENCIAS - Historias reales de conversión, sanación, etc.
+8. DATOS CIENTÍFICOS/HISTÓRICOS - Hechos que apoyen o ilustren el tema
+9. VIDEOS DE YOUTUBE - Enlaces de canales católicos confiables
+10. REFERENCIAS DOCTRINALES - Documentos pontificios, encíclicas relevantes
+11. DOCUMENTOS OFICIALES DE LA IGLESIA - Textos del Vaticano, conferencias episcopales
+
+Para cada recurso incluye: título descriptivo, fuente autorizada, descripción de 2-3 líneas, y contenido completo cuando sea relevante.
+
+SOLO usar fuentes católicas ortodoxas aprobadas. RECHAZAR cualquier fuente sectaria, protestante o anti-católica."
+```
+
+**Procesamiento de Respuesta:**
+- Parsear respuesta de Gemini por categorías
+- Contar recursos válidos por categoría → actualizar números (0), (1), (8), etc.
+- Organizar contenido de cada categoría para mostrar al expandir
+- Mostrar recuadro verde "Sugerir Sermón" solo cuando hay resultados exitosos
+
+#### 3.2.5 Generación Automática de Sermón (Opción 1)
+**Trigger:** Usuario hace clic "Pedir a la IA que te sugiera un sermón"
+**Contexto:** Tema específico + recursos encontrados en todas las categorías
+
+**Request a Gemini:**
+```
+Prompt Maestro + "Crea un sermón COMPLETO usando la estructura CHIFONIER sobre el tema: '[TEMA_EXACTO]'. 
+
+ESTRUCTURA REQUERIDA:
+1. Título atractivo y específico
+2. Introducción completa (Presentación del tema + Motivación inicial)
+3. EXACTAMENTE 5-6 Ideas Principales, cada una con:
+   - H1: Frase que refuerza el título principal
+   - Elemento de Apoyo: Texto bíblico/doctrinal COMPLETO (nunca resumido)
+   - 4 Disparadores Mentales con sus respectivos párrafos desarrollados
+4. Imperativos (acciones concretas)
+
+CONTEXTO LITÚRGICO (si aplica):
+[INFORMACION_LITURGICA_COMPLETA]
+[LECTURAS_DEL_DIA_COMPLETAS]
+
+RECURSOS DISPONIBLES POR CATEGORÍA:
+[DOCTRINA_CATOLICA_RECURSOS]
+[CATECISMO_RECURSOS] 
+[SANTORAL_RECURSOS]
+[CITAS_BIBLICAS_RECURSOS]
+[REFLEXIONES_RECURSOS]
+[EJEMPLOS_PRACTICOS_RECURSOS]
+[TESTIMONIOS_RECURSOS]
+[DATOS_HISTORICOS_RECURSOS]
+[REFERENCIAS_DOCTRINALES_RECURSOS]
+[DOCUMENTOS_IGLESIA_RECURSOS]
+
+PARA CADA IDEA PRINCIPAL:
+- H1 debe reforzar específicamente el título del sermón
+- Elemento de Apoyo: usar recursos encontrados, texto ÍNTEGRO
+- Cada Disparador Mental: máximo 1-2 líneas que resuman el párrafo
+- Cada Párrafo: 2-4 párrafos que expliquen y profundicen el Elemento de Apoyo en relación al H1
+
+DURACIÓN OBJETIVO: 15-20 minutos de predicación
+AUDIENCIA: Feligreses católicos promedio
+
+Estructura exacta para llenar formulario:
+TÍTULO: [título]
+PRESENTACIÓN: [presentación]  
+MOTIVACIÓN: [motivación]
+IDEA_1_H1: [h1]
+IDEA_1_ELEMENTO: [texto completo]
+IDEA_1_DISPARADOR_1: [disparador] | PÁRRAFO_1: [párrafo]
+IDEA_1_DISPARADOR_2: [disparador] | PÁRRAFO_2: [párrafo]
+IDEA_1_DISPARADOR_3: [disparador] | PÁRRAFO_3: [párrafo]  
+IDEA_1_DISPARADOR_4: [disparador] | PÁRRAFO_4: [párrafo]
+[Repetir estructura para IDEA_2 hasta IDEA_5/6]
+IMPERATIVOS: [imperativos]
+```
+
+**Procesamiento:**
+- Parsear respuesta estructurada de Gemini
+- Crear automáticamente 5-6 Ideas Principales en el formulario
+- Llenar cada idea con: H1 + Elemento de Apoyo + 4 pares Disparador-Párrafo
+- **Asociar contexto litúrgico** automáticamente al sermón generado
+- **Generar tags automáticos** basados en contenido y contexto
+- Todos los campos completamente editables después de generados
+- Usuario puede agregar más ideas con botón "Añadir Nueva Idea"
+- **Guardar automáticamente en biblioteca** con metadatos completos
+
+#### 3.2.6 Creación Manual Guiada (Opción 2)  
+**Trigger:** Usuario hace clic "Crear el sermón tú mismo con los recursos proporcionados"
+**Contexto:** Mismo tema + mismas categorías, pero usuario construye manualmente
+
+**Comportamiento:**
+- NO hacer request a Gemini para contenido completo
+- Mostrar formulario en Modo Edición con placeholders guía tenues
+- Usuario puede borrar placeholders y usar contenido de las categorías expandibles
+- **Placeholders por campo:**
+  - Título: "Escriba aquí un título atractivo para su sermón"
+  - Presentación: "Ponga aquí cómo va a presentar el tema a la audiencia"
+  - Motivación: "Ponga aquí texto que genere expectativa e interés en los oyentes"
+  - Disparador Mental: "Ponga aquí un disparador mental - frase que le recuerde todo el contenido"
+  - Contenido: "Ponga aquí un párrafo largo desarrollando completamente esta idea"
+  - Elemento Apoyo: "Ponga aquí un texto bíblico / testimonio / ejemplo según corresponda"
+  - Imperativos: "Ponga aquí acciones concretas que deben tomar"
+
+**Flujo de Trabajo Manual:**
+1. Usuario ve placeholders guía
+2. Expande categorías de recursos del panel derecho
+3. Copia/adapta contenido de categorías a los campos
+4. Construye sermón a su ritmo y estilo personal
+
+### 3.3 Gestión de Estados de IA
+
+#### 3.3.1 Estados Visuales
+- **Idle:** Interfaz normal
+- **Searching:** Mostrar "Buscando..." con spinner
+- **Success:** Mostrar resultados
+- **Error:** Mostrar mensaje de error amigable
+
+#### 3.3.2 Cache y Performance
+- Cachear búsquedas recientes (localStorage)
+- Timeout de 30 segundos para requests
+- Retry automático (máximo 2 intentos)
+
+---
+
+## 4. SISTEMA DE EXPORTACIÓN
+
+### 4.1 Ubicación del Menú de Exportación
+- Dropdown menu en la esquina superior derecha del panel izquierdo
+- Icono: 📤 "Exportar"
+- Disponible solo en "Modo Edición"
+
+### 4.2 Funcionalidad "Mi Biblioteca"
+**Trigger:** Click en "Mi Biblioteca" desde el header
+**Comportamiento:** Abrir modal/drawer sobre la aplicación principal
+
+**Contenido de la Biblioteca:**
+- **Historial completo** de sermones creados anteriormente
+- **Vista de tarjetas** con:
+  - Título del sermón
+  - Fecha de creación
+  - Tema litúrgico (si aplica)
+  - Tags automáticos (Adviento, Cuaresma, Eucaristía, etc.)
+  - Última fecha de modificación
+- **Filtros disponibles:**
+  - Por fecha (más reciente, más antiguo)
+  - Por temporada litúrgica
+  - Por tema principal
+  - Por frecuencia de uso
+- **Acciones por sermón:**
+  - "Abrir": Cargar sermón en el editor actual
+  - "Duplicar": Crear copia para editar
+  - "Eliminar": Borrar de la biblioteca
+  - "Exportar": Acceso directo a opciones de exportación
+
+**Gestión de Tags:**
+- **Tags automáticos:** Sistema genera tags basados en contenido (santos, sacramentos, virtudes)
+- **Tags de temporada:** Automáticos según fecha litúrgica del momento de creación
+- **Búsqueda inteligente:** Campo de búsqueda dentro de la biblioteca
+
+### 4.3 Opciones de Exportación
+
+#### 4.2.1 Exportar como HTML
+**Funcionalidad:**
+- Generar archivo .html completo
+- Incluir CSS embebido para formato profesional
+- Preservar estructura de headings y párrafos
+- Optimizado para impresión web
+
+**Formato de salida:**
+- Header con título del sermón
+- Estilos profesionales embebidos
+- Estructura semántica correcta
+- Footer con fecha de creación
+
+#### 4.2.2 Exportar como Word (.docx)
+**Funcionalidad:**
+- Generar archivo .docx compatible con Microsoft Word
+- Formato profesional con estilos definidos
+- Estructura de headings mantenida
+- Editable después de exportar
+
+**Estructura del documento:**
+- Página de título
+- Estructura del sermón con formato
+- Márgenes y tipografía profesional
+
+#### 4.2.3 Exportar como PDF
+**Funcionalidad:**
+- Generar PDF de alta calidad
+- No editable, formato final
+- Optimizado para impresión física
+- Watermark opcional: "Creado con El Predicador Católico"
+
+#### 4.2.4 Exportar como Texto Estructurado
+**Funcionalidad:**
+- Archivo .txt simple
+- Mantener estructura con indentación
+- Compatible con cualquier editor de texto
+- Formato de backup ligero
+
+### 4.3 Implementación Técnica de Exportación
+**Librerías requeridas:**
+- `html2pdf.js` para PDF
+- `docx` para Word
+- `file-saver` para descargas
+- Generación nativa para HTML/TXT
+
+---
+
+## 5. PERSISTENCIA Y ALMACENAMIENTO
+
+### 5.1 Almacenamiento Local Expandido
+- **localStorage** para:
+  - Borrador actual del sermón
+  - **Biblioteca completa de sermones** (historial con metadatos)
+  - Cache de búsquedas recientes
+  - Preferencias de usuario (tamaños de paneles, configuración de presentación)
+  - Historial de temas buscados
+  - Configuración de layout (proporción de paneles)
+  - **Cache del calendario litúrgico** (datos de fechas especiales)
+  - **Sistema de tags** automáticos y manuales
+
+### 5.2 Estructura de Datos del Sermón Expandida
+```typescript
+interface Sermon {
+  id: string;
+  titulo: string;
+  fechaCreacion: string;
+  fechaModificacion: string;
+  contextoLiturgico?: {
+    fecha: string;
+    temporada: 'Adviento' | 'Navidad' | 'Cuaresma' | 'Pascua' | 'Tiempo Ordinario';
+    ciclo: 'A' | 'B' | 'C';
+    nombreLiturgico: string;
+    lecturas?: {
+      primera: string;
+      salmo: string;
+      segunda?: string;
+      evangelio: string;
+    };
+  };
+  tags: string[]; // Tags automáticos y manuales
+  vecesUsado: number; // Contador de veces que se abrió
+  introduccion: {
+    presentacion: string;
+    motivacion: string;
+  };
+  ideas: Array<{
+    id: string;
+    h1: string; // Idea central
+    elementoApoyo: {
+      tipo: 'cita_biblica' | 'catecismo' | 'documento_pontificio' | 'ensenanza_iglesia' | 'testimonio_doctrinal';
+      contenido: string; // Texto completo
+    };
+    disparadores: Array<{
+      id: string;
+      disparador: string; // 1-2 líneas
+      parrafo: string; // Párrafo completo
+      orden: number;
+    }>;
+    orden: number;
+  }>;
+  imperativos: string;
+}
+
+interface BibliotecaSermon {
+  id: string;
+  titulo: string;
+  fechaCreacion: string;
+  fechaUltimaModificacion: string;
+  contextoLiturgico?: string; // Nombre legible
+  tags: string[];
+  vecesUsado: number;
+  estadisticas: {
+    tiempoTotalEdicion: number; // minutos
+    ultimaVezAbierto: string;
+  };
+}
+```
+
+### 5.3 Estructura de Datos de Preferencias
+```typescript
+interface UserPreferences {
+  layout: {
+    leftPanelWidth: number; // porcentaje 10-90
+    rightPanelWidth: number; // porcentaje 10-90
+  };
+  presentation: {
+    fontSize: number; // 1.0-2.0em
+    contentWidth: number; // 60-90%
+  };
+  search: {
+    recentSearches: string[];
+    cachedSuggestions: string[];
+  };
+}
+```
+
+### 5.4 Auto-guardado Inteligente
+- **Guardar en biblioteca automáticamente** cada vez que se completa un sermón
+- Guardar cambios automáticamente cada 30 segundos en borrador actual
+- Guardar inmediatamente al cambiar de sección
+- **Detección de contexto litúrgico:** Automáticamente detectar y asociar fecha litúrgica
+- **Generación automática de tags** basada en contenido del sermón
+- Indicador visual de estado de guardado
+- **Backup de seguridad:** Mantener últimas 5 versiones de cada sermón
+
+---
+
+## 6. RESPONSIVE DESIGN Y ACCESIBILIDAD
+
+### 6.1 Breakpoints
+- **Desktop:** 1024px+ (layout dos paneles redimensionables)
+- **Tablet:** 768px-1023px (paneles apilables, redimensión deshabilitada)
+- **Mobile:** <768px (navegación por tabs, redimensión deshabilitada)
+
+### 6.2 Mobile Adaptations
+- Convertir panel derecho en modal/drawer
+- Tabs superiores para alternar vista
+- Botones de acción más grandes
+- Typography adaptada
+
+### 6.3 Accesibilidad
+- Contraste WCAG AA compliant
+- Navegación por teclado completa
+- Screen reader friendly
+- Focus indicators visibles
+- Semantic HTML structure
+
+---
+
+## 7. PERFORMANCE Y OPTIMIZACIÓN
+
+### 7.1 Lazy Loading
+- Cargar componentes bajo demanda
+- Chunking de código por rutas
+- Images lazy loading
+
+### 7.2 Bundle Optimization
+- Tree shaking habilitado
+- Code splitting por rutas
+- Compression gzip/brotli
+- Service worker para caching
+
+---
+
+## 8. TESTING Y CALIDAD
+
+### 8.1 Tipos de Testing
+- Unit tests para funciones puras
+- Integration tests para flujos completos
+- E2E tests para casos de uso críticos
+- Visual regression tests
+
+### 8.2 Quality Gates
+- ESLint + Prettier configurados
+- TypeScript strict mode
+- Pre-commit hooks con Husky
+- CI/CD pipeline con tests automáticos
+
+---
+
+## 9. DEPLOYMENT Y HOSTING
+
+### 9.1 Configuración Firebase
+- Firebase Hosting para static files
+- Firebase Functions para API calls (opcional)
+- Environment variables para API keys
+- Custom domain configuration
+
+### 9.2 CI/CD Pipeline
+- GitHub Actions para build automático
+- Deploy automático a staging en PR
+- Deploy a producción en merge a main
+- Rollback capabilities
+
+---
+
+## 10. MONITOREO Y ANALYTICS
+
+### 10.1 Error Tracking
+- Sentry para error monitoring
+- Logging de errores de IA integration
+- Performance monitoring
+
+### 10.2 Usage Analytics
+- Google Analytics para usage patterns
+- Track búsquedas más comunes
+- Monitor export functionality usage
+- User journey analysis
+
+---
+
+Esta especificación está diseñada para ser implementada por Visual Studio con Copilot, proporcionando todos los detalles técnicos necesarios sin código específico, pero con suficiente detalle para guiar la implementación completa.

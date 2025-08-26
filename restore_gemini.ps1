@@ -1,0 +1,1 @@
+# Restaura el archivo geminiService.js desde backup\n$backup = "${PWD}\backup\geminiService.js"\n$target = "${PWD}\src\services\ai\geminiService.js"\nif (-not (Test-Path $backup)) { Write-Error "Backup no encontrado: $backup"; exit 1 }\nCopy-Item -Path $backup -Destination $target -Force\nWrite-Output "Restaurado $backup -> $target"\n

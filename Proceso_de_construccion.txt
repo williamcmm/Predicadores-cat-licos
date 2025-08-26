@@ -1,0 +1,78 @@
+Resumen del proceso de construcción - Predicador
+Fecha: 25-08-2025
+
+Objetivo rápido
+- Organizar y estabilizar el buscador de recursos (interfaz y servicio de IA). Mantener la UI igual visualmente y mostrar 5 recursos en la vista colapsada por categoría.
+
+Estado actual (alto nivel)
+- UI: `src/components/resources/ResourcePanel.jsx` actualizado para:
+  - Mostrar hasta 5 previews en la vista colapsada (constante PREVIEW_COUNT = 5).
+  - Añadir fallbacks para título/fuente/excerpt cuando la IA devuelve campos faltantes.
+  - Evitar que las categorías se abran automáticamente: ahora sólo se expanden cuando el usuario hace clic.
+  - Añadí tooltip con parte del JSON de cada preview para inspección rápida.
+
+- Servicio IA: `src/services/ai/geminiService.js` limpiado y corregido para:
+  - Usar un único módulo limpio (se eliminaron duplicados y fragmentos corruptos).
+  - `searchResourcesProgressive` ahora envía el prompt correcto por categoría (se cambió la llamada para usar `basePrompt`).
+  - `extractAndParseJson` implementado con heurísticas tolerantes para extraer JSON de respuestas del modelo.
+
+Cambios principales aplicados (lista corta y exacta)
+1) `src/components/resources/ResourcePanel.jsx`
+   - PREVIEW_COUNT = 5
+   - FallBacks en las tarjetas previas: título||description||excerpt||primer párrafo o 'Recurso sin título'.
+   - Tooltip con parte del objeto JSON para cada preview (atributo title).
+   - Control de expansión: introduje `userToggledCategories` y `handleToggleCategory(cat)`.
+     - Eliminé la lógica que permitía abrir categorías desde actualizaciones automáticas.
+   - Cuando se inicia una búsqueda o se selecciona una sugerencia se reinicia `userToggledCategories` (quedan todas colapsadas).
+
+2) `src/services/ai/geminiService.js`
+   - Reescrito/limpiado el módulo. Funciones clave: `extractAndParseJson`, `searchResources`, `searchResourcesProgressive`, `generateGeneralSuggestions`, `generateSermon`.
+   - Bug crítico arreglado: la llamada a la API en `searchResourcesProgressive` usaba la variable equivocada `prompt` en vez de `basePrompt` — ya está corregido.
+
+Errores ya solucionados (dos/ejemplos)
+- Error A: `geminiService` enviaba la variable equivocada al modelo (usaba `prompt` indefinida en el loop por categorías). Solución: sustituí por `basePrompt` y validé la lectura del texto de respuesta.
+- Error B: vista previa en UI mostraba sólo 2 items (o nada) y tenía comportamientos no robustos cuando la IA devolvía objetos incompletos. Solución: añadir `PREVIEW_COUNT = 5`, fallbacks en las tarjetas y tooltip para investigar el JSON crudo.
+
+Problema actual en pantalla (lo que vemos ahora)
+- Observación: las categorías aparecen desplegadas (ej.: en la captura la categoría se muestra expandida con varias tarjetas). El requisito es que las categorías lleguen siempre colapsadas y muestren sólo el número de resultados; sólo deben abrirse cuando el usuario haga clic.
+
+Qué hemos intentado para resolverlo
+1) Forzar reinicio de estado de expansión al iniciar una búsqueda y al seleccionar sugerencias: anteriormente se llamaba `setExpandedCategories({})` y/o `setUserToggledCategories({})`.
+2) Introduje `userToggledCategories` como único control que permite expansión — la UI sólo expande si `userToggledCategories[cat] === true`.
+3) Eliminé todo uso automático de `expandedCategories` para evitar que las actualizaciones parciales abrieran secciones.
+
+Hipótesis sobre por qué aún se ve desplegado
+- Causa posible 1: la categoría fue abierta manualmente por el usuario antes de la captura y el estado persiste en la sesión; al recargar debería quedar cerrada. (Comprueba recargar / reiniciar navegador). 
+- Causa posible 2: el componente recibe `searchResults` con objetos que contienen una clave que el render interpreta como indicador de expansión (no tenemos código que use esa clave, pero es buena idea inspeccionar el JSON que llega). El tooltip que añadí muestra parte del JSON en la vista previa para comprobarlo.
+- Causa posible 3: estado guardado en otro lugar (evento global o interacción previa) — revisar si la aplicación envía un evento que abra categorías (`window.dispatchEvent` o listeners externos).
+
+Pasos concretos para reproducir y verificar (rápido)
+1) Reiniciar dev server y hacer hard-reload (Ctrl+F5). Abrir http://localhost:3000 (o puerto que indique el terminal).
+2) Hacer una búsqueda (ejemplo: "María, Madre de la Iglesia" o "Navegando las Dudas y las Crisis de Fe").
+3) Observar: todas las categorías deberían mostrarse colapsadas con un número a la derecha. Pasar el ratón por encima de una tarjeta previa para ver el tooltip JSON parcial.
+4) Si alguna categoría aparece abierta sin que la hayas tocado: abrir DevTools → Consola y pegar aquí los mensajes; también inspeccionar el tooltip JSON para la categoría problemático y copiar el contenido.
+
+Comandos útiles para diagnóstico (PowerShell)
+- Reiniciar servidor:
+  npm install
+  npm start
+- Comprobar puerto desde PowerShell:
+  Invoke-WebRequest http://localhost:3000 -UseBasicParsing
+- Si hace falta matar proceso node (en caso de puertos ocupados):
+  Get-Process -Name node | Select-Object Id,StartTime,CPU
+  taskkill /PID <PID> /F
+
+Siguientes pasos recomendados (prioridad)
+1) Tú: prueba recargar la página y verifica si las categorías permanecen colapsadas. Si no, pásame la captura de la consola o el JSON parcial del tooltip de una tarjeta que esté dentro de la categoría que se abre.
+2) Yo: si me das permiso puedo ejecutar una búsqueda de prueba desde aquí y pegar la respuesta cruda del servicio para analizarla (no haré cambios sin tu confirmación).
+3) Si el problema viene del shape de la respuesta de Gemini, ajustaremos `getFoundForCategory` o normalizaremos la estructura en `searchResourcesProgressive` para evitar que el mapeo coincida mal con las constantes de categoría.
+
+Notas finales y rastros
+- Archivos editados recientemente:
+  - src/components/resources/ResourcePanel.jsx
+  - src/services/ai/geminiService.js
+- Si cierras y vuelves a abrir el editor: abre este archivo `Proceso_de_construccion.txt` para ver el estado y seguir con las instrucciones en "Pasos concretos".
+
+Si quieres que lo documente con más detalle (por ejemplo, incluir fragmentos de código o copias de los prompts que usamos al llamar a Gemini), dime y lo añado aquí.
+
+Fin del registro corto.

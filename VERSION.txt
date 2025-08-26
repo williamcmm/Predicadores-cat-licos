@@ -1,3 +1,0 @@
-Versión publicada: 1.2
-Fecha: 20 de agosto de 2025
-Descripción: Flujo optimizado de búsqueda y selección de títulos, sin autores ni nombres de personas, solo categorías católicas. Input único, dos pasos: sugerencia de títulos y búsqueda de contenido por categorías.

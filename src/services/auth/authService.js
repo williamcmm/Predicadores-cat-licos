@@ -1,45 +1,37 @@
-/**
- * @fileoverview Servicio de autenticación con Firebase
- * @author AI Generated - 19/08/2025
- * @version 1.0.0
- *
- * @description
- * Proporciona funciones para registro, login y logout de usuarios usando Firebase Auth.
- *
- * @dependencies
- * - firebase/auth
- * - src/config/firebase.js
- *
- * @usage
- * import { register, login, logout } from './authService';
- */
-import { auth } from '../../config/firebase';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
-import { handleError } from '../../utils/errorHandler';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
+import app from '../../config/firebase';
 
-export const register = async (email, password) => {
+const auth = getAuth(app);
+const googleProvider = new GoogleAuthProvider();
+
+export const signInWithGoogle = async () => {
   try {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    return userCredential.user;
+    const result = await signInWithPopup(auth, googleProvider);
+    // The signed-in user info.
+    const user = result.user;
+    console.log('User signed in:', user);
+    return user;
   } catch (error) {
-    throw handleError(error, 'authService.register');
+    // Handle Errors here.
+    const errorCode = error.code;
+    const errorMessage = error.message;
+    // The email of the user's account used.
+    const email = error.customData?.email;
+    // The AuthCredential type that was used.
+    const credential = GoogleAuthProvider.credentialFromError(error);
+    console.error('Error during Google Sign-In:', errorCode, errorMessage, email, credential);
+    throw error;
   }
 };
 
-export const login = async (email, password) => {
-  try {
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    return userCredential.user;
-  } catch (error) {
-    throw handleError(error, 'authService.login');
-  }
-};
-
-export const logout = async () => {
+export const signOutUser = async () => {
   try {
     await signOut(auth);
-    return true;
+    console.log('User signed out.');
   } catch (error) {
-    throw handleError(error, 'authService.logout');
+    console.error('Error during sign out:', error);
+    throw error;
   }
 };
+
+export default auth;

@@ -1,0 +1,52 @@
+# Resumen del Problema de CSS en el Proyecto "El Predicador Católico"
+
+## 1. Descripción del Problema Inicial
+
+La aplicación, desarrollada con React y Tailwind CSS, no aplica correctamente los estilos de Tailwind a los componentes JSX. El síntoma visual es un layout roto: en lugar de mostrar dos paneles verticales uno al lado del otro, el contenido del panel derecho aparece debajo del izquierdo, sin ningún estilo (márgenes, colores, fondos, etc.). El problema visual se corresponde con la captura `imagenes/12.png`.
+
+El stack tecnológico relevante es:
+- **Framework:** React (creado con Create React App)
+- **Build:** CRACO (`@craco/craco`) para modificar la configuración de CRA.
+- **Estilos:** Tailwind CSS.
+
+---
+
+## 2. Pasos de Diagnóstico y Corrección Realizados
+
+Se ha seguido un proceso de depuración sistemático para aislar la causa:
+
+### Paso 2.1: Conflicto de Configuración de PostCSS
+- **Observación:** Existían dos archivos configurando PostCSS: `craco.config.js` y `postcss.config.js`. Esto puede crear conflictos.
+- **Acción:** Se eliminó el archivo `postcss.config.js` para centralizar la configuración únicamente en `craco.config.js`.
+- **Resultado:** El problema persistió sin cambios.
+
+### Paso 2.2: Conflicto con CSS Boilerplate de React
+- **Observación:** El archivo `src/App.css`, que contiene los estilos por defecto de Create React App, todavía existía y se importaba en `App.js`.
+- **Acción:** Se eliminó el archivo `src/App.css` y se quitó su importación de `App.js` para evitar cualquier posible conflicto o sobreescritura de estilos.
+- **Resultado:** El problema persistió sin cambios.
+
+### Paso 2.3: Verificación del Proceso de Compilación de CSS
+- **Prueba:** Para confirmar si el sistema de compilación de CSS funcionaba, se añadió una regla CSS (`background-color: fuchsia;`) directamente al `body` en el archivo `src/index.css`.
+- **Resultado:** **La página SÍ se mostró con el fondo fucsia.**
+- **Conclusión:** Este paso fue crucial. Demostró que el proceso de compilación (CRACO > PostCSS) funciona correctamente y que el navegador está cargando el archivo CSS procesado. El problema es más específico: el compilador JIT (Just-In-Time) de Tailwind no está detectando o generando las clases de utilidad usadas en los archivos JSX.
+
+### Paso 2.4: Conflicto de Versiones de Tailwind CSS
+- **Observación:** Al revisar `package.json`, se descubrió que el proyecto usaba `tailwindcss` versión 4.x. Esta es una versión muy nueva, aún en desarrollo, que tiene requisitos de configuración diferentes a la versión 3 (estable). La configuración del proyecto estaba diseñada para la v3.
+- **Acción:** Se consideró este el problema raíz. Se desinstaló la v4 y se instaló la última versión estable de la v3 (`tailwindcss@^3.0.0`), junto con `postcss` y `autoprefixer` como dependencias de desarrollo.
+- **Resultado:** Después de reinstalar las dependencias y reiniciar el servidor, el usuario informa que el problema visual persiste exactamente igual.
+
+---
+
+## 3. Estado Actual del Problema
+
+A pesar de haber corregido todos los conflictos de configuración y versiones identificados, el problema sigue sin resolverse.
+
+- **El síntoma no ha cambiado:** Las clases de utilidad de Tailwind (`flex`, `bg-white`, `p-6`, etc.) en los componentes JSX no se ven reflejadas en la página.
+- **Sabemos que:**
+    - El build de CSS se ejecuta.
+    - El CSS base de Tailwind (`@tailwind base`) se aplica correctamente (demostrado por la prueba del fondo fucsia).
+    - La configuración de `tailwind.config.js` apunta a los archivos correctos (`content: ["./src/**/*.{js,jsx,ts,tsx}"]`).
+    - No hay archivos de configuración o de estilos conflictivos.
+    - La versión de Tailwind es la 3.x (estable y compatible con la configuración).
+
+El problema reside en un punto muy específico y difícil de diagnosticar: **el escaneo del contenido de los archivos JSX por parte del compilador JIT de Tailwind no está funcionando como se esperaba.**
