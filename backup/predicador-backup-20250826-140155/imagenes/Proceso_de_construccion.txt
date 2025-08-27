@@ -1,0 +1,106 @@
+# Diario de Construcción: El Predicador Católico
+
+## Objetivo del Proyecto
+Reconstruir desde cero la aplicación web "El Predicador Católico". La fuente de verdad para toda la funcionalidad, diseño y arquitectura es el documento `c:\predicador\imagenes\descripciones_funcionales.txt`. No se debe recuperar nada de versiones anteriores.
+
+## Plan de Desarrollo Acordado
+
+El desarrollo se ha dividido en 5 fases secuenciales:
+
+**Fase 1: Cimientos y Estructura Principal**
+- **Objetivo:** Crear el esqueleto de la aplicación.
+- **Tareas:**
+  - Inicializar un nuevo proyecto React.
+  - Instalar dependencias (`firebase`, `tailwindcss`).
+  - Construir el layout principal de dos paneles redimensionables y el encabezado.
+  - Implementar las pestañas para los tres modos de trabajo (Edición, Estudio, Predicación).
+
+**Fase 2: Autenticación de Usuarios y Base de Datos**
+- **Objetivo:** Implementar el sistema de usuarios y la conexión a la base de datos.
+- **Tareas:**
+  - Configurar un nuevo proyecto de Firebase.
+  - Implementar el inicio de sesión único con Google.
+  - Proteger las rutas de la aplicación.
+  - Configurar el servicio de Firestore.
+
+**Fase 3: El Corazón de la App: "Modo Edición"**
+- **Objetivo:** Desarrollar la funcionalidad principal de creación de sermones.
+- **Tareas:**
+  - Construir el formulario completo del sermón.
+  - Implementar la lógica para añadir/eliminar/reordenar ideas.
+  - Conectar el formulario a Firestore para el guardado automático.
+
+**Fase 4: Potencia de la IA: "Buscador de Recursos" y Modos de Lectura**
+- **Objetivo:** Integrar la IA para búsqueda y las vistas de lectura.
+- **Tareas:**
+  - Construir el panel de búsqueda.
+  - Integrar la API de Gemini para la búsqueda de recursos por tema.
+  - Desarrollar las vistas "Modo Estudio" y "Modo Predicación".
+
+**Fase 5: Funciones Avanzadas y Finalización**
+- **Objetivo:** Añadir las características avanzadas y pulir la aplicación.
+- **Tareas:**
+  - Implementar la generación de sermones con IA.
+  - Añadir las sugerencias de búsqueda inteligente (litúrgicas/generales).
+  - Crear la funcionalidad "Mi Biblioteca" y las opciones de exportación.
+
+## Estado Actual
+
+- **Fecha:** 2025-08-24
+- **Estado:** **Fase 3 Completada.** Plan de desarrollo definido y aprobado por el usuario.
+- **Próximo Paso:** Iniciar la **Fase 4: Potencia de la IA: "Buscador de Recursos" y Modos de Lectura**.
+
+## Historial de Desarrollo
+
+### 2025-08-24
+**Instalación y configuración de Tailwind CSS**
+- Se instaló `tailwindcss` como dependencia de desarrollo.
+- Se creó y configuró el archivo `tailwind.config.js` para que analice los archivos del proyecto en `src`.
+- Se añadieron las directivas `@tailwind` al archivo `src/index.css` para habilitar las utilidades de Tailwind en toda la aplicación.
+
+**Implementación del Header y Layout Básico**
+- Se creó el componente `Header.jsx` con el título y estilos definidos.
+- Se limpió `App.js` y se implementó un layout básico de dos paneles (`Preparador de Sermones` y `Buscador de Recursos`) utilizando flexbox y clases de Tailwind CSS.
+
+**Implementación de Paneles Redimensionables**
+- Se creó el componente `PanelResizer.jsx` para manejar la funcionalidad de arrastrar y soltar para redimensionar paneles.
+- Se integró `PanelResizer` en `App.js`, permitiendo a los usuarios ajustar el ancho de los paneles izquierdo y derecho, y persistiendo la preferencia en `localStorage`.
+
+**Implementación de Pestañas de Modo de Trabajo**
+- Se creó el componente `Sidebar.jsx` para mostrar las pestañas de los modos de trabajo (Edición, Estudio, Predicación).
+- Se integró `Sidebar` en `App.js`, gestionando el estado del modo actual y mostrando contenido condicionalmente en el panel izquierdo según el modo seleccionado.
+
+### 2025-08-24
+**Inicio de la Fase 2: Autenticación de Usuarios y Base de Datos**
+- Se verificó la existencia del archivo `src/config/firebase.js`.
+- **ACCIÓN REQUERIDA:** El usuario debe actualizar el archivo `src/config/firebase.js` con las credenciales reales de su proyecto de Firebase antes de continuar.
+
+**Implementación de Inicio de Sesión con Google**
+- Se creó `src/services/auth/authService.js` para encapsular la lógica de autenticación con Firebase (Google Sign-In y Sign-Out).
+- Se creó el componente `src/components/auth/LoginButton.jsx` para manejar la interfaz de usuario de inicio/cierre de sesión.
+- Se integró `LoginButton` en `src/components/ui/Header.jsx` para que sea accesible desde la interfaz principal.
+
+**Implementación de Contexto de Autenticación**
+- Se creó `src/context/AuthContext.js` para proporcionar el estado de autenticación del usuario a toda la aplicación.
+- Se envolvió el componente `App` con `AuthProvider` en `src/index.js` para que el contexto de autenticación esté disponible globalmente.
+
+**Configuración del Servicio de Firestore**
+- Se verificó la existencia y configuración del archivo `src/services/database/firestoreService.js`, que ya contiene las funciones básicas para interactuar con Firestore.
+
+### 2025-08-24
+**Inicio de la Fase 3: El Corazón de la App: "Modo Edición"**
+- Se creó el componente `src/components/sermon/SermonEditor.jsx` con los campos básicos del formulario de sermones (Título, Introducción, Imperativos).
+- Se integró `SermonEditor` en `App.js` para que se renderice cuando el modo de trabajo sea 'edicion'.
+
+**Implementación de Gestión de Ideas en el Editor de Sermones**
+- Se creó el componente `src/components/sermon/SermonIdea.jsx` para representar una sola idea de sermón, incluyendo H1, Elemento de Apoyo y Disparadores Mentales.
+- Se integró `SermonIdea` en `SermonEditor.jsx`, permitiendo la adición, actualización y eliminación dinámica de ideas en el formulario del sermón.
+
+**Conexión del Formulario a Firestore para Guardado Automático**
+- Se creó el componente `src/components/sermon/SermonSaveButton.jsx` para mostrar el estado de guardado y permitir el guardado manual.
+- Se implementó un mecanismo de autoguardado en `SermonEditor.jsx` que guarda el sermón en Firestore (utilizando `guardarSermon` de `firestoreService.js`) cada vez que el estado del sermón cambia, con un retardo para evitar guardados excesivos. También se guarda en `localStorage`.
+
+### 2025-08-24
+**Inicio de la Fase 4: Potencia de la IA: "Buscador de Recursos" y Modos de Lectura**
+- Se creó el componente `src/components/resources/ResourcePanel.jsx` con la interfaz de usuario básica para la búsqueda de recursos (barra de búsqueda, botón y marcador de posición para resultados).
+- Se integró `ResourcePanel` en `App.js` para que se renderice en el panel derecho de la aplicación.

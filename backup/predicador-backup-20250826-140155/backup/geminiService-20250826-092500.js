@@ -36,15 +36,15 @@ const extractAndParseJson = (text) => {
   const firstBrace = text.indexOf('{');
   const lastBrace = text.lastIndexOf('}');
   if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
-    const candidate = text.substring(firstBrace, lastBrace + 1).replace(/,\s*(?=[\]\}\]])/g, '');
+    const candidate = text.substring(firstBrace, lastBrace + 1).replace(/,\s*(?=[}\]])/g, '');
     try { return JSON.parse(candidate); } catch (e) { /* continue */ }
   }
 
-  // try to extract first [...]
+  // try to extract first [...] 
   const firstArr = text.indexOf('[');
   const lastArr = text.lastIndexOf(']');
   if (firstArr !== -1 && lastArr !== -1 && lastArr > firstArr) {
-    const candidate = text.substring(firstArr, lastArr + 1).replace(/,\s*(?=[\]\}\]])/g, '');
+    const candidate = text.substring(firstArr, lastArr + 1).replace(/,\s*(?=[}\]])/g, '');
     try { return JSON.parse(candidate); } catch (e) { /* continue */ }
   }
 
@@ -55,7 +55,7 @@ const extractAndParseJson = (text) => {
     const after = text.substring(mk.index + mk[0].length);
     const arr = findBalanced(after, 0, '[', ']');
     if (arr) {
-      const candidate = ('{"categories":' + arr + '}').replace(/,\s*(?=[\]\}\]])/g, '');
+      const candidate = ('{"categories":' + arr + '}').replace(/,\s*(?=[}\]])/g, '');
       try { return JSON.parse(candidate); } catch (e) { /* continue */ }
     }
   }
@@ -133,7 +133,7 @@ export async function generateGeneralSuggestions() {
       if (cleaned) items.push(cleaned);
     }
     if (items.length < 6) {
-      const parts = text.split(/[;,\n\u2022\-]/).map(p => p.trim()).filter(p => p.length > 6 && p.length < 120);
+      const parts = text.split(/[;,\n•-]+/).map(p => p.trim()).filter(p => p.length > 6 && p.length < 120);
       for (const p of parts) { if (!items.includes(p)) items.push(p); if (items.length >= 10) break; }
     }
     return Array.from(new Set(items)).slice(0, 10);
@@ -204,20 +204,5 @@ export async function generateSermon(topic = '', searchResults = {}, liturgyCont
       throw new Error(`La IA devolvió un formato inválido en la estructura principal. Contenido: ${err.raw.substring(0, 200)}...`);
     }
     throw err;
-  }
-}
-
-export async function generateAlternative(sermon, field) {
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
-  // Robustly access nested field
-  const fieldValue = field.split('.').reduce((o, i) => (o ? o[i] : undefined), sermon);
-  const prompt = `Para el sermón con título "${sermon.title}", genera una alternativa para el campo "${field}". El contenido actual es: "${fieldValue}". La respuesta debe ser solo el texto alternativo, sin adornos.`;
-  try {
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    return await response.text();
-  } catch (e) {
-    console.error('generateAlternative error', e);
-    return `Error al generar alternativa: ${e.message}`;
   }
 }

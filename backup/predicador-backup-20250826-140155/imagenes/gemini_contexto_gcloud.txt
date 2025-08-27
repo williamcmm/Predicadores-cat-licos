@@ -1,0 +1,23 @@
+## Contexto de Gemini para la configuración de Google Cloud
+
+**Objetivo Principal:**
+Guardar el proyecto local `predicador` en un nuevo repositorio de Google Cloud Source Repositories.
+
+**Información Recopilada:**
+- **ID del Proyecto de Google Cloud:** `el-predicador-catolico2`
+
+**Último Paso Realizado:**
+- El usuario ha instalado el SDK de Google Cloud (`gcloud`).
+
+**Problema Actual:**
+- Al ejecutar un comando `gcloud`, la terminal devuelve el error: `"gcloud" no se reconoce como un comando interno o externo`.
+- Esto indica que la ruta del ejecutable de `gcloud` no está en el PATH del sistema.
+
+**Próxima Acción Requerida por el Usuario:**
+1.  **Reiniciar el computador.** Esta es la solución más común para que el sistema operativo actualice las variables de entorno (incluyendo el PATH) después de una instalación.
+
+**Mi Próximo Paso (Después del reinicio):**
+1.  Una vez que el usuario confirme que ha reiniciado, debo volver a ejecutar el comando de verificación:
+    `gcloud config list project`
+2.  **Si el comando funciona:** Analizar el resultado para asegurarse de que el proyecto activo es `el-predicador-catolico2`.
+3.  **Si el comando sigue fallando:** Guiar al usuario para que añada manualmente la ruta del SDK de `gcloud` a las variables de entorno de Windows.

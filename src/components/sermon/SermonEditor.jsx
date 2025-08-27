@@ -2,12 +2,14 @@ import React, { useState, useEffect, useCallback } from 'react';
 import SermonIdea from './SermonIdea';
 import SermonSaveButton from './SermonSaveButton';
 import { guardarSermon } from '../../services/database/firestoreService';
+import { generateAlternative } from '../../services/ai/geminiService';
 import { useAuth } from '../../context/AuthContext';
 
 const SermonEditor = ({ sermon, setSermon }) => {
   const { currentUser } = useAuth();
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState(null);
+  const [isSuggesting, setIsSuggesting] = useState({ presentation: false, motivation: false });
 
   // Auto-save effect
   useEffect(() => {
@@ -58,6 +60,24 @@ const SermonEditor = ({ sermon, setSermon }) => {
       setSermon({ ...sermon, introduction: { ...sermon.introduction, motivation: value } });
     } else if (id === 'imperatives') {
       setSermon({ ...sermon, imperatives: value });
+    }
+  };
+
+  const handleSuggestAnother = async (field) => {
+    setIsSuggesting(prev => ({ ...prev, [field]: true }));
+    try {
+      const alternative = await generateAlternative(sermon, field);
+      if (alternative) {
+        setSermon(prevSermon => ({
+          ...prevSermon,
+          introduction: { ...prevSermon.introduction, [field]: alternative }
+        }));
+      }
+    } catch (error) {
+      console.error(`Error suggesting another for ${field}:`, error);
+      alert(`Hubo un error al sugerir otra opción para ${field}.`);
+    } finally {
+      setIsSuggesting(prev => ({ ...prev, [field]: false }));
     }
   };
 
@@ -123,9 +143,14 @@ const SermonEditor = ({ sermon, setSermon }) => {
         <div className="ml-4 border-l-2 border-gray-200 pl-4">
           {/* B.1 Presentación del Tema */}
           <div className="mb-4">
-            <label htmlFor="presentation" className="block text-gray-600 text-sm font-medium mb-2">
-              Presentación del Tema
-            </label>
+            <div className="flex justify-between items-center mb-2">
+              <label htmlFor="presentation" className="block text-gray-600 text-sm font-medium">
+                Presentación del Tema
+              </label>
+              <button onClick={() => handleSuggestAnother('presentation')} disabled={isSuggesting.presentation} className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 disabled:opacity-50">
+                {isSuggesting.presentation ? '...' : 'Sugerir Otro'}
+              </button>
+            </div>
             <textarea
               id="presentation"
               rows="3"
@@ -138,9 +163,14 @@ const SermonEditor = ({ sermon, setSermon }) => {
 
           {/* B.2 Motivación Inicial */}
           <div className="mb-4">
-            <label htmlFor="motivation" className="block text-gray-600 text-sm font-medium mb-2">
-              Motivación Inicial
-            </label>
+            <div className="flex justify-between items-center mb-2">
+              <label htmlFor="motivation" className="block text-gray-600 text-sm font-medium">
+                Motivación Inicial
+              </label>
+              <button onClick={() => handleSuggestAnother('motivation')} disabled={isSuggesting.motivation} className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 disabled:opacity-50">
+                {isSuggesting.motivation ? '...' : 'Sugerir Otro'}
+              </button>
+            </div>
             <textarea
               id="motivation"
               rows="3"
@@ -164,6 +194,8 @@ const SermonEditor = ({ sermon, setSermon }) => {
             idea={idea}
             onUpdate={updateIdea}
             onDelete={deleteIdea}
+            generateAlternative={generateAlternative}
+            sermonContext={sermon}
           />
         ))}
         <button

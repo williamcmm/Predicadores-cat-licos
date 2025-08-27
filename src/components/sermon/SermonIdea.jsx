@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 
-const SermonIdea = ({ idea, onUpdate, onDelete }) => {
+const SermonIdea = ({ idea, onUpdate, onDelete, generateAlternative, sermonContext }) => {
   // Internal state for controlled components
   const [h1, setH1] = useState(idea.h1 || '');
   const [elementType, setElementType] = useState(idea.elementoApoyo?.tipo || 'cita_biblica');
   const [elementContent, setElementContent] = useState(idea.elementoApoyo?.contenido || '');
   const [disparadores, setDisparadores] = useState(idea.disparadores || []);
+  const [isSuggesting, setIsSuggesting] = useState({ h1: false, parrafo: {} });
 
   // This effect synchronizes the component's internal state with the props from the parent.
   // This is crucial for when the sermon data is loaded asynchronously from the AI.
@@ -61,6 +62,36 @@ const SermonIdea = ({ idea, onUpdate, onDelete }) => {
     handleUpdate('disparadores', updatedDisparadores);
   };
 
+  const handleSuggestIdeaAlternative = async (field, disparadorId = null) => {
+    setIsSuggesting(prev => {
+      if (field === 'parrafo') return { ...prev, parrafo: { ...prev.parrafo, [disparadorId]: true } };
+      return { ...prev, [field]: true };
+    });
+    try {
+      const alternative = await generateAlternative(sermonContext, field, idea.id, disparadorId);
+      if (alternative) {
+        if (field === 'h1') {
+          setH1(alternative);
+          handleUpdate('h1', alternative);
+        } else if (field === 'parrafo') {
+          const updatedDisparadores = disparadores.map(d => 
+            d.id === disparadorId ? { ...d, parrafo: alternative } : d
+          );
+          setDisparadores(updatedDisparadores);
+          handleUpdate('disparadores', updatedDisparadores);
+        }
+      }
+    } catch (error) {
+      console.error(`Error suggesting another for ${field}:`, error);
+      alert(`Hubo un error al sugerir otra opción para ${field}.`);
+    } finally {
+      setIsSuggesting(prev => {
+        if (field === 'parrafo') return { ...prev, parrafo: { ...prev.parrafo, [disparadorId]: false } };
+        return { ...prev, [field]: false };
+      });
+    }
+  };
+
   const addDisparador = () => {
     const newId = disparadores.length > 0 ? Math.max(...disparadores.map(d => d.id)) + 1 : Date.now();
     const newDisparadores = [...disparadores, { id: newId, disparador: '', parrafo: '' }];
@@ -84,9 +115,14 @@ const SermonIdea = ({ idea, onUpdate, onDelete }) => {
       </button>
       {/* NIVEL 1: H1 (Idea Central) */}
       <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-semibold mb-2">
-          Idea Central (H1)
-        </label>
+        <div className="flex justify-between items-center mb-2">
+          <label className="block text-gray-700 text-sm font-semibold">
+            Idea Central (H1)
+          </label>
+          <button onClick={() => handleSuggestIdeaAlternative('h1')} disabled={isSuggesting.h1} className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 disabled:opacity-50">
+            {isSuggesting.h1 ? '...' : 'Sugerir Otro'}
+          </button>
+        </div>
         <input
           type="text"
           className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -147,9 +183,14 @@ const SermonIdea = ({ idea, onUpdate, onDelete }) => {
               />
             </div>
             <div>
-              <label className="block text-gray-600 text-xs font-medium mb-1">
-                Párrafo Explicativo
-              </label>
+              <div className="flex justify-between items-center mb-1">
+                <label className="block text-gray-600 text-xs font-medium">
+                  Párrafo Explicativo
+                </label>
+                <button onClick={() => handleSuggestIdeaAlternative('parrafo', disparador.id)} disabled={isSuggesting.parrafo[disparador.id]} className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 disabled:opacity-50">
+                  {isSuggesting.parrafo[disparador.id] ? '...' : 'Sugerir Otro'}
+                </button>
+              </div>
               <textarea
                 rows="6"
                 className="shadow appearance-none border rounded w-full py-1 px-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-sm"
