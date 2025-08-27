@@ -13,7 +13,25 @@ const INITIAL_CATEGORIES = [
   'VIDEOS DE YOUTUBE',
   'REFERENCIAS DOCTRINALES',
   'DOCUMENTOS OFICIALES DE LA IGLESIA'
-];
+].map(name => ({ name, active: true }));
+
+// Helper to initialize categories state
+const initializeCategories = () => {
+  const savedCategories = localStorage.getItem('resourceCategories');
+  if (savedCategories) {
+    try {
+      const parsed = JSON.parse(savedCategories);
+      // Ensure it's in the new format {name, active}
+      if (Array.isArray(parsed) && parsed.every(c => typeof c === 'object' && 'name' in c && 'active' in c)) {
+        return parsed;
+      }
+    } catch (e) {
+      // Fallback if parsing fails
+    }
+  }
+  return INITIAL_CATEGORIES;
+};
+
 
 export default function ResourcePanel() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -24,20 +42,26 @@ export default function ResourcePanel() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuggesting, setIsSuggesting] = useState(false);
   const [error, setError] = useState(null);
-  const [userToggledCategories, setUserToggledCategories] = useState({});
+  const [userToggledCategories, setUserToggledCategories] = useState({}); // This state is for expanding/collapsing the resource list, not for activation
   const [generating, setGenerating] = useState(false);
   const [expandedResources, setExpandedResources] = useState({});
   const dropdownRef = useRef(null);
   const abortControllerRef = useRef(null);
 
-  const [categories, setCategories] = useState(() => {
-    const savedCategories = localStorage.getItem('resourceCategories');
-    return savedCategories ? JSON.parse(savedCategories) : INITIAL_CATEGORIES;
-  });
+  const [categories, setCategories] = useState(initializeCategories);
 
   useEffect(() => {
     localStorage.setItem('resourceCategories', JSON.stringify(categories));
   }, [categories]);
+
+  const handleToggleCategoryActive = (categoryName) => {
+    let newCategories = categories.map(c => 
+      c.name === categoryName ? { ...c, active: !c.active } : c
+    );
+    // Sort to bring active categories to the top
+    newCategories.sort((a, b) => b.active - a.active);
+    setCategories(newCategories);
+  };
 
   const handleMoveCategory = (index, direction) => {
     const newCategories = [...categories];
@@ -68,24 +92,25 @@ export default function ResourcePanel() {
   const mapCategory = (incoming) => {
     if (!incoming) return incoming;
     const up = (incoming || '').toUpperCase();
-    for (const c of categories) if (c === up) return c;
-    for (const c of categories) {
+    const categoryNames = categories.map(c => c.name);
+    for (const c of categoryNames) if (c === up) return c;
+    for (const c of categoryNames) {
       const key = c.split(' ')[0];
       if (up.includes(key) || c.includes(up.split(' ')[0])) return c;
     }
     return incoming;
   };
 
-  const getFoundForCategory = (cat) => {
+  const getFoundForCategory = (catName) => {
     const list = searchResults || [];
     return list.find(c => {
-      const catName = (c.category || '').toUpperCase();
-      if (!catName) return false;
-      if (catName === cat) return true;
-      const key = cat.split(' ')[0];
-      if (catName.includes(key)) return true;
-      const catToken = catName.split(' ')[0];
-      if (cat.includes(catToken)) return true;
+      const resultCatName = (c.category || '').toUpperCase();
+      if (!resultCatName) return false;
+      if (resultCatName === catName) return true;
+      const key = catName.split(' ')[0];
+      if (resultCatName.includes(key)) return true;
+      const catToken = resultCatName.split(' ')[0];
+      if (catName.includes(catToken)) return true;
       return false;
     }) || null;
   };
@@ -129,7 +154,9 @@ export default function ResourcePanel() {
         setSearchResults([]); 
         const partial = [];
         const loadingState = {};
-        categories.forEach(c => { loadingState[c] = true; });
+        const activeCategories = categories.filter(c => c.active).map(c => c.name);
+        
+        activeCategories.forEach(cName => { loadingState[cName] = true; });
         setCategoryLoading(loadingState);
 
         await searchResourcesProgressive(termToSearch, (categoryName, resources) => {
@@ -140,7 +167,7 @@ export default function ResourcePanel() {
           else partial[existingIndex] = entry;
           setSearchResults([...partial]);
           setCategoryLoading(prev => ({ ...prev, [mapped]: false }));
-        }, categories, signal);
+        }, activeCategories, signal);
       }
     } catch (err) {
       if (err.name !== 'AbortError') {
@@ -191,11 +218,14 @@ export default function ResourcePanel() {
   const handleGenerateSermon = async () => {
     if (!searchTerm && !searchResults) return;
 
+    const activeCategoryNames = categories.filter(c => c.active).map(c => c.name);
+    const filteredResults = (searchResults || []).filter(res => activeCategoryNames.includes(res.category));
+
     const isStillLoading = Object.values(categoryLoading).some(status => status === true);
 
     if (isStillLoading) {
       const confirmation = window.confirm(
-        "La búsqueda de recursos aún no ha terminado.\n\nGeneraremos el sermón solo con los recursos encontrados hasta el momento.\n\n¿Desea continuar y generar el sermón ahora, o esperar a que terminen de cargarse todos los recursos?"
+        "La búsqueda de recursos aún no ha terminado.\n\nGeneraremos el sermón solo con los recursos encontrados hasta el momento (y de las categorías activas).\n\n¿Desea continuar y generar el sermón ahora, o esperar a que terminen de cargarse todos los recursos?"
       );
       if (!confirmation) {
         return;
@@ -205,7 +235,7 @@ export default function ResourcePanel() {
     setGenerating(true);
     setError(null);
     try {
-      const res = await generateSermon(searchTerm || '', searchResults || {}, categories);
+      const res = await generateSermon(searchTerm || '', filteredResults || {}, activeCategoryNames);
       if (res) {
         window.dispatchEvent(new CustomEvent('insertSermonIntoEditor', { detail: res }));
         try { localStorage.setItem('lastGeneratedSermon', JSON.stringify(res)); } catch (e) {
@@ -229,20 +259,18 @@ export default function ResourcePanel() {
   const renderInitialState = () => {
     if (isSuggesting) return <p className="text-gray-500">Buscando sugerencias...</p>;
     if (error) return <p className="text-red-500">Error: {error}</p>;
-    return <p className="text-gray-500">Escribe un tema para buscar recursos o haz clic en "Buscar" para obtener sugerencias.</p>;
+    return null;
   };
 
   return (
     <div className="p-4 rounded-lg shadow-md h-full flex flex-col">
-      <h2 className="text-lg font-semibold mb-4 text-gray-700">Buscar temas y recursos para predicación</h2>
-
       <div className="flex mb-4 items-start">
         <div className="flex-1">
           <div className="flex">
             <input
               type="text"
               className="flex-1 shadow appearance-none border rounded-l w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              placeholder="La Eucaristía como fuente y culmen de la vida cristiana"
+              placeholder="Buscar temas y recursos para predicación"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch(searchTerm)}
@@ -256,7 +284,7 @@ export default function ResourcePanel() {
             </button>
             <button
               onClick={handleClearSearch}
-              className="ml-2 px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors"
+              className="ml-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
               title="Limpiar tema y resultados"
             >
               Limpiar
@@ -315,39 +343,58 @@ export default function ResourcePanel() {
           )}
 
           <h3 className="text-md font-semibold mb-2">Categorías</h3>
+          <p className="text-base font-semibold text-gray-700 mb-2">Activa o desactiva las categorías para tu búsqueda y sermón.</p>
           {searchResults === null && !isLoading && <div className="mb-4">{renderInitialState()}</div>}
           <div className="grid grid-cols-1 gap-2">
             {categories.map((cat, index) => {
-              const found = searchResults ? getFoundForCategory(cat) : null;
+              const found = searchResults ? getFoundForCategory(cat.name) : null;
               const count = found && found.resources ? found.resources.length : 0;
-              const isExpanded = !!userToggledCategories[cat];
-              const isLoadingCat = categoryLoading[cat] && (!searchResults || !found);
+              const isExpanded = !!userToggledCategories[cat.name];
+              const isLoadingCat = categoryLoading[cat.name] && (!searchResults || !found);
 
               return (
-                <div key={cat} className="border rounded p-2">
+                <div key={cat.name} className={`border rounded p-2 transition-opacity ${!cat.active ? 'opacity-50' : ''}`}>
                   <div className="flex justify-between items-center">
                     <div className="flex items-center">
+                       <input 
+                        type="checkbox"
+                        checked={cat.active}
+                        onChange={() => handleToggleCategoryActive(cat.name)}
+                        className="mr-3 h-5 w-5"
+                      />
                       <div className="flex flex-col mr-2">
-                        <button onClick={() => handleMoveCategory(index, -1)} disabled={index === 0} className="disabled:opacity-25">▲</button>
-                        <button onClick={() => handleMoveCategory(index, 1)} disabled={index === categories.length - 1} className="disabled:opacity-25">▼</button>
+                        <button 
+                          onClick={() => handleMoveCategory(index, -1)} 
+                          disabled={index === 0 || (!cat.active && categories[index - 1]?.active)} 
+                          className="disabled:opacity-25"
+                        >
+                          ▲
+                        </button>
+                        <button 
+                          onClick={() => handleMoveCategory(index, 1)} 
+                          disabled={index === categories.length - 1 || (cat.active && !categories[index + 1]?.active)} 
+                          className="disabled:opacity-25"
+                        >
+                          ▼
+                        </button>
                       </div>
-                      <div className="font-medium text-blue-600 hover:underline cursor-pointer" onClick={() => handleToggleCategory(cat)}>{cat}</div>
+                      <div className="font-medium text-blue-600 hover:underline cursor-pointer" onClick={() => handleToggleCategory(cat.name)}>{cat.name}</div>
                     </div>
                     <div className="flex items-center space-x-2">
                       <div className="text-sm text-gray-600">({count})</div>
                       {isLoadingCat && <div className="text-sm text-yellow-600">Buscando...</div>}
                       {count > 0 && (
-                          <button onClick={() => handleToggleCategory(cat)} className="text-blue-600 hover:underline text-sm">
+                          <button onClick={() => handleToggleCategory(cat.name)} className="text-blue-600 hover:underline text-sm">
                               {isExpanded ? 'Cerrar' : 'Abrir'}
                           </button>
                       )}
                     </div>
                   </div>
-                  {isExpanded && (
+                  {isExpanded && cat.active && (
                     <div className="mt-2">
                       {count === 0 && <p className="text-sm text-gray-500">Sin resultados en esta categoría.</p>}
                       {count > 0 && (found.resources || []).map((resource, idx) => {
-                        const rid = resource.id || `${cat}-${idx}`;
+                        const rid = resource.id || `${cat.name}-${idx}`;
                         return (
                           <div key={rid} className="border-b pb-2 mb-2 last:border-b-0">
                             <p className="font-medium">{resource.title}</p>

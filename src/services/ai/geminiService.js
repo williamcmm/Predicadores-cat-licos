@@ -136,7 +136,7 @@ export async function generateSermon(topic = '', searchResults = {}, liturgyCont
     REGLAS PARA EL JSON DE SALIDA:
     - La respuesta debe ser un único objeto JSON.
     - El objeto raíz debe tener: "title" (string), "introduction" (objeto con "presentation" y "motivation"), "imperatives" (string), y "ideas" (array).
-    - El array "ideas" debe contener entre 3 y 5 objetos.
+    - El array "ideas" debe contener entre 5 y 7 objetos.
     - CADA objeto en "ideas" debe tener SOLAMENTE: "h1" (la idea principal) y "elementoApoyo" (un objeto con "tipo" y "contenido").
     - NO incluyas la clave "disparadores" en esta respuesta inicial.
   `;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Header from './components/ui/Header';
 import PanelResizer from './components/ui/PanelResizer';
 import Sidebar from './components/ui/Sidebar';
@@ -8,6 +8,7 @@ import SermonStudyView from './components/sermon/SermonStudyView';
 import SermonPreachingView from './components/sermon/SermonPreachingView';
 import MiBiblioteca from './components/biblioteca/MiBiblioteca';
 import { useAuth } from './context/AuthContext';
+import { guardarSermon } from './services/database/firestoreService';
 
 const getInitialSermonState = () => ({
   title: '',
@@ -24,6 +25,8 @@ function App() {
   });
   const [modo, setModo] = useState('edicion');
   const [showBiblioteca, setShowBiblioteca] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [lastSaved, setLastSaved] = useState(null);
 
   const [sermon, setSermon] = useState(() => {
     if (!currentUser) {
@@ -43,6 +46,35 @@ function App() {
     }
     return getInitialSermonState();
   });
+
+  const handleSave = useCallback(async () => {
+    if (!currentUser || !sermon.title) {
+      return;
+    }
+    setIsSaving(true);
+    try {
+      const sermonToSave = { ...sermon, userId: currentUser.uid, createdAt: new Date() };
+      const docId = await guardarSermon(sermonToSave);
+      setLastSaved(new Date());
+      console.log('Sermon saved with ID:', docId);
+    } catch (error) {
+      console.error('Error saving sermon:', error);
+    } finally {
+      setIsSaving(false);
+    }
+  }, [sermon, currentUser]);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      if (currentUser && sermon.title) {
+        handleSave();
+      }
+    }, 2000);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [sermon, currentUser, handleSave]);
 
   useEffect(() => {
     if (!currentUser) {
@@ -130,10 +162,17 @@ function App() {
           className="bg-white p-6 overflow-y-auto flex flex-col"
           style={{ width: `${leftPanelWidth}%` }}
         >
-          <Sidebar modo={modo} setModo={setModo} onClearSermon={handleClearSermon} />
+          <Sidebar 
+            modo={modo} 
+            setModo={setModo} 
+            onClearSermon={handleClearSermon} 
+            onSave={handleSave} 
+            isSaving={isSaving} 
+            lastSaved={lastSaved} 
+          />
           <div className="flex-1 mt-4">
             {modo === 'edicion' && (
-              <SermonEditor sermon={sermon} setSermon={setSermon} user={currentUser} />
+              <SermonEditor sermon={sermon} setSermon={setSermon} />
             )}
           </div>
         </div>
@@ -154,10 +193,10 @@ function App() {
       </div>
 
       {modo === 'estudio' && (
-        <SermonStudyView sermon={sermon} onClose={() => setModo('edicion')} user={currentUser} />
+        <SermonStudyView sermon={sermon} onClose={() => setModo('edicion')} />
       )}
       {modo === 'predicacion' && (
-        <SermonPreachingView sermon={sermon} onClose={() => setModo('edicion')} user={currentUser} />
+        <SermonPreachingView sermon={sermon} onClose={() => setModo('edicion')} />
       )}
       {showBiblioteca && <MiBiblioteca onClose={toggleBiblioteca} onOpenSermon={handleOpenSermon} />}
     </div>

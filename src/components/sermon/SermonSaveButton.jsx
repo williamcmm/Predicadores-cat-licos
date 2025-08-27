@@ -10,7 +10,7 @@ const SermonSaveButton = ({ onSave, isSaving, lastSaved }) => {
         `}
         disabled={isSaving}
       >
-        {isSaving ? 'Guardando...' : 'Guardar Sermón'}
+        {isSaving ? 'Guardando...' : 'Guardar'}
       </button>
       {lastSaved && (
         <span className="text-gray-600 text-sm">

@@ -1,6 +1,7 @@
 import React from 'react';
+import SermonSaveButton from '../sermon/SermonSaveButton';
 
-const Sidebar = ({ modo, setModo, onClearSermon }) => {
+const Sidebar = ({ modo, setModo, onClearSermon, onSave, isSaving, lastSaved }) => {
   const modes = [
     { id: 'edicion', name: 'Modo Edición' },
     { id: 'estudio', name: 'Modo Estudio' },
@@ -22,12 +23,15 @@ const Sidebar = ({ modo, setModo, onClearSermon }) => {
           </button>
         ))}
       </div>
-      <button
-        onClick={onClearSermon}
-        className="px-4 py-2 rounded-md text-sm font-medium bg-red-500 text-white hover:bg-red-600"
-      >
-        Limpiar
-      </button>
+      <div className="flex items-center gap-4">
+        <button
+          onClick={onClearSermon}
+          className="px-4 py-2 rounded-md text-sm font-medium bg-red-500 text-white hover:bg-red-600"
+        >
+          Limpiar
+        </button>
+        <SermonSaveButton onSave={onSave} isSaving={isSaving} lastSaved={lastSaved} />
+      </div>
     </div>
   );
 };

@@ -1,4 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Fragment } from 'react';
+import { Popover, Transition } from '@headlessui/react';
+import { FaQuestionCircle } from 'react-icons/fa';
 
 const SermonPreachingView = ({ sermon, onClose, user }) => {
   const [fontSize, setFontSize] = useState(1.8);
@@ -93,10 +95,56 @@ const SermonPreachingView = ({ sermon, onClose, user }) => {
                 </div>
                 <div className="space-y-5 pl-5">
                   {idea.disparadores?.map((disparador, dIndex) => (
-                    <div key={disparador.id || dIndex} className="flex items-start">
-                      <span className="text-blue-700 font-bold mr-4" style={{ fontSize: '1.5em' }}>•</span>
-                      <p className="font-semibold">{disparador.disparador}</p>
-                    </div>
+                     <Popover key={disparador.id || dIndex} className="relative flex items-start">
+                      {({ open }) => (
+                        <>
+                          <span className="text-blue-700 font-bold mr-4 flex-shrink-0" style={{ fontSize: '1.5em' }}>•</span>
+                          <p className="font-semibold mr-2">{disparador.disparador}</p>
+                          
+                          <Popover.Button className="text-gray-400 hover:text-blue-600 focus:outline-none pt-1">
+                            <FaQuestionCircle />
+                          </Popover.Button>
+
+                          <Transition
+                            as={Fragment}
+                            enter="ease-out duration-300"
+                            enterFrom="opacity-0"
+                            enterTo="opacity-100"
+                            leave="ease-in duration-200"
+                            leaveFrom="opacity-100"
+                            leaveTo="opacity-0"
+                          >
+                            <Popover.Overlay className="fixed inset-0 z-10 bg-black/30" />
+                          </Transition>
+                          
+                          <Transition
+                            as={Fragment}
+                            enter="ease-out duration-300"
+                            enterFrom="opacity-0 scale-95"
+                            enterTo="opacity-100 scale-100"
+                            leave="ease-in duration-200"
+                            leaveFrom="opacity-100 scale-100"
+                            leaveTo="opacity-0 scale-95"
+                          >
+                            <Popover.Panel className="fixed inset-0 z-20 m-auto flex h-fit max-h-[80vh] w-full max-w-3xl flex-col rounded-xl bg-white p-6 shadow-xl">
+                              <div className="flex-shrink-0 text-right">
+                                <Popover.Button className="inline-flex items-center justify-center p-1 text-2xl font-bold text-gray-500 hover:text-gray-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
+                                  <span aria-hidden="true">&times;</span>
+                                </Popover.Button>
+                              </div>
+                              <div className="overflow-y-auto mt-2">
+                                <h3 className="text-xl font-bold text-blue-700 mb-4 pb-2 border-b">
+                                  {disparador.disparador}
+                                </h3>
+                                <p className="text-gray-800" style={{ fontSize: `${fontSize * 0.85}em`, lineHeight: 1.6 }}>
+                                  {disparador.parrafo}
+                                </p>
+                              </div>
+                            </Popover.Panel>
+                          </Transition>
+                        </>
+                      )}
+                    </Popover>
                   ))}
                 </div>
               </div>

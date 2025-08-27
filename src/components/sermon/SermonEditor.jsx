@@ -1,52 +1,16 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import SermonIdea from './SermonIdea';
-import SermonSaveButton from './SermonSaveButton';
-import { guardarSermon } from '../../services/database/firestoreService';
 import { generateAlternative } from '../../services/ai/geminiService';
 import { useAuth } from '../../context/AuthContext';
 
 const SermonEditor = ({ sermon, setSermon }) => {
   const { currentUser } = useAuth();
-  const [isSaving, setIsSaving] = useState(false);
-  const [lastSaved, setLastSaved] = useState(null);
   const [isSuggesting, setIsSuggesting] = useState({ presentation: false, motivation: false });
-
-  // Auto-save effect
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      if (currentUser && sermon.title) { // Only auto-save if logged in and sermon has a title
-        handleSave();
-      }
-    }, 2000); // Debounce for 2 seconds
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [sermon, currentUser]); // Re-run effect when sermon or user changes
 
   // Save to localStorage on every sermon change
   useEffect(() => {
     if (currentUser) {
       localStorage.setItem('currentSermon', JSON.stringify(sermon));
-    }
-  }, [sermon, currentUser]);
-
-  const handleSave = useCallback(async () => {
-    if (!currentUser) {
-      console.log('User not logged in. Cannot save sermon.');
-      return;
-    }
-    setIsSaving(true);
-    try {
-      // Add user ID to sermon data before saving
-      const sermonToSave = { ...sermon, userId: currentUser.uid, createdAt: new Date() };
-      const docId = await guardarSermon(sermonToSave);
-      setLastSaved(new Date());
-      console.log('Sermon saved with ID:', docId);
-    } catch (error) {
-      console.error('Error saving sermon:', error);
-    } finally {
-      setIsSaving(false);
     }
   }, [sermon, currentUser]);
 
@@ -116,10 +80,6 @@ const SermonEditor = ({ sermon, setSermon }) => {
 
   return (
     <div className="p-4 bg-white rounded-lg shadow-md">
-      <div className="flex justify-end mb-4">
-        <SermonSaveButton onSave={handleSave} isSaving={isSaving} lastSaved={lastSaved} />
-      </div>
-
       {/* TÍTULO DEL SERMÓN */}
       <div className="mb-6">
         <label htmlFor="sermonTitle" className="block text-gray-700 text-sm font-semibold mb-2 uppercase">
