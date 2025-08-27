@@ -28,6 +28,7 @@ export default function ResourcePanel() {
   const [generating, setGenerating] = useState(false);
   const [expandedResources, setExpandedResources] = useState({});
   const dropdownRef = useRef(null);
+  const abortControllerRef = useRef(null);
 
   const [categories, setCategories] = useState(() => {
     const savedCategories = localStorage.getItem('resourceCategories');
@@ -94,6 +95,13 @@ export default function ResourcePanel() {
   };
 
   const handleSearch = async (termToSearch) => {
+    if (isLoading) {
+      return;
+    }
+
+    abortControllerRef.current = new AbortController();
+    const signal = abortControllerRef.current.signal;
+
     const isSuggestionSearch = termToSearch.trim() === '';
     
     if (isSuggestionSearch) {
@@ -132,10 +140,12 @@ export default function ResourcePanel() {
           else partial[existingIndex] = entry;
           setSearchResults([...partial]);
           setCategoryLoading(prev => ({ ...prev, [mapped]: false }));
-        }, categories);
+        }, categories, signal);
       }
     } catch (err) {
-      setError(err.message ? err.message : String(err));
+      if (err.name !== 'AbortError') {
+        setError(err.message ? err.message : String(err));
+      }
     } finally {
       if (isSuggestionSearch) {
         setIsSuggesting(false);
@@ -143,6 +153,30 @@ export default function ResourcePanel() {
         setIsLoading(false);
       }
     }
+  };
+
+  const handleStopSearch = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    setIsLoading(false);
+  };
+
+  const handleClearSearch = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    setSearchTerm('');
+    setSearchResults(null);
+    setCategoryLoading({});
+    setSuggestions([]);
+    setShowDropdown(false);
+    setIsLoading(false);
+    setIsSuggesting(false);
+    setError(null);
+    setUserToggledCategories({});
+    setGenerating(false);
+    setExpandedResources({});
   };
 
   const onSuggestionClick = async (suggestion) => {
@@ -202,32 +236,50 @@ export default function ResourcePanel() {
     <div className="p-4 rounded-lg shadow-md h-full flex flex-col">
       <h2 className="text-lg font-semibold mb-4 text-gray-700">Buscar temas y recursos para predicación</h2>
 
-      <div className="flex mb-4">
-        <input
-          type="text"
-          className="flex-1 shadow appearance-none border rounded-l w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          placeholder="La Eucaristía como fuente y culmen de la vida cristiana"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleSearch(searchTerm)}
-        />
-        <button
-          onClick={() => handleSearch(searchTerm)}
-          className="px-4 py-2 bg-blue-500 text-white rounded-r hover:bg-blue-600 transition-colors"
-          disabled={isLoading || isSuggesting}
-        >
-          {isLoading ? 'Buscando...' : (isSuggesting ? '...' : 'Buscar')}
-        </button>
-      </div>
-
-      <div className="text-sm text-gray-600 mb-4">
-        <p>Forma 1: Escribe un tema y haz clic en Buscar.</p>
-        <p>Forma 2: Haz clic en Buscar (sin escribir nada) para obtener sugerencias.</p>
+      <div className="flex mb-4 items-start">
+        <div className="flex-1">
+          <div className="flex">
+            <input
+              type="text"
+              className="flex-1 shadow appearance-none border rounded-l w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              placeholder="La Eucaristía como fuente y culmen de la vida cristiana"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSearch(searchTerm)}
+            />
+            <button
+              onClick={() => handleSearch(searchTerm)}
+              className="px-4 py-2 bg-blue-500 text-white rounded-r hover:bg-blue-600 transition-colors disabled:bg-blue-300"
+              disabled={isLoading || isSuggesting}
+            >
+              {isLoading ? 'Buscando...' : (isSuggesting ? '...' : 'Buscar')}
+            </button>
+            <button
+              onClick={handleClearSearch}
+              className="ml-2 px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors"
+              title="Limpiar tema y resultados"
+            >
+              Limpiar
+            </button>
+          </div>
+          <div className="text-sm text-gray-600 mt-2">
+            <p>Forma 1: Escribe un tema y haz clic en Buscar.</p>
+            <p>Forma 2: Haz clic en Buscar (sin escribir nada) para obtener sugerencias.</p>
+          </div>
+        </div>
+        {isLoading && (
+          <button
+            onClick={handleStopSearch}
+            className="ml-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+          >
+            Detener Búsqueda
+          </button>
+        )}
       </div>
 
       <div className="flex-1 bg-white p-4 rounded-md overflow-y-auto relative">
         {showDropdown && suggestions.length > 0 && (
-          <div className="absolute top-0 left-0 right-0 w-full bg-white border rounded-md shadow-lg max-h-80 overflow-y-auto z-10" ref={dropdownRef}>
+          <div className="absolute top-0 left-0 right-0 w-full bg-white border rounded-md shadow-lg z-10" ref={dropdownRef}>
             <div className="p-2 border-b">
               <h3 className="text-md font-semibold">Sugerencias de Temas</h3>
             </div>

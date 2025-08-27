@@ -66,7 +66,7 @@ const extractAndParseJson = (text) => {
 };
 
 export async function searchResources(query) {
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
   const prompt = `Busca recursos católicos para el tema: '${query}'. Devuelve SOLO JSON válido. La estructura esperada: { "categories": [ { "category": "...", "resources": [ { "title": "...", "source": "...", "description": "...", "excerpt": "...", "content": ["párrafo1", "párrafo2"] } ] } ] }.`;
   try {
     const result = await model.generateContent(prompt);
@@ -76,53 +76,10 @@ export async function searchResources(query) {
   } catch (e) { console.error('API error', e); return null; }
 }
 
-export async function searchResourcesProgressive(query, onCategory, categories = null) {
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
-  const DEFAULT_CATS = [
-    'DOCTRINA CATÓLICA','CATECISMO','SANTORAL CATÓLICO','CITAS BÍBLICAS RELEVANTES','REFLEXIONES SOBRE EL TEMA',
-    'EJEMPLOS PRÁCTICOS','TESTIMONIOS Y EXPERIENCIAS','DATOS CIENTÍFICOS/HISTÓRICOS','VIDEOS DE YOUTUBE','REFERENCIAS DOCTRINALES','DOCUMENTOS OFICIALES DE LA IGLESIA'
-  ];
-  const cats = Array.isArray(categories) && categories.length > 0 ? categories : DEFAULT_CATS;
-
-  for (const cat of cats) {
-    let basePrompt = '';
-
-    if (cat === 'CITAS BÍBLICAS RELEVANTES') {
-      basePrompt = `Para el tema: "${query}", devuelve una lista de 5 a 10 citas bíblicas relevantes. Usa una traducción católica adecuada. Devuelve EXCLUSIVAMENTE JSON con la clave \"resources\" que sea un array de objetos. Cada objeto: { title, source, content: [versículos] }.`;
-    } else {
-      basePrompt = `Para la categoría: ${cat} y el tema: "${query}", devuelve SOLO JSON válido con la clave \"resources\" que sea un array de objetos. Cada objeto debe tener: title, source, description, y un content que sea un array de párrafos largos y sustanciales. Devuelve al menos 5 recursos por categoría cuando sea posible, máximo 10.`;
-    }
-
-    try {
-      const result = await model.generateContent(basePrompt);
-      const response = await result.response;
-      const text = await response.text();
-      try {
-        const parsed = extractAndParseJson(text);
-        let resources = null;
-        if (Array.isArray(parsed)) resources = parsed;
-        else if (parsed && parsed.resources && Array.isArray(parsed.resources)) resources = parsed.resources;
-        else if (parsed && parsed.categories) {
-          const found = parsed.categories.find(c => (c.category || '').toUpperCase().includes((cat || '').split(' ')[0]));
-          resources = found ? found.resources : [];
-        }
-        resources = Array.isArray(resources) ? resources.slice(0, 10) : [];
-        onCategory(cat, resources);
-      } catch (parseErr) {
-        console.error('Could not parse category response for', cat, parseErr);
-        onCategory(cat, []);
-      }
-    } catch (err) {
-      console.error('Error requesting category', cat, err);
-      onCategory(cat, []);
-    }
-    await new Promise(r => setTimeout(r, 400));
-  }
-  return true;
-}
+export async function searchResourcesProgressive(query, onCategory, categories = null, signal) { const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' }); const DEFAULT_CATS = [ 'DOCTRINA CATÓLICA','CATECISMO','SANTORAL CATÓLICO','CITAS BÍBLICAS RELEVANTES','REFLEXIONES SOBRE EL TEMA', 'EJEMPLOS PRÁCTICOS','TESTIMONIOS Y EXPERIENCIAS','DATOS CIENTÍFICOS/HISTÓRICOS','VIDEOS DE YOUTUBE','REFERENCIAS DOCTRINALES','DOCUMENTOS OFICIALES DE LA IGLESIA' ]; const cats = Array.isArray(categories) && categories.length > 0 ? categories : DEFAULT_CATS; for (const cat of cats) { if (signal?.aborted) { console.log('Búsqueda progresiva cancelada por el usuario.'); break; } let basePrompt = ''; if (cat === 'CITAS BÍBLICAS RELEVANTES') { basePrompt = `Para el tema: "${query}", devuelve una lista de 5 a 10 citas bíblicas relevantes. Usa una traducción católica adecuada. Devuelve EXCLUSIVAMENTE JSON con la clave "resources" que sea un array de objetos. Cada objeto: { title, source, content: [versículos] }.`; } else { basePrompt = `Para la categoría: ${cat} y el tema: "${query}", devuelve SOLO JSON válido con la clave "resources" que sea un array de objetos. Cada objeto debe tener: title, source, description, y un content que sea un array de párrafos largos y sustanciales. Devuelve al menos 5 recursos por categoría cuando sea posible, máximo 10.`; } try { const result = await model.generateContent(basePrompt, { signal }); const response = await result.response; const text = await response.text(); try { const parsed = extractAndParseJson(text); let resources = null; if (Array.isArray(parsed)) resources = parsed; else if (parsed && parsed.resources && Array.isArray(parsed.resources)) resources = parsed.resources; else if (parsed && parsed.categories) { const found = parsed.categories.find(c => (c.category || '').toUpperCase().includes((cat || '').split(' ')[0])); resources = found ? found.resources : []; } resources = Array.isArray(resources) ? resources.slice(0, 10) : []; onCategory(cat, resources); } catch (parseErr) { console.error('Could not parse category response for', cat, parseErr); onCategory(cat, []); } } catch (err) { if (err.name === 'AbortError') { console.log(`Búsqueda para ${cat} cancelada.`); } else { console.error('Error requesting category', cat, err); } onCategory(cat, []); } await new Promise(r => setTimeout(r, 400)); } return true; }
 
 export async function generateGeneralSuggestions() {
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
   const prompt = `Genera exactamente 10 sugerencias de temas para sermones católicos, una por línea.`;
   const parseSuggestions = (text) => {
     if (!text || typeof text !== 'string') return [];
@@ -208,7 +165,7 @@ export async function generateSermon(topic = '', searchResults = {}, liturgyCont
 }
 
 export async function generateAlternative(sermon, field) {
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
   // Robustly access nested field
   const fieldValue = field.split('.').reduce((o, i) => (o ? o[i] : undefined), sermon);
   const prompt = `Para el sermón con título "${sermon.title}", genera una alternativa para el campo "${field}". El contenido actual es: "${fieldValue}". La respuesta debe ser solo el texto alternativo, sin adornos.`;
