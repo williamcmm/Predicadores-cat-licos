@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import SermonIdea from './SermonIdea';
-import { generateAlternative } from '../../services/ai/geminiService';
+import ConfirmationModal from '../ui/ConfirmationModal';
 import { useAuth } from '../../context/AuthContext';
 
 const SermonEditor = ({ sermon, setSermon }) => {
   const { currentUser } = useAuth();
-  const [isSuggesting, setIsSuggesting] = useState({ presentation: false, motivation: false });
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [ideaToDelete, setIdeaToDelete] = useState(null);
 
   // Save to localStorage on every sermon change
   useEffect(() => {
@@ -27,26 +28,8 @@ const SermonEditor = ({ sermon, setSermon }) => {
     }
   };
 
-  const handleSuggestAnother = async (field) => {
-    setIsSuggesting(prev => ({ ...prev, [field]: true }));
-    try {
-      const alternative = await generateAlternative(sermon, field);
-      if (alternative) {
-        setSermon(prevSermon => ({
-          ...prevSermon,
-          introduction: { ...prevSermon.introduction, [field]: alternative }
-        }));
-      }
-    } catch (error) {
-      console.error(`Error suggesting another for ${field}:`, error);
-      alert(`Hubo un error al sugerir otra opción para ${field}.`);
-    } finally {
-      setIsSuggesting(prev => ({ ...prev, [field]: false }));
-    }
-  };
-
   const addIdea = () => {
-    const newId = sermon.ideas.length > 0 ? Math.max(...sermon.ideas.map(idea => idea.id)) + 1 : 1;
+    const newId = `idea_${Date.now()}`;
     setSermon({
       ...sermon,
       ideas: [
@@ -54,9 +37,14 @@ const SermonEditor = ({ sermon, setSermon }) => {
         {
           id: newId,
           h1: '',
-          elementType: 'cita_biblica',
-          elementContent: '',
-          disparadores: [{ id: 1, trigger: '', paragraph: '' }],
+          lineaInicial: '',
+          elementoApoyo: { 
+            tipo: 'cita_biblica', 
+            contenido: '' 
+          },
+          disparadores: [{ id: `disparador_${Date.now()}`, disparador: '', parrafo: '' }],
+          ejemploPractico: '',
+          resultadoEsperado: '',
         },
       ],
     });
@@ -73,114 +61,129 @@ const SermonEditor = ({ sermon, setSermon }) => {
 
   const deleteIdea = (id) => {
     setSermon({
-      ...sermon,
-      ideas: sermon.ideas.filter((idea) => idea.id !== id),
+        ...sermon,
+        ideas: sermon.ideas.filter((idea) => idea.id !== id),
     });
   };
 
-  return (
-    <div className="p-4 bg-white rounded-lg shadow-md">
-      {/* TÍTULO DEL SERMÓN */}
-      <div className="mb-6">
-        <label htmlFor="sermonTitle" className="block text-gray-700 text-sm font-semibold mb-2 uppercase">
-          TÍTULO DEL SERMÓN
-        </label>
-        <input
-          type="text"
-          id="sermonTitle"
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          placeholder="Escriba aquí un título atractivo para su sermón"
-          value={sermon.title}
-          onChange={handleInputChange}
-        />
-      </div>
+  const handleDeleteRequest = (id) => {
+    setIdeaToDelete(id);
+    setIsDeleteModalOpen(true);
+  };
 
-      {/* INTRODUCCIÓN */}
-      <div className="mb-6">
-        <label className="block text-gray-700 text-sm font-semibold mb-2 uppercase">
-          INTRODUCCIÓN
-        </label>
-        <div className="ml-4 border-l-2 border-gray-200 pl-4">
-          {/* B.1 Presentación del Tema */}
-          <div className="mb-4">
-            <div className="flex justify-between items-center mb-2">
-              <label htmlFor="presentation" className="block text-gray-600 text-sm font-medium">
+  const handleConfirmDelete = () => {
+    if (ideaToDelete) {
+      deleteIdea(ideaToDelete);
+      setIdeaToDelete(null);
+      setIsDeleteModalOpen(false);
+    }
+  };
+
+  return (
+    <>
+      <ConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleConfirmDelete}
+        title="Confirmar Eliminación"
+      >
+        <p>¿Está seguro que desea eliminar esta idea? Esta acción no se puede deshacer.</p>
+      </ConfirmationModal>
+
+      <div className="p-6 bg-gray-50 rounded-lg">
+        {/* TÍTULO DEL SERMÓN */}
+        <div className="mb-8">
+          <label htmlFor="sermonTitle" className="block text-gray-800 text-base font-bold mb-2 uppercase">
+            TÍTULO DEL SERMÓN
+          </label>
+          <input
+            type="text"
+            id="sermonTitle"
+            className="w-full p-4 border-2 border-gray-300 rounded-lg text-xl font-semibold text-gray-800 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+            placeholder="Escriba aquí un título atractivo para su sermón"
+            value={sermon.title}
+            onChange={handleInputChange}
+          />
+        </div>
+
+        {/* INTRODUCCIÓN */}
+        <div className="mb-8 p-6 bg-white rounded-xl shadow-md">
+          <label className="block text-gray-800 text-base font-bold mb-4 uppercase">
+            INTRODUCCIÓN
+          </label>
+          <div className="space-y-6">
+            {/* B.1 Presentación del Tema */}
+            <div>
+              <label htmlFor="presentation" className="block text-gray-600 text-sm font-semibold mb-2">
                 Presentación del Tema
               </label>
-              <button onClick={() => handleSuggestAnother('presentation')} disabled={isSuggesting.presentation} className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 disabled:opacity-50">
-                {isSuggesting.presentation ? '...' : 'Sugerir Otro'}
-              </button>
+              <textarea
+                id="presentation"
+                rows="3"
+                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Ponga aquí cómo va a presentar el tema a la audiencia"
+                value={sermon.introduction.presentation}
+                onChange={handleInputChange}
+              ></textarea>
             </div>
-            <textarea
-              id="presentation"
-              rows="3"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              placeholder="Ponga aquí cómo va a presentar el tema a la audiencia"
-              value={sermon.introduction.presentation}
-              onChange={handleInputChange}
-            ></textarea>
-          </div>
 
-          {/* B.2 Motivación Inicial */}
-          <div className="mb-4">
-            <div className="flex justify-between items-center mb-2">
-              <label htmlFor="motivation" className="block text-gray-600 text-sm font-medium">
+            {/* B.2 Motivación Inicial */}
+            <div>
+              <label htmlFor="motivation" className="block text-gray-600 text-sm font-semibold mb-2">
                 Motivación Inicial
               </label>
-              <button onClick={() => handleSuggestAnother('motivation')} disabled={isSuggesting.motivation} className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 disabled:opacity-50">
-                {isSuggesting.motivation ? '...' : 'Sugerir Otro'}
-              </button>
+              <textarea
+                id="motivation"
+                rows="3"
+                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Ponga aquí texto que genere expectativa e interés en los oyentes"
+                value={sermon.introduction.motivation}
+                onChange={handleInputChange}
+              ></textarea>
             </div>
-            <textarea
-              id="motivation"
-              rows="3"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              placeholder="Ponga aquí texto que genere expectativa e interés en los oyentes"
-              value={sermon.introduction.motivation}
-              onChange={handleInputChange}
-            ></textarea>
           </div>
         </div>
-      </div>
 
-      {/* IDEAS PRINCIPALES */}
-      <div className="mb-6">
-        <label className="block text-gray-700 text-sm font-semibold mb-2 uppercase">
-          IDEAS PRINCIPALES
-        </label>
-        {sermon.ideas.map((idea) => (
-          <SermonIdea
-            key={idea.id}
-            idea={idea}
-            onUpdate={updateIdea}
-            onDelete={deleteIdea}
-            generateAlternative={generateAlternative}
-            sermonContext={sermon}
-          />
-        ))}
-        <button
-          onClick={addIdea}
-          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
-        >
-          Añadir Nueva Idea Principal
-        </button>
-      </div>
+        {/* IDEAS PRINCIPALES */}
+        <div className="mb-8">
+          <label className="block text-gray-800 text-base font-bold mb-4 uppercase">
+            IDEAS PRINCIPALES
+          </label>
+          <div className="space-y-8">
+              {sermon.ideas.map((idea, index) => (
+                <SermonIdea
+                  key={idea.id}
+                  idea={idea}
+                  index={index}
+                  onUpdate={updateIdea}
+                  onDelete={handleDeleteRequest}
+                />
+              ))}
+          </div>
+          <button
+            onClick={addIdea}
+            className="mt-6 w-full py-3 px-4 bg-blue-600 text-white rounded-lg font-semibold text-lg hover:bg-blue-700 transition-all shadow-md hover:shadow-lg"
+          >
+            + Añadir Nueva Idea Principal
+          </button>
+        </div>
 
-      {/* IMPERATIVOS */}
-      <div className="mb-6">
-        <label htmlFor="imperatives" className="block text-gray-700 text-sm font-semibold mb-2 uppercase">
-          IMPERATIVOS
-        </label>
-        <textarea
-          id="imperatives"
-          rows="4"
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          placeholder="Ponga aquí acciones concretas que deben tomar (conclusión lógica, no moralismo)"
-          value={sermon.imperatives}
-          onChange={handleInputChange}
-        ></textarea>
+        {/* IMPERATIVOS */}
+        <div className="p-6 bg-white rounded-xl shadow-md">
+          <label htmlFor="imperatives" className="block text-gray-800 text-base font-bold mb-4 uppercase">
+            IMPERATIVOS
+          </label>
+          <textarea
+            id="imperatives"
+            rows="4"
+            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Ponga aquí acciones concretas que deben tomar (conclusión lógica, no moralismo)"
+            value={sermon.imperatives}
+            onChange={handleInputChange}
+          ></textarea>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

@@ -27,6 +27,7 @@ function App() {
   const [showBiblioteca, setShowBiblioteca] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState(null);
+  const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < 768);
 
   const [sermon, setSermon] = useState(() => {
     if (!currentUser) {
@@ -46,6 +47,14 @@ function App() {
     }
     return getInitialSermonState();
   });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsSmallScreen(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleSave = useCallback(async () => {
     if (!currentUser || !sermon.title) {
@@ -155,12 +164,12 @@ function App() {
   const rightPanelWidth = 100 - leftPanelWidth;
 
   return (
-    <div className="h-screen flex flex-col">
+    <div className="h-screen flex flex-col bg-gray-100">
       <Header onToggleBiblioteca={toggleBiblioteca} />
-      <div className="flex flex-1 overflow-hidden">
+      <div className={`flex flex-1 overflow-hidden ${isSmallScreen ? 'flex-col' : 'flex-row'}`}>
         <div
-          className="bg-white p-6 overflow-y-auto flex flex-col"
-          style={{ width: `${leftPanelWidth}%` }}
+          className="bg-white p-4 md:p-6 overflow-y-auto flex flex-col"
+          style={{ width: isSmallScreen ? '100%' : `${leftPanelWidth}%` }}
         >
           <Sidebar 
             modo={modo} 
@@ -177,16 +186,18 @@ function App() {
           </div>
         </div>
 
-        <PanelResizer
-          initialLeftWidth={60}
-          minWidth={10}
-          maxWidth={90}
-          onResize={handleResize}
-        />
+        {!isSmallScreen && (
+            <PanelResizer
+                initialLeftWidth={60}
+                minWidth={10}
+                maxWidth={90}
+                onResize={handleResize}
+            />
+        )}
 
         <div
-          className="bg-[#F8F9FA] p-5 overflow-y-auto"
-          style={{ width: `${rightPanelWidth}%` }}
+          className="bg-[#F8F9FA] p-4 md:p-5 overflow-y-auto"
+          style={{ width: isSmallScreen ? '100%' : `${rightPanelWidth}%` }}
         >
           <ResourcePanel />
         </div>

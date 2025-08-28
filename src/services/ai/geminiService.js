@@ -30,13 +30,13 @@ const extractAndParseJson = (text) => {
   const firstBrace = text.indexOf('{');
   const lastBrace = text.lastIndexOf('}');
   if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
-    const candidate = text.substring(firstBrace, lastBrace + 1).replace(/,\s*(?=[\\\]\}\}])/g, '');
+    const candidate = text.substring(firstBrace, lastBrace + 1).replace(/,\s*(?=[\\\\]\}\})/g, '');
     try { return JSON.parse(candidate); } catch (e) { /* continue */ }
   }
   const firstArr = text.indexOf('[');
   const lastArr = text.lastIndexOf(']');
   if (firstArr !== -1 && lastArr !== -1 && lastArr > firstArr) {
-    const candidate = text.substring(firstArr, lastArr + 1).replace(/,\s*(?=[\\\]\}\}])/g, '');
+    const candidate = text.substring(firstArr, lastArr + 1).replace(/,\s*(?=[\\\\]\}\})/g, '');
     try { return JSON.parse(candidate); } catch (e) { /* continue */ }
   }
   const categoriesKey = /"categories"\s*:\s*/i;
@@ -45,7 +45,7 @@ const extractAndParseJson = (text) => {
     const after = text.substring(mk.index + mk[0].length);
     const arr = findBalanced(after, 0, '[', ']');
     if (arr) {
-      const candidate = ('{\"categories\":' + arr + '}').replace(/,\s*(?=[\\\]\}\}])/g, '');
+      const candidate = ('{\"categories\":' + arr + '}').replace(/,\s*(?=[\\\\]\}\})/g, '');
       try { return JSON.parse(candidate); } catch (e) { /* continue */ }
     }
   }
@@ -217,5 +217,18 @@ export async function generateAlternative(sermon, field) {
   } catch (e) {
     console.error('generateAlternative error', e);
     return `Error al generar alternativa: ${e.message}`;
+  }
+}
+
+export async function generateDisparador(paragraph) {
+  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+  const prompt = `Dada el siguiente párrafo de un sermón: "${paragraph}".\n\nGenera una única frase corta (máximo 10 palabras) que actúe como un "disparador mental" para recordar el contenido de este párrafo. La respuesta debe ser únicamente la frase, sin comillas ni texto adicional.`;
+  try {
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    return await response.text();
+  } catch (e) {
+    console.error('generateDisparador error', e);
+    return `Error: ${e.message}`;
   }
 }

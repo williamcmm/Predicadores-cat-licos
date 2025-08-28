@@ -1,37 +1,147 @@
-import React from 'react';
+import React, { useState, useEffect, useRef, Fragment } from 'react';
+import { Popover, Transition } from '@headlessui/react';
+import { FaBars } from 'react-icons/fa';
 import SermonSaveButton from '../sermon/SermonSaveButton';
 
 const Sidebar = ({ modo, setModo, onClearSermon, onSave, isSaving, lastSaved }) => {
+  const [displayMode, setDisplayMode] = useState('wide'); // wide, narrow, collapsed
+  const sidebarRef = useRef(null);
+
   const modes = [
-    { id: 'edicion', name: 'Modo Edición' },
-    { id: 'estudio', name: 'Modo Estudio' },
-    { id: 'predicacion', name: 'Modo Predicación' },
+    { id: 'edicion', name: 'Modo Edición', shortName: 'Edición' },
+    { id: 'estudio', name: 'Modo Estudio', shortName: 'Estudio' },
+    { id: 'predicacion', name: 'Modo Predicación', shortName: 'Predicación' },
   ];
 
-  return (
-    <div className="flex justify-between items-center p-4 bg-gray-200 shadow-md">
-      <div className="flex gap-4">
+  useEffect(() => {
+    const observer = new ResizeObserver(entries => {
+      for (let entry of entries) {
+        const { width } = entry.contentRect;
+        if (width < 420) {
+          setDisplayMode('collapsed');
+        } else if (width < 580) {
+          setDisplayMode('narrow');
+        } else {
+          setDisplayMode('wide');
+        }
+      }
+    });
+
+    if (sidebarRef.current) {
+      observer.observe(sidebarRef.current);
+    }
+
+    return () => {
+      if (sidebarRef.current) {
+        observer.unobserve(sidebarRef.current);
+      }
+    };
+  }, []);
+
+  const renderButtons = (isPopover = false) => {
+    const actionButtonClassName = "px-4 py-2 rounded-md text-sm transition-all";
+
+    if (isPopover) {
+        return (
+            <>
+                <div className="flex flex-col items-center gap-2 w-full">
+                    {modes.map((m) => (
+                        <button
+                            key={m.id}
+                            className={`w-full px-3 py-2 rounded-md text-sm font-semibold transition-all duration-200 text-center 
+                            ${modo === m.id 
+                                ? 'bg-blue-600 text-white shadow-md' 
+                                : 'bg-transparent text-gray-600 hover:bg-blue-50 hover:text-blue-700'
+                            }`}
+                            onClick={() => setModo(m.id)}
+                        >
+                            {m.name}
+                        </button>
+                    ))}
+                </div>
+                <div className="flex flex-col items-center gap-2 w-full pt-4 border-t">
+                    <button
+                        onClick={onClearSermon}
+                        className={`${actionButtonClassName} w-full font-medium bg-transparent text-red-600 hover:bg-red-50 border border-red-200 hover:border-red-400`}>
+                        Limpiar
+                    </button>
+                    <SermonSaveButton 
+                        onSave={onSave} 
+                        isSaving={isSaving} 
+                        lastSaved={lastSaved} 
+                        className={`${actionButtonClassName} w-full border border-transparent`} 
+                    />
+                </div>
+            </>
+        )
+    }
+
+    return (
+    <>
+      <div className={'items-center border border-gray-200 rounded-lg p-1 flex'}>
         {modes.map((m) => (
           <button
             key={m.id}
-            className={`px-4 py-2 rounded-md text-sm font-medium 
-              ${modo === m.id ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-800 hover:bg-gray-400'}
-            `}
+            className={`px-3 py-2 rounded-md text-sm font-semibold transition-all duration-200 text-left 
+              ${modo === m.id 
+                ? 'bg-blue-600 text-white shadow-md' 
+                : 'bg-transparent text-gray-600 hover:bg-blue-50 hover:text-blue-700'
+              }`}
             onClick={() => setModo(m.id)}
           >
-            {m.name}
+            {displayMode === 'wide' ? m.name : m.shortName}
           </button>
         ))}
       </div>
-      <div className="flex items-center gap-4">
+
+      <div className={'flex items-center gap-2 sm:gap-4'}>
         <button
           onClick={onClearSermon}
-          className="px-4 py-2 rounded-md text-sm font-medium bg-red-500 text-white hover:bg-red-600"
-        >
+          className={`${actionButtonClassName} font-medium bg-transparent text-red-600 hover:bg-red-50 border border-red-200 hover:border-red-400`}>
           Limpiar
         </button>
-        <SermonSaveButton onSave={onSave} isSaving={isSaving} lastSaved={lastSaved} />
+        <SermonSaveButton 
+            onSave={onSave} 
+            isSaving={isSaving} 
+            lastSaved={lastSaved} 
+            className={`${actionButtonClassName} border border-transparent`} 
+        />
       </div>
+    </>
+  )};
+
+  return (
+    <div ref={sidebarRef} className="flex justify-between items-center p-3 border-b border-gray-200 gap-4">
+      {displayMode === 'collapsed' ? (
+        <Popover className="relative">
+          {({ open }) => (
+            <>
+              <Popover.Button className="p-2 rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <FaBars className="h-5 w-5" />
+              </Popover.Button>
+              <Transition
+                as={Fragment}
+                enter="transition ease-out duration-200"
+                enterFrom="opacity-0 translate-y-1"
+                enterTo="opacity-100 translate-y-0"
+                leave="transition ease-in duration-150"
+                leaveFrom="opacity-100 translate-y-0"
+                leaveTo="opacity-0 translate-y-1"
+              >
+                <Popover.Panel className="absolute z-10 mt-2 w-auto bg-white shadow-lg rounded-lg ring-1 ring-black ring-opacity-5">
+                  <div className="p-2 flex flex-col items-center gap-2">
+                    {renderButtons(true)}
+                  </div>
+                </Popover.Panel>
+              </Transition>
+            </>
+          )}
+        </Popover>
+      ) : (
+        <div className="flex flex-nowrap justify-between items-center gap-4 w-full overflow-hidden">
+            {renderButtons()}
+        </div>
+      )}
     </div>
   );
 };

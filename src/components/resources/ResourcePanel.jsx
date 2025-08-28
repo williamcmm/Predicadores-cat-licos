@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { FaSync, FaPaste, FaTimes } from 'react-icons/fa';
+import { FaSync, FaPaste, FaTimes, FaGripVertical } from 'react-icons/fa';
 import { searchResourcesProgressive, generateGeneralSuggestions, generateSermon } from '../../services/ai/geminiService';
 
 const PERSONAL_RESOURCE_CATEGORY = 'RECURSOS PERSONALES';
@@ -20,6 +20,17 @@ const INITIAL_CATEGORIES = [
 ].map(name => ({ name, active: true }));
 
 const initializeCategories = () => {
+  try {
+    const savedCategories = localStorage.getItem('resourceCategories');
+    if (savedCategories) {
+      const parsed = JSON.parse(savedCategories);
+      if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].name) {
+        return parsed;
+      }
+    }
+  } catch (error) {
+    console.error("Error reading categories from localStorage", error);
+  }
   return INITIAL_CATEGORIES;
 };
 
@@ -185,12 +196,25 @@ export default function ResourcePanel() {
     <div className="p-4 rounded-lg shadow-md h-full flex flex-col">
       {isPastingModalOpen && <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4"><div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[80vh] flex flex-col"><div className="flex justify-between items-center p-4 border-b"><h3 className="text-lg font-semibold">Añadir Recurso Personal</h3><button onClick={() => setIsPastingModalOpen(false)} className="text-2xl"><FaTimes /></button></div><div className="p-4 overflow-y-auto flex-1"><textarea className="w-full h-full p-2 border rounded-md min-h-[300px]" placeholder="Copia y pega aquí tu texto. Este texto se tratará como un recurso más para la generación del sermón." value={pastedTextInput} onChange={(e) => setPastedTextInput(e.target.value)}></textarea></div><div className="flex justify-end p-4 border-t space-x-4"><button onClick={() => setIsPastingModalOpen(false)} className="px-4 py-2 rounded-md bg-gray-200">Cancelar</button><button onClick={handleSavePastedText} className="px-4 py-2 rounded-md bg-blue-500 text-white">Usar este Texto</button></div></div></div>}
       
-      <div className="flex mb-4 items-start"><div className="flex-1"><div className="flex"><input type="text" className="flex-1 shadow appearance-none border rounded-l w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Buscar temas y recursos para predicación" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSearch(searchTerm)} /><button onClick={() => handleSearch(searchTerm)} className="px-4 py-2 bg-blue-500 text-white rounded-r hover:bg-blue-600 transition-colors disabled:bg-blue-300" disabled={isLoading || isSuggesting}>{isLoading ? 'Buscando...' : (isSuggesting ? '...' : 'Buscar')}</button><button onClick={handleClearSearch} className="ml-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors" title="Limpiar tema y resultados">Limpiar</button></div><div className="text-sm text-gray-600 mt-2"><p>Forma 1: Escribe un tema y haz clic en Buscar.</p><p>Forma 2: Haz clic en Buscar (sin escribir nada) para obtener sugerencias.</p></div></div>{isLoading && <button onClick={handleStopSearch} className="ml-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors">Detener Búsqueda</button>}</div>
+      <div className="flex flex-col sm:flex-row mb-4 items-start sm:items-center">
+        <div className="flex-1 w-full sm:w-auto">
+            <div className="flex">
+                <input type="text" className="flex-1 shadow appearance-none border rounded-l w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Buscar temas y recursos para predicación" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSearch(searchTerm)} />
+                <button onClick={() => handleSearch(searchTerm)} className="px-4 py-2 bg-blue-500 text-white rounded-r hover:bg-blue-600 transition-colors disabled:bg-blue-300" disabled={isLoading || isSuggesting}>{isLoading ? 'Buscando...' : (isSuggesting ? '...' : 'Buscar')}</button>
+                <button onClick={handleClearSearch} className="ml-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors" title="Limpiar tema y resultados">Limpiar</button>
+            </div>
+            <div className="text-sm text-gray-600 mt-2">
+                <p>Forma 1: Escribe un tema y haz clic en Buscar.</p>
+                <p>Forma 2: Haz clic en Buscar (sin escribir nada) para obtener sugerencias.</p>
+            </div>
+        </div>
+        {isLoading && <button onClick={handleStopSearch} className="mt-2 sm:mt-0 sm:ml-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors">Detener Búsqueda</button>}
+      </div>
 
       <div className="flex-1 bg-white p-4 rounded-md overflow-y-auto relative">
         {showDropdown && suggestions.length > 0 && <div className="absolute top-0 left-0 right-0 w-full bg-white border rounded-md shadow-lg z-10" ref={dropdownRef}><div className="p-2 border-b"><h3 className="text-md font-semibold">Sugerencias de Temas</h3></div><ul className="p-2">{suggestions.map((s, i) => <li key={i} className="py-2 px-2 text-gray-700 cursor-pointer hover:bg-gray-100 rounded" onClick={() => onSuggestionClick(s)}>{s}</li>)}</ul></div>}
         <>
-          {hasContent() && <div className="mb-4 p-4 bg-green-50 border border-green-300 rounded"><div className="text-sm text-gray-700 font-medium">¿Cómo quieres continuar?</div><div className="mt-3 flex gap-3"><button className="px-4 py-2 bg-green-500 text-white rounded" onClick={handleGenerateSermon} disabled={generating}>{generating ? 'Generando...' : 'Pedir a la IA que te sugiera un sermón'}</button><button className="px-4 py-2 border border-green-500 text-green-700 rounded" onClick={() => window.dispatchEvent(new CustomEvent('startManualSermonFromResources', { detail: { topic: searchTerm } }))}>Crear el sermón tú mismo</button></div></div>}
+          {hasContent() && <div className="mb-4 p-4 bg-green-50 border border-green-300 rounded"><div className="text-sm text-gray-700 font-medium">¿Cómo quieres continuar?</div><div className="mt-3 flex flex-col sm:flex-row gap-3"><button className="px-4 py-2 bg-green-500 text-white rounded" onClick={handleGenerateSermon} disabled={generating}>{generating ? 'Generando...' : 'Pedir a la IA que te sugiera un sermón'}</button><button className="px-4 py-2 border border-green-500 text-green-700 rounded" onClick={() => window.dispatchEvent(new CustomEvent('startManualSermonFromResources', { detail: { topic: searchTerm } }))}>Crear el sermón tú mismo</button></div></div>}
           
           <p className="text-base font-semibold text-gray-700 mb-2">Categorías de Búsqueda</p>
           
@@ -203,20 +227,23 @@ export default function ResourcePanel() {
               const isPersonalResource = cat.name === PERSONAL_RESOURCE_CATEGORY;
 
               return (
-                <div key={cat.name} className={`border rounded p-2 transition-opacity ${!cat.active ? 'opacity-50' : ''}`}>
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center">
-                       <input type="checkbox" checked={cat.active} onChange={() => handleToggleCategoryActive(cat.name)} className="mr-3 h-5 w-5" />
+                <div key={cat.name} className={`border rounded p-3 transition-opacity ${!cat.active ? 'opacity-50' : 'bg-gray-50'}`}>
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                    <div className="flex items-center mb-2 sm:mb-0">
+                       <input type="checkbox" checked={cat.active} onChange={() => handleToggleCategoryActive(cat.name)} className="mr-3 h-5 w-5 rounded text-blue-600 focus:ring-blue-500" />
+                       <div className="flex items-center text-gray-400 mr-3">
+                        <FaGripVertical />
+                       </div>
                       <div className="flex flex-col mr-2">
-                        <button onClick={() => handleMoveCategory(index, -1)} disabled={index === 0 || (!cat.active && categories[index - 1]?.active)} className="disabled:opacity-25">▲</button>
-                        <button onClick={() => handleMoveCategory(index, 1)} disabled={index === categories.length - 1 || (cat.active && !categories[index + 1]?.active)} className="disabled:opacity-25">▼</button>
+                        <button onClick={() => handleMoveCategory(index, -1)} disabled={index === 0} className="disabled:opacity-25 text-gray-600 hover:text-blue-600">▲</button>
+                        <button onClick={() => handleMoveCategory(index, 1)} disabled={index === categories.length - 1} className="disabled:opacity-25 text-gray-600 hover:text-blue-600">▼</button>
                       </div>
                       <div className="font-medium text-blue-600 hover:underline cursor-pointer" onClick={() => handleToggleCategory(cat.name)}>{cat.name}</div>
                       {isPersonalResource && (
                         <button onClick={() => setIsPastingModalOpen(true)} className="ml-4 px-3 py-1.5 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600 flex items-center"><FaPaste className="mr-2" />Añadir Texto</button>
                       )}
                     </div>
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-2 self-end sm:self-center">
                       {!isPersonalResource && <button onClick={() => handleFetchSingleCategory(cat.name)} disabled={isLoadingCat || !cat.active} className="p-1 text-gray-400 hover:text-blue-600 disabled:opacity-50 disabled:cursor-not-allowed" title="Buscar en esta categoría"><FaSync className={isLoadingCat ? 'animate-spin' : ''} /></button>}
                       <div className="text-sm text-gray-600">({count})</div>
                       {isLoadingCat && <div className="text-sm text-yellow-600">Buscando...</div>}
@@ -224,7 +251,7 @@ export default function ResourcePanel() {
                     </div>
                   </div>
                   {isExpanded && cat.active && (
-                    <div className="mt-2">
+                    <div className="mt-2 pl-8">
                       {count === 0 && <p className="text-sm text-gray-500">{isPersonalResource ? 'Aún no has añadido un texto personal.' : 'Sin resultados en esta categoría.'}</p>}
                       {count > 0 && (
                         (found.resources || []).map((resource, idx) => {

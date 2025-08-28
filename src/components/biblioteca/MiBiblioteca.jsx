@@ -79,22 +79,22 @@ const MiBiblioteca = ({ onClose, onOpenSermon }) => {
   }, [sermones, searchTerm, sortOrder]);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-40 flex justify-center items-center">
-      <div className="bg-white rounded-lg shadow-2xl w-3/4 h-3/4 p-6 flex flex-col">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-40 flex justify-center items-center p-4">
+      <div className="bg-white rounded-lg shadow-2xl w-full md:w-3/4 lg:w-2/3 h-5/6 p-6 flex flex-col">
         <div className="flex justify-between items-center border-b pb-4 mb-4">
-          <h2 className="text-2xl font-bold">Mi Biblioteca de Sermones</h2>
+          <h2 className="text-xl sm:text-2xl font-bold">Mi Biblioteca de Sermones</h2>
           <button onClick={onClose} className="text-2xl font-bold">&times;</button>
         </div>
 
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
           <input 
             type="text"
             placeholder="Buscar por título..."
-            className="px-4 py-2 border rounded-md w-1/2"
+            className="px-4 py-2 border rounded-md w-full sm:w-1/2"
             onChange={(e) => setSearchTerm(e.target.value)}
           />
           <select 
-            className="px-4 py-2 border rounded-md"
+            className="px-4 py-2 border rounded-md w-full sm:w-auto"
             onChange={(e) => setSortOrder(e.target.value)}
             value={sortOrder}
           >
@@ -110,29 +110,29 @@ const MiBiblioteca = ({ onClose, onOpenSermon }) => {
           ) : filteredAndSortedSermons.length > 0 ? (
             <ul className="divide-y divide-gray-200">
               {filteredAndSortedSermons.map((sermon) => (
-                <li key={sermon.id} className="p-4 flex justify-between items-center hover:bg-gray-50">
-                  <div>
+                <li key={sermon.id} className="p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center hover:bg-gray-50 gap-4">
+                  <div className="mb-4 sm:mb-0">
                     <h3 className="font-bold text-lg">{sermon.title}</h3>
                     <p className="text-sm text-gray-500">
                       Creado: {sermon.createdAt && sermon.createdAt.seconds ? new Date(sermon.createdAt.seconds * 1000).toLocaleDateString() : 'Fecha no disponible'}
                     </p>
                   </div>
-                  <div className="flex space-x-2">
+                  <div className="flex flex-wrap space-x-2 self-end sm:self-center">
                     <button 
                       onClick={() => handleOpenSermon(sermon)}
-                      className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+                      className="px-3 py-1 sm:px-4 sm:py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors text-sm"
                     >
                       Abrir
                     </button>
                     <button 
                       onClick={() => handleDuplicateSermon(sermon)}
-                      className="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition-colors"
+                      className="px-3 py-1 sm:px-4 sm:py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition-colors text-sm"
                     >
                       Duplicar
                     </button>
                     <button 
                       onClick={() => handleDeleteSermon(sermon.id)}
-                      className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+                      className="px-3 py-1 sm:px-4 sm:py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors text-sm"
                     >
                       Eliminar
                     </button>

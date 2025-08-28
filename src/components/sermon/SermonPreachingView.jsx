@@ -169,7 +169,7 @@ const SermonPreachingView = ({ sermon, onClose, user }) => {
           ⚙️
         </button>
         {showSettings && (
-          <div className="absolute bottom-20 right-4 bg-white p-4 rounded-lg shadow-lg border border-gray-200 w-64">
+          <div className="absolute bottom-20 right-4 bg-white p-4 rounded-lg shadow-lg border border-gray-200 w-full sm:w-64 left-4 sm:left-auto">
             <div className="mb-4">
               <label htmlFor="fontSizeSliderPred" className="block text-sm font-medium text-gray-700">Tamaño de Letra: {fontSize.toFixed(1)}em</label>
               <input

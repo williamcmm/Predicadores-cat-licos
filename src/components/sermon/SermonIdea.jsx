@@ -1,57 +1,39 @@
 import React, { useState, useEffect } from 'react';
+import { generateDisparador } from '../../services/ai/geminiService';
 
-const SermonIdea = ({ idea, onUpdate, onDelete, generateAlternative, sermonContext }) => {
+const SermonIdea = ({ idea, onUpdate, onDelete, index }) => {
   // Internal state for controlled components
   const [h1, setH1] = useState(idea.h1 || '');
+  const [lineaInicial, setLineaInicial] = useState(idea.lineaInicial || '');
   const [elementType, setElementType] = useState(idea.elementoApoyo?.tipo || 'cita_biblica');
   const [elementContent, setElementContent] = useState(idea.elementoApoyo?.contenido || '');
   const [disparadores, setDisparadores] = useState(idea.disparadores || []);
-  const [isSuggesting, setIsSuggesting] = useState({ h1: false, parrafo: {} });
+  const [ejemploPractico, setEjemploPractico] = useState(idea.ejemploPractico || '');
+  const [resultadoEsperado, setResultadoEsperado] = useState(idea.resultadoEsperado || '');
+  const [isGenerating, setIsGenerating] = useState({});
 
-  // This effect synchronizes the component's internal state with the props from the parent.
-  // This is crucial for when the sermon data is loaded asynchronously from the AI.
+  // Sync with parent component state
   useEffect(() => {
     setH1(idea.h1 || '');
+    setLineaInicial(idea.lineaInicial || '');
     setElementType(idea.elementoApoyo?.tipo || 'cita_biblica');
     setElementContent(idea.elementoApoyo?.contenido || '');
     setDisparadores(idea.disparadores || []);
-  }, [idea]); // Dependency array ensures this runs whenever the 'idea' prop changes
+    setEjemploPractico(idea.ejemploPractico || '');
+    setResultadoEsperado(idea.resultadoEsperado || '');
+  }, [idea]);
 
+  // --- Event Handlers ---
   const handleUpdate = (field, value) => {
-    let updatedIdea = { ...idea };
-
-    switch (field) {
-      case 'h1':
-        updatedIdea.h1 = value;
-        break;
-      case 'elementType':
-        updatedIdea.elementoApoyo = { ...updatedIdea.elementoApoyo, tipo: value };
-        break;
-      case 'elementContent':
-        updatedIdea.elementoApoyo = { ...updatedIdea.elementoApoyo, contenido: value };
-        break;
-      case 'disparadores':
-        updatedIdea.disparadores = value;
-        break;
-      default:
-        break;
-    }
+    const updatedIdea = { ...idea, [field]: value };
     onUpdate(updatedIdea);
   };
 
-  const handleH1Change = (e) => {
-    setH1(e.target.value);
-    handleUpdate('h1', e.target.value);
-  };
-
-  const handleElementTypeChange = (e) => {
-    setElementType(e.target.value);
-    handleUpdate('elementType', e.target.value);
-  };
-
-  const handleElementContentChange = (e) => {
-    setElementContent(e.target.value);
-    handleUpdate('elementContent', e.target.value);
+  const handleElementChange = (field, value) => {
+    const updatedElementoApoyo = { ...idea.elementoApoyo, [field]: value };
+    if(field === 'tipo') setElementType(value);
+    if(field === 'contenido') setElementContent(value);
+    handleUpdate('elementoApoyo', updatedElementoApoyo);
   };
 
   const handleDisparadorChange = (id, field, value) => {
@@ -62,152 +44,180 @@ const SermonIdea = ({ idea, onUpdate, onDelete, generateAlternative, sermonConte
     handleUpdate('disparadores', updatedDisparadores);
   };
 
-  const handleSuggestIdeaAlternative = async (field, disparadorId = null) => {
-    setIsSuggesting(prev => {
-      if (field === 'parrafo') return { ...prev, parrafo: { ...prev.parrafo, [disparadorId]: true } };
-      return { ...prev, [field]: true };
-    });
-    try {
-      const alternative = await generateAlternative(sermonContext, field, idea.id, disparadorId);
-      if (alternative) {
-        if (field === 'h1') {
-          setH1(alternative);
-          handleUpdate('h1', alternative);
-        } else if (field === 'parrafo') {
-          const updatedDisparadores = disparadores.map(d => 
-            d.id === disparadorId ? { ...d, parrafo: alternative } : d
-          );
-          setDisparadores(updatedDisparadores);
-          handleUpdate('disparadores', updatedDisparadores);
-        }
-      }
-    } catch (error) {
-      console.error(`Error suggesting another for ${field}:`, error);
-      alert(`Hubo un error al sugerir otra opción para ${field}.`);
-    } finally {
-      setIsSuggesting(prev => {
-        if (field === 'parrafo') return { ...prev, parrafo: { ...prev.parrafo, [disparadorId]: false } };
-        return { ...prev, [field]: false };
-      });
-    }
-  };
-
   const addDisparador = () => {
-    const newId = disparadores.length > 0 ? Math.max(...disparadores.map(d => d.id)) + 1 : Date.now();
+    if (disparadores.length >= 8) {
+        alert('Máximo 8 disparadores por idea');
+        return;
+    }
+    const newId = `disparador_${Date.now()}`;
     const newDisparadores = [...disparadores, { id: newId, disparador: '', parrafo: '' }];
     setDisparadores(newDisparadores);
     handleUpdate('disparadores', newDisparadores);
   };
 
   const deleteDisparador = (id) => {
+    if (disparadores.length <= 1) {
+        alert('Debe mantener al menos un disparador en cada idea');
+        return;
+    }
     const updatedDisparadores = disparadores.filter((d) => d.id !== id);
     setDisparadores(updatedDisparadores);
     handleUpdate('disparadores', updatedDisparadores);
   };
 
+  const handleGenerateDisparador = async (id) => {
+    const disparador = disparadores.find(d => d.id === id);
+    if (!disparador || !disparador.parrafo.trim()) {
+        alert('Primero escriba el contenido del párrafo para generar el disparador');
+        return;
+    }
+    setIsGenerating(prev => ({ ...prev, [id]: true }));
+    try {
+        const suggestion = await generateDisparador(disparador.parrafo);
+        handleDisparadorChange(id, 'disparador', suggestion.trim());
+    } catch (error) {
+        console.error("Error generating disparador:", error);
+        alert("Hubo un error al generar el disparador.");
+    } finally {
+        setIsGenerating(prev => ({ ...prev, [id]: false }));
+    }
+  };
+
+
   return (
-    <div className="border p-4 mb-4 rounded-md bg-gray-50 relative">
-      <button
-        onClick={() => onDelete(idea.id)}
-        className="absolute top-2 right-2 text-red-500 hover:text-red-700 font-bold"
-      >
-        X
-      </button>
-      {/* NIVEL 1: H1 (Idea Central) */}
-      <div className="mb-4">
-        <div className="flex justify-between items-center mb-2">
-          <label className="block text-gray-700 text-sm font-semibold">
-            Idea Central (H1)
-          </label>
-          <button onClick={() => handleSuggestIdeaAlternative('h1')} disabled={isSuggesting.h1} className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 disabled:opacity-50">
-            {isSuggesting.h1 ? '...' : 'Sugerir Otro'}
-          </button>
-        </div>
-        <input
-          type="text"
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          placeholder="Frase que refuerza directamente el título del sermón"
-          value={h1}
-          onChange={handleH1Change}
-        />
-      </div>
-
-      {/* NIVEL 2: Elemento de Apoyo (Texto Base Sagrado) */}
-      <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-semibold mb-2">
-          Elemento de Apoyo
-        </label>
-        <select
-          className="shadow border rounded w-full py-2 px-3 text-gray-700 mb-2 leading-tight focus:outline-none focus:shadow-outline"
-          value={elementType}
-          onChange={handleElementTypeChange}
-        >
-          <option value="cita_biblica">Cita Bíblica Completa</option>
-          <option value="catecismo">Cita del Catecismo Completa</option>
-          <option value="documento_pontificio">Documento Pontificio</option>
-          <option value="ensenanza_iglesia">Enseñanza de la Iglesia</option>
-          <option value="testimonio_doctrinal">Testimonio Doctrinal</option>
-        </select>
-        <textarea
-          rows="5"
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          placeholder="Texto completo que fundamenta la Idea Central (H1)"
-          value={elementContent}
-          onChange={handleElementContentChange}
-        ></textarea>
-      </div>
-
-      {/* NIVEL 3: Sistema de Disparadores Mentales + Párrafos */}
-      <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-semibold mb-2">
-          Disparadores Mentales y Párrafos
-        </label>
-        {disparadores.map((disparador, index) => (
-          <div key={disparador.id || index} className="border p-3 mb-3 rounded-md bg-white relative">
-            <button
-              onClick={() => deleteDisparador(disparador.id)}
-              className="absolute top-1 right-1 text-red-400 hover:text-red-600 text-xs font-bold"
-            >
-              X
+    <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-4 sm:p-8 border-l-4 border-blue-600 mb-8">
+        {/* Header con título de la idea */}
+        <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-6 pb-4 border-b-2 border-gray-200">
+            <div className="flex-1 mb-4 sm:mb-0">
+                <label className="block font-bold text-gray-600 text-xs uppercase mb-2">IDEA PRINCIPAL #{index + 1}</label>
+                <input 
+                    type="text" 
+                    value={h1}
+                    onChange={(e) => { setH1(e.target.value); handleUpdate('h1', e.target.value); }}
+                    placeholder="Una Nueva Mentalidad - El Conflicto como Invitación Divina"
+                    className="w-full p-3 border-2 border-gray-300 rounded-lg text-lg font-semibold text-gray-800 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+                />
+            </div>
+            <button onClick={() => onDelete(idea.id)} className="bg-red-500 text-white border-none py-2 px-4 rounded-md cursor-pointer text-sm sm:ml-4 transition-colors hover:bg-red-600 self-end sm:self-center">
+                Eliminar Idea
             </button>
-            <div className="mb-2">
-              <label className="block text-gray-600 text-xs font-medium mb-1">
-                Disparador Mental
-              </label>
-              <input
-                type="text"
-                className="shadow appearance-none border rounded w-full py-1 px-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-sm"
-                placeholder="1-2 líneas máximo - frase que resume el párrafo de abajo"
-                value={disparador.disparador}
-                onChange={(e) => handleDisparadorChange(disparador.id, 'disparador', e.target.value)}
-              />
+        </div>
+
+        {/* Línea inicial destacada */}
+        <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-md mb-6">
+            <label className="block font-semibold text-blue-800 text-sm mb-2">Línea Inicial Impactante</label>
+            <textarea 
+                value={lineaInicial}
+                onChange={(e) => { setLineaInicial(e.target.value); handleUpdate('lineaInicial', e.target.value); }}
+                placeholder='Todo conflicto matrimonial es una invitación de Dios a crecer en santidad'
+                className="w-full p-2 border border-blue-200 rounded-md resize-y text-sm bg-white"
+                rows={2}
+            />
+        </div>
+
+        {/* Fragmento Doctrinal */}
+        <div className="mb-6 p-5 bg-gray-100 rounded-lg">
+            <div className="mb-4">
+                <label className="block font-semibold text-gray-700 mb-1">Tipo de Fragmento</label>
+                <select 
+                    value={elementType} 
+                    onChange={(e) => handleElementChange('tipo', e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded-md bg-white text-sm"
+                >
+                    <option value="cita_biblica">Cita Bíblica</option>
+                    <option value="catecismo">Catecismo de la Iglesia Católica</option>
+                    <option value="reflexion">Reflexión Teológica Importante</option>
+                </select>
             </div>
             <div>
-              <div className="flex justify-between items-center mb-1">
-                <label className="block text-gray-600 text-xs font-medium">
-                  Párrafo Explicativo
-                </label>
-                <button onClick={() => handleSuggestIdeaAlternative('parrafo', disparador.id)} disabled={isSuggesting.parrafo[disparador.id]} className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 disabled:opacity-50">
-                  {isSuggesting.parrafo[disparador.id] ? '...' : 'Sugerir Otro'}
-                </button>
-              </div>
-              <textarea
-                rows="6"
-                className="shadow appearance-none border rounded w-full py-1 px-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-sm"
-                placeholder="Párrafo completo que desarrolla y explica el disparador mental"
-                value={disparador.parrafo}
-                onChange={(e) => handleDisparadorChange(disparador.id, 'parrafo', e.target.value)}
-              ></textarea>
+                <textarea 
+                    value={elementContent}
+                    onChange={(e) => handleElementChange('contenido', e.target.value)}
+                    placeholder='"Donde abunda el pecado, sobreabunda la gracia" (Romanos 5:20, DHH)'
+                    className="w-full p-3 border border-gray-300 rounded-md min-h-[80px] resize-y text-sm"
+                ></textarea>
             </div>
-          </div>
-        ))}
-        <button
-          onClick={addDisparador}
-          className="mt-2 px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors text-sm"
-        >
-          Añadir Disparador
-        </button>
-      </div>
+        </div>
+
+        {/* Sección de Disparadores Mentales */}
+        <div className="mb-6">
+            <div className="text-lg font-bold text-gray-800 mb-5 flex items-center gap-3">
+                <span className="text-xl">💡</span>
+                Disparadores Mentales Clave
+            </div>
+
+            {disparadores.map((disparador, d_index) => (
+                <div key={disparador.id} className="bg-gray-50 border border-gray-200 rounded-lg p-5 mb-4 relative">
+                    <button onClick={() => deleteDisparador(disparador.id)} className="absolute top-2 right-3 bg-red-500 text-white border-none w-7 h-7 rounded-full cursor-pointer text-lg font-bold flex items-center justify-center transition-colors hover:bg-red-600 z-10">
+                        ×
+                    </button>
+                    <div className="bg-blue-600 text-white w-7 h-7 rounded-full flex items-center justify-center font-bold text-sm absolute -top-2 left-4">
+                        {d_index + 1}
+                    </div>
+                    <div className="ml-5 pt-3">
+                        <div className="mb-4">
+                            <label className="block font-semibold text-gray-500 mb-1 text-xs">Disparador Mental</label>
+                            <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
+                                <input 
+                                    type="text" 
+                                    value={disparador.disparador}
+                                    onChange={(e) => handleDisparadorChange(disparador.id, 'disparador', e.target.value)}
+                                    placeholder="Frase corta que ayuda a recordar el párrafo"
+                                    className="flex-1 p-2 border border-gray-300 rounded-md font-semibold text-gray-800 bg-white"
+                                />
+                                <button 
+                                    onClick={() => handleGenerateDisparador(disparador.id)} 
+                                    className="bg-teal-500 text-white border-none py-2 px-4 rounded-md cursor-pointer text-xs font-semibold whitespace-nowrap transition-colors hover:bg-teal-600 disabled:bg-gray-400"
+                                    disabled={isGenerating[disparador.id]}
+                                >
+                                    {isGenerating[disparador.id] ? '...' : 'Generar'}
+                                </button>
+                            </div>
+                        </div>
+                        <div>
+                            <textarea 
+                                value={disparador.parrafo}
+                                onChange={(e) => handleDisparadorChange(disparador.id, 'parrafo', e.target.value)}
+                                placeholder="Introduzca aquí un párrafo que desea recordar con el disparador mental"
+                                className="w-full p-3 border border-gray-300 rounded-md min-h-[100px] resize-y text-sm"
+                            ></textarea>
+                        </div>
+                    </div>
+                </div>
+            ))}
+
+            <button onClick={addDisparador} className="bg-blue-500 text-white border-none py-3 px-5 rounded-md cursor-pointer font-semibold w-full mt-3 transition-colors hover:bg-blue-600">
+                + Añadir Nuevo Disparador
+            </button>
+        </div>
+
+        {/* Ejemplo Práctico */}
+        <div className="bg-amber-100 border-l-4 border-amber-500 p-5 rounded-lg my-5">
+            <div className="font-bold text-amber-800 mb-2 flex items-center gap-2">
+                <span className="text-lg">💼</span>
+                Ejemplo Práctico
+            </div>
+            <textarea 
+                value={ejemploPractico}
+                onChange={(e) => { setEjemploPractico(e.target.value); handleUpdate('ejemploPractico', e.target.value); }}
+                placeholder="Cuando discutan por el dinero, no vean solo el problema financiero..."
+                className="w-full p-2 border-none rounded-md resize-y text-sm bg-transparent focus:outline-none focus:ring-1 focus:ring-amber-500"
+            />
+        </div>
+
+        {/* Resultado Esperado */}
+        <div className="bg-emerald-100 border-l-4 border-emerald-500 p-5 rounded-lg my-5">
+            <div className="font-bold text-emerald-800 mb-2 flex items-center gap-2">
+                <span className="text-lg">🎯</span>
+                Resultado Esperado
+            </div>
+            <textarea 
+                value={resultadoEsperado}
+                onChange={(e) => { setResultadoEsperado(e.target.value); handleUpdate('resultadoEsperado', e.target.value); }}
+                placeholder="En lugar de salir lastimados del conflicto, salen fortalecidos..."
+                className="w-full p-2 border-none rounded-md resize-y text-sm bg-transparent focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            />
+        </div>
     </div>
   );
 };
