@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, Fragment } from 'react';
 import { Popover, Transition } from '@headlessui/react';
 import { FaQuestionCircle } from 'react-icons/fa';
+import SermonExportButton from './SermonExportButton';
 
 const SermonPreachingView = ({ sermon, onClose, user }) => {
   const [fontSize, setFontSize] = useState(1.8);
@@ -158,7 +159,8 @@ const SermonPreachingView = ({ sermon, onClose, user }) => {
         </div>
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-gray-100 p-4 border-t border-gray-300 z-10 flex justify-end items-center">
+      <div className="fixed bottom-0 left-0 right-0 bg-gray-100 p-4 border-t border-gray-300 z-10 flex justify-end items-center space-x-4">
+        <SermonExportButton sermon={sermon} />
         <button
           onClick={() => setShowSettings(!showSettings)}
           className="bg-blue-500 text-white rounded-full w-12 h-12 flex items-center justify-center text-2xl"
