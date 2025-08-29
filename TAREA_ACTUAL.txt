@@ -1,0 +1,32 @@
+# Tarea Actual: Diagnosticar y solucionar el bloqueo de la aplicación al iniciar.
+
+## Problema Identificado:
+La aplicación no puede iniciar y los intentos de limpieza fallan porque archivos en la carpeta `node_modules` están bloqueados por un proceso desconocido, impidiendo su eliminación. Esto persiste incluso después de cerrar programas.
+
+## Plan de Acción General:
+1.  **Fase 1: Rescatar Código (Completada):** Se respaldó el código fuente modificado y no guardado para evitar su pérdida.
+2.  **Fase 2: Limpiar y Restaurar (En Progreso):** Restaurar el código a una versión estable y reinstalar las dependencias desde cero.
+3.  **Fase 3: Reintegrar y Probar (Pendiente):** Reintroducir gradualmente el código rescatado en el proyecto limpio para encontrar el conflicto.
+
+---
+
+## Historial de Pasos Ejecutados (Sesión Actual):
+
+1.  **Análisis:** Se detectó que, además del problema de `node_modules`, existían múltiples archivos críticos (`App.js`, `firebase.js`, etc.) con cambios importantes no guardados en Git.
+2.  **Decisión:** Se acordó no descartar los cambios. En su lugar, se optó por un plan de rescate.
+3.  **Creación de Respaldo:** Se creó la carpeta `c:\predicador\temp_backup`.
+4.  **Copia de Seguridad:** Se copió exitosamente el contenido de todos los archivos modificados importantes a la carpeta `temp_backup`.
+5.  **Restauración de Código Fuente:** Se ejecutó `git restore .` para descartar los cambios del directorio de trabajo y devolver el código a la última versión estable guardada en el repositorio.
+6.  **Intento de Limpieza Fallido:** Se intentó eliminar `node_modules` y `package-lock.json`, pero el comando falló nuevamente debido al bloqueo de archivos, confirmando que un proceso sigue activo.
+
+---
+
+## SIGUIENTE PASO (ACCIÓN DEL USUARIO):
+
+*   **Reiniciar el PC.** Esta es la acción más fiable para terminar cualquier proceso fantasma que esté bloqueando los archivos.
+
+## SIGUIENTES PASOS (GEMINI - POST-REINICIO):
+
+1.  Una vez que el usuario reinicie y volvamos a establecer contacto, mi **primera acción** será ejecutar el comando para **eliminar `node_modules` y `package-lock.json`**.
+2.  Inmediatamente después, ejecutaré `npm install` para instalar dependencias limpias.
+3.  Si todo va bien, comenzaremos la **Fase 3**, reintroduciendo el primer archivo respaldado (`firebase.js`) y probando si la aplicación arranca.

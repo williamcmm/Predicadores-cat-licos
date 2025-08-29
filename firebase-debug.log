@@ -1,0 +1,555 @@
+[debug] [2025-08-28T22:56:51.875Z] ----------------------------------------------------------------------
+[debug] [2025-08-28T22:56:51.878Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\willi\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy
+[debug] [2025-08-28T22:56:51.879Z] CLI Version:   14.15.0
+[debug] [2025-08-28T22:56:51.879Z] Platform:      win32
+[debug] [2025-08-28T22:56:51.879Z] Node Version:  v22.17.1
+[debug] [2025-08-28T22:56:51.880Z] Time:          Thu Aug 28 2025 17:56:51 GMT-0500 (hora estándar de Colombia)
+[debug] [2025-08-28T22:56:51.880Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-08-28T22:56:52.136Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-08-28T22:56:52.138Z] > authorizing via signed-in user (william.comunidad@gmail.com)
+[debug] [2025-08-28T22:56:52.139Z] [iam] checking project predicadores-catolicos for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2025-08-28T22:56:52.140Z] Checked if tokens are valid: true, expires at: 1756423248046
+[debug] [2025-08-28T22:56:52.141Z] Checked if tokens are valid: true, expires at: 1756423248046
+[debug] [2025-08-28T22:56:52.142Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/predicadores-catolicos:testIamPermissions [none]
+[debug] [2025-08-28T22:56:52.142Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/predicadores-catolicos:testIamPermissions x-goog-quota-user=projects/predicadores-catolicos
+[debug] [2025-08-28T22:56:52.142Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/predicadores-catolicos:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2025-08-28T22:56:52.787Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/predicadores-catolicos:testIamPermissions 200
+[debug] [2025-08-28T22:56:52.789Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/predicadores-catolicos:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2025-08-28T22:56:52.791Z] Checked if tokens are valid: true, expires at: 1756423248046
+[debug] [2025-08-28T22:56:52.791Z] Checked if tokens are valid: true, expires at: 1756423248046
+[debug] [2025-08-28T22:56:52.792Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/predicadores-catolicos [none]
+[debug] [2025-08-28T22:56:53.196Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/predicadores-catolicos 200
+[debug] [2025-08-28T22:56:53.196Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/predicadores-catolicos {"projectId":"predicadores-catolicos","projectNumber":"605560352237","displayName":"predicadores catolicos","name":"projects/predicadores-catolicos","resources":{"hostingSite":"predicadores-catolicos"},"state":"ACTIVE","etag":"1_b68e1542-d368-43c3-a7c5-73f235cccc8f"}
+[info] 
+[info] === Deploying to 'predicadores-catolicos'...
+[info] 
+[info] i  deploying hosting 
+[debug] [2025-08-28T22:56:53.215Z] Checked if tokens are valid: true, expires at: 1756423248046
+[debug] [2025-08-28T22:56:53.216Z] Checked if tokens are valid: true, expires at: 1756423248046
+[debug] [2025-08-28T22:56:53.216Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/versions [none]
+[debug] [2025-08-28T22:56:53.216Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/versions {"status":"CREATED","labels":{"deployment-tool":"cli-firebase"}}
+[debug] [2025-08-28T22:56:54.520Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/versions 200
+[debug] [2025-08-28T22:56:54.520Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/versions {"name":"projects/605560352237/sites/predicadores-catolicos/versions/3701cf739d2022fb","status":"CREATED","config":{},"labels":{"deployment-tool":"cli-firebase"}}
+[info] i  hosting[predicadores-catolicos]: beginning deploy... 
+[info] i  hosting[predicadores-catolicos]: found 17 files in build 
+[debug] [2025-08-28T22:56:54.581Z] [hosting] uploading with 200 concurrency
+[debug] [2025-08-28T22:56:55.680Z] Checked if tokens are valid: true, expires at: 1756423248046
+[debug] [2025-08-28T22:56:55.680Z] Checked if tokens are valid: true, expires at: 1756423248046
+[debug] [2025-08-28T22:56:55.683Z] [hosting] hash cache [YnVpbGQ] stored for 17 files
+[debug] [2025-08-28T22:56:55.684Z] [hosting][hash queue][FINAL] {"max":1084,"min":31,"avg":103.23529411764706,"active":0,"complete":17,"success":17,"errored":0,"retried":0,"total":17,"elapsed":1099}
+[debug] [2025-08-28T22:56:55.685Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/605560352237/sites/predicadores-catolicos/versions/3701cf739d2022fb:populateFiles [none]
+[debug] [2025-08-28T22:56:55.685Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/605560352237/sites/predicadores-catolicos/versions/3701cf739d2022fb:populateFiles {"files":{"/assets/modo predicacion.png":"46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e","/assets/Modo inicio.png":"46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e","/assets/modo estudio.png":"46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e","/robots.txt":"bfe106a3fb878dc83461c86818bf74fc1bdc7f28538ba613cd3e775516ce8b49","/index.html":"772c56c1b04fdc7c624408576f57180c837d48fd529094740edf395384b2194c","/asset-manifest.json":"51d3b977f307b54c9cc103277020e2c2661e95468fec9b5426fb5705832d31bd","/static/js/main.1734ca71.js.LICENSE.txt":"fa91e71397d9873bc792b8580026b06a06ed4e195c0cf15d95cc8943770acc5f","/logo512.png":"212b102aa09e51b3b3e06647e81f7801a61333e171f6582e8124379aabccb41d","/logo192.png":"79e2b749561016bc8af300ea19f48347ceed3cb1a54f48ae456172eca45e08f0","/favicon.ico":"27edce7be5922cf0bef7d4136f69b5bfbdd5bf8c13c7b026f71187d41a00aa7d","/static/js/453.29e888ec.chunk.js":"cd40bffc74a95194f68346bcefe57dcce69693af78da9c0db7500061c9008c56","/static/js/453.29e888ec.chunk.js.map":"7b9d972a45ca6a9c009b30603021191aa09c7a92c0fd26387c7d54be3306a4bc","/static/css/main.3d368d28.css.map":"c1fd70fad1edf6c8aa754e2bfdb73b5f7b261938a52bc1d41948bad22984c43e","/manifest.json":"ee04fb47e525c67d8424ffe9b4d8a8a24e434504478afca4e0ca602146836d4c","/static/css/main.3d368d28.css":"7c907b52d70ce5b5e5a43ab12f043bb590ee65ec9c45c848457e6bf3f3a31cf8","/static/js/main.1734ca71.js":"0242f379e78a81059827508d962513773dabbbffbe2d7185f1350800f007483c","/static/js/main.1734ca71.js.map":"851277bd03687151e2c63007a19bce2d5735b57fde80ec5b902529d9518b9555"}}
+[debug] [2025-08-28T22:56:55.893Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/605560352237/sites/predicadores-catolicos/versions/3701cf739d2022fb:populateFiles 200
+[debug] [2025-08-28T22:56:55.893Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/605560352237/sites/predicadores-catolicos/versions/3701cf739d2022fb:populateFiles {"uploadRequiredHashes":["0242f379e78a81059827508d962513773dabbbffbe2d7185f1350800f007483c","bfe106a3fb878dc83461c86818bf74fc1bdc7f28538ba613cd3e775516ce8b49","27edce7be5922cf0bef7d4136f69b5bfbdd5bf8c13c7b026f71187d41a00aa7d","c1fd70fad1edf6c8aa754e2bfdb73b5f7b261938a52bc1d41948bad22984c43e","fa91e71397d9873bc792b8580026b06a06ed4e195c0cf15d95cc8943770acc5f","851277bd03687151e2c63007a19bce2d5735b57fde80ec5b902529d9518b9555","212b102aa09e51b3b3e06647e81f7801a61333e171f6582e8124379aabccb41d","51d3b977f307b54c9cc103277020e2c2661e95468fec9b5426fb5705832d31bd","46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e","772c56c1b04fdc7c624408576f57180c837d48fd529094740edf395384b2194c","ee04fb47e525c67d8424ffe9b4d8a8a24e434504478afca4e0ca602146836d4c","cd40bffc74a95194f68346bcefe57dcce69693af78da9c0db7500061c9008c56","7b9d972a45ca6a9c009b30603021191aa09c7a92c0fd26387c7d54be3306a4bc","7c907b52d70ce5b5e5a43ab12f043bb590ee65ec9c45c848457e6bf3f3a31cf8","79e2b749561016bc8af300ea19f48347ceed3cb1a54f48ae456172eca45e08f0"],"uploadUrl":"https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files"}
+[debug] [2025-08-28T22:56:55.895Z] Checked if tokens are valid: true, expires at: 1756423248046
+[debug] [2025-08-28T22:56:55.896Z] Checked if tokens are valid: true, expires at: 1756423248046
+[debug] [2025-08-28T22:56:55.897Z] Checked if tokens are valid: true, expires at: 1756423248046
+[debug] [2025-08-28T22:56:55.897Z] Checked if tokens are valid: true, expires at: 1756423248046
+[debug] [2025-08-28T22:56:55.898Z] Checked if tokens are valid: true, expires at: 1756423248046
+[debug] [2025-08-28T22:56:55.898Z] Checked if tokens are valid: true, expires at: 1756423248046
+[debug] [2025-08-28T22:56:55.899Z] Checked if tokens are valid: true, expires at: 1756423248046
+[debug] [2025-08-28T22:56:55.899Z] Checked if tokens are valid: true, expires at: 1756423248046
+[debug] [2025-08-28T22:56:55.899Z] Checked if tokens are valid: true, expires at: 1756423248046
+[debug] [2025-08-28T22:56:55.900Z] Checked if tokens are valid: true, expires at: 1756423248046
+[debug] [2025-08-28T22:56:55.900Z] Checked if tokens are valid: true, expires at: 1756423248046
+[debug] [2025-08-28T22:56:55.900Z] Checked if tokens are valid: true, expires at: 1756423248046
+[debug] [2025-08-28T22:56:55.901Z] Checked if tokens are valid: true, expires at: 1756423248046
+[debug] [2025-08-28T22:56:55.901Z] Checked if tokens are valid: true, expires at: 1756423248046
+[debug] [2025-08-28T22:56:55.901Z] Checked if tokens are valid: true, expires at: 1756423248046
+[debug] [2025-08-28T22:56:55.901Z] Checked if tokens are valid: true, expires at: 1756423248046
+[debug] [2025-08-28T22:56:55.902Z] Checked if tokens are valid: true, expires at: 1756423248046
+[debug] [2025-08-28T22:56:55.902Z] Checked if tokens are valid: true, expires at: 1756423248046
+[debug] [2025-08-28T22:56:55.903Z] Checked if tokens are valid: true, expires at: 1756423248046
+[debug] [2025-08-28T22:56:55.903Z] Checked if tokens are valid: true, expires at: 1756423248046
+[debug] [2025-08-28T22:56:55.904Z] Checked if tokens are valid: true, expires at: 1756423248046
+[debug] [2025-08-28T22:56:55.905Z] Checked if tokens are valid: true, expires at: 1756423248046
+[debug] [2025-08-28T22:56:55.906Z] Checked if tokens are valid: true, expires at: 1756423248046
+[debug] [2025-08-28T22:56:55.906Z] Checked if tokens are valid: true, expires at: 1756423248046
+[debug] [2025-08-28T22:56:55.907Z] Checked if tokens are valid: true, expires at: 1756423248046
+[debug] [2025-08-28T22:56:55.907Z] Checked if tokens are valid: true, expires at: 1756423248046
+[debug] [2025-08-28T22:56:55.908Z] Checked if tokens are valid: true, expires at: 1756423248046
+[debug] [2025-08-28T22:56:55.908Z] Checked if tokens are valid: true, expires at: 1756423248046
+[debug] [2025-08-28T22:56:55.908Z] Checked if tokens are valid: true, expires at: 1756423248046
+[debug] [2025-08-28T22:56:55.909Z] Checked if tokens are valid: true, expires at: 1756423248046
+[debug] [2025-08-28T22:56:55.909Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/0242f379e78a81059827508d962513773dabbbffbe2d7185f1350800f007483c [none]
+[debug] [2025-08-28T22:56:55.909Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/0242f379e78a81059827508d962513773dabbbffbe2d7185f1350800f007483c [stream]
+[debug] [2025-08-28T22:56:55.914Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/bfe106a3fb878dc83461c86818bf74fc1bdc7f28538ba613cd3e775516ce8b49 [none]
+[debug] [2025-08-28T22:56:55.915Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/bfe106a3fb878dc83461c86818bf74fc1bdc7f28538ba613cd3e775516ce8b49 [stream]
+[debug] [2025-08-28T22:56:55.918Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/27edce7be5922cf0bef7d4136f69b5bfbdd5bf8c13c7b026f71187d41a00aa7d [none]
+[debug] [2025-08-28T22:56:55.918Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/27edce7be5922cf0bef7d4136f69b5bfbdd5bf8c13c7b026f71187d41a00aa7d [stream]
+[debug] [2025-08-28T22:56:55.923Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/c1fd70fad1edf6c8aa754e2bfdb73b5f7b261938a52bc1d41948bad22984c43e [none]
+[debug] [2025-08-28T22:56:55.923Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/c1fd70fad1edf6c8aa754e2bfdb73b5f7b261938a52bc1d41948bad22984c43e [stream]
+[debug] [2025-08-28T22:56:55.927Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/fa91e71397d9873bc792b8580026b06a06ed4e195c0cf15d95cc8943770acc5f [none]
+[debug] [2025-08-28T22:56:55.927Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/fa91e71397d9873bc792b8580026b06a06ed4e195c0cf15d95cc8943770acc5f [stream]
+[debug] [2025-08-28T22:56:55.933Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/851277bd03687151e2c63007a19bce2d5735b57fde80ec5b902529d9518b9555 [none]
+[debug] [2025-08-28T22:56:55.934Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/851277bd03687151e2c63007a19bce2d5735b57fde80ec5b902529d9518b9555 [stream]
+[debug] [2025-08-28T22:56:55.938Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/212b102aa09e51b3b3e06647e81f7801a61333e171f6582e8124379aabccb41d [none]
+[debug] [2025-08-28T22:56:55.939Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/212b102aa09e51b3b3e06647e81f7801a61333e171f6582e8124379aabccb41d [stream]
+[debug] [2025-08-28T22:56:55.942Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/51d3b977f307b54c9cc103277020e2c2661e95468fec9b5426fb5705832d31bd [none]
+[debug] [2025-08-28T22:56:55.943Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/51d3b977f307b54c9cc103277020e2c2661e95468fec9b5426fb5705832d31bd [stream]
+[debug] [2025-08-28T22:56:55.946Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e [none]
+[debug] [2025-08-28T22:56:55.947Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e [stream]
+[debug] [2025-08-28T22:56:55.950Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/772c56c1b04fdc7c624408576f57180c837d48fd529094740edf395384b2194c [none]
+[debug] [2025-08-28T22:56:55.950Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/772c56c1b04fdc7c624408576f57180c837d48fd529094740edf395384b2194c [stream]
+[debug] [2025-08-28T22:56:55.956Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/ee04fb47e525c67d8424ffe9b4d8a8a24e434504478afca4e0ca602146836d4c [none]
+[debug] [2025-08-28T22:56:55.956Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/ee04fb47e525c67d8424ffe9b4d8a8a24e434504478afca4e0ca602146836d4c [stream]
+[debug] [2025-08-28T22:56:55.959Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/cd40bffc74a95194f68346bcefe57dcce69693af78da9c0db7500061c9008c56 [none]
+[debug] [2025-08-28T22:56:55.959Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/cd40bffc74a95194f68346bcefe57dcce69693af78da9c0db7500061c9008c56 [stream]
+[debug] [2025-08-28T22:56:55.963Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/7b9d972a45ca6a9c009b30603021191aa09c7a92c0fd26387c7d54be3306a4bc [none]
+[debug] [2025-08-28T22:56:55.964Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/7b9d972a45ca6a9c009b30603021191aa09c7a92c0fd26387c7d54be3306a4bc [stream]
+[debug] [2025-08-28T22:56:55.966Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/7c907b52d70ce5b5e5a43ab12f043bb590ee65ec9c45c848457e6bf3f3a31cf8 [none]
+[debug] [2025-08-28T22:56:55.966Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/7c907b52d70ce5b5e5a43ab12f043bb590ee65ec9c45c848457e6bf3f3a31cf8 [stream]
+[debug] [2025-08-28T22:56:55.968Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/79e2b749561016bc8af300ea19f48347ceed3cb1a54f48ae456172eca45e08f0 [none]
+[debug] [2025-08-28T22:56:55.969Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/79e2b749561016bc8af300ea19f48347ceed3cb1a54f48ae456172eca45e08f0 [stream]
+[debug] [2025-08-28T22:56:55.974Z] [hosting][populate queue][FINAL] {"max":230,"min":230,"avg":230,"active":0,"complete":1,"success":1,"errored":0,"retried":0,"total":1,"elapsed":295}
+[debug] [2025-08-28T22:56:55.975Z] [hosting] uploads queued: 15
+[info] i  hosting: uploading new files [0/15] (0%) 
+[debug] [2025-08-28T22:56:56.675Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/cd40bffc74a95194f68346bcefe57dcce69693af78da9c0db7500061c9008c56 200
+[debug] [2025-08-28T22:56:56.676Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/cd40bffc74a95194f68346bcefe57dcce69693af78da9c0db7500061c9008c56 [stream]
+[debug] [2025-08-28T22:56:56.677Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/79e2b749561016bc8af300ea19f48347ceed3cb1a54f48ae456172eca45e08f0 200
+[debug] [2025-08-28T22:56:56.679Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/79e2b749561016bc8af300ea19f48347ceed3cb1a54f48ae456172eca45e08f0 [stream]
+[debug] [2025-08-28T22:56:56.682Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e 200
+[debug] [2025-08-28T22:56:56.683Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e [stream]
+[debug] [2025-08-28T22:56:56.686Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/7b9d972a45ca6a9c009b30603021191aa09c7a92c0fd26387c7d54be3306a4bc 200
+[debug] [2025-08-28T22:56:56.687Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/7b9d972a45ca6a9c009b30603021191aa09c7a92c0fd26387c7d54be3306a4bc [stream]
+[debug] [2025-08-28T22:56:56.696Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/ee04fb47e525c67d8424ffe9b4d8a8a24e434504478afca4e0ca602146836d4c 200
+[debug] [2025-08-28T22:56:56.697Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/ee04fb47e525c67d8424ffe9b4d8a8a24e434504478afca4e0ca602146836d4c [stream]
+[debug] [2025-08-28T22:56:56.730Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/212b102aa09e51b3b3e06647e81f7801a61333e171f6582e8124379aabccb41d 200
+[debug] [2025-08-28T22:56:56.730Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/212b102aa09e51b3b3e06647e81f7801a61333e171f6582e8124379aabccb41d [stream]
+[debug] [2025-08-28T22:56:56.732Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/bfe106a3fb878dc83461c86818bf74fc1bdc7f28538ba613cd3e775516ce8b49 200
+[debug] [2025-08-28T22:56:56.732Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/bfe106a3fb878dc83461c86818bf74fc1bdc7f28538ba613cd3e775516ce8b49 [stream]
+[debug] [2025-08-28T22:56:56.734Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/27edce7be5922cf0bef7d4136f69b5bfbdd5bf8c13c7b026f71187d41a00aa7d 200
+[debug] [2025-08-28T22:56:56.734Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/27edce7be5922cf0bef7d4136f69b5bfbdd5bf8c13c7b026f71187d41a00aa7d [stream]
+[debug] [2025-08-28T22:56:56.806Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/51d3b977f307b54c9cc103277020e2c2661e95468fec9b5426fb5705832d31bd 200
+[debug] [2025-08-28T22:56:56.807Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/51d3b977f307b54c9cc103277020e2c2661e95468fec9b5426fb5705832d31bd [stream]
+[debug] [2025-08-28T22:56:56.831Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/772c56c1b04fdc7c624408576f57180c837d48fd529094740edf395384b2194c 200
+[debug] [2025-08-28T22:56:56.832Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/772c56c1b04fdc7c624408576f57180c837d48fd529094740edf395384b2194c [stream]
+[debug] [2025-08-28T22:56:56.871Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/7c907b52d70ce5b5e5a43ab12f043bb590ee65ec9c45c848457e6bf3f3a31cf8 200
+[debug] [2025-08-28T22:56:56.872Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/7c907b52d70ce5b5e5a43ab12f043bb590ee65ec9c45c848457e6bf3f3a31cf8 [stream]
+[debug] [2025-08-28T22:56:56.908Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/fa91e71397d9873bc792b8580026b06a06ed4e195c0cf15d95cc8943770acc5f 200
+[debug] [2025-08-28T22:56:56.908Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/fa91e71397d9873bc792b8580026b06a06ed4e195c0cf15d95cc8943770acc5f [stream]
+[debug] [2025-08-28T22:56:57.035Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/0242f379e78a81059827508d962513773dabbbffbe2d7185f1350800f007483c 200
+[debug] [2025-08-28T22:56:57.035Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/0242f379e78a81059827508d962513773dabbbffbe2d7185f1350800f007483c [stream]
+[debug] [2025-08-28T22:56:57.277Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/c1fd70fad1edf6c8aa754e2bfdb73b5f7b261938a52bc1d41948bad22984c43e 200
+[debug] [2025-08-28T22:56:57.278Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/c1fd70fad1edf6c8aa754e2bfdb73b5f7b261938a52bc1d41948bad22984c43e [stream]
+[debug] [2025-08-28T22:56:57.816Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/851277bd03687151e2c63007a19bce2d5735b57fde80ec5b902529d9518b9555 200
+[debug] [2025-08-28T22:56:57.817Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/3701cf739d2022fb/files/851277bd03687151e2c63007a19bce2d5735b57fde80ec5b902529d9518b9555 [stream]
+[debug] [2025-08-28T22:56:57.817Z] [hosting][upload queue][FINAL] {"max":1917,"min":771,"avg":977,"active":0,"complete":15,"success":15,"errored":0,"retried":0,"total":15,"elapsed":1924}
+[info] i  hosting: upload complete 
+[info] +  hosting[predicadores-catolicos]: file upload complete 
+[debug] [2025-08-28T22:56:57.818Z] [hosting] deploy completed after 3287ms
+[debug] [2025-08-28T22:56:57.818Z] [
+  {
+    "config": {
+      "public": "build",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "rewrites": [
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ],
+      "site": "predicadores-catolicos"
+    },
+    "version": "projects/605560352237/sites/predicadores-catolicos/versions/3701cf739d2022fb"
+  }
+]
+[info] i  hosting[predicadores-catolicos]: finalizing version... 
+[debug] [2025-08-28T22:56:57.827Z] Checked if tokens are valid: true, expires at: 1756423248046
+[debug] [2025-08-28T22:56:57.828Z] Checked if tokens are valid: true, expires at: 1756423248046
+[debug] [2025-08-28T22:56:57.829Z] >>> [apiv2][query] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/versions/3701cf739d2022fb updateMask=status%2Cconfig
+[debug] [2025-08-28T22:56:57.830Z] >>> [apiv2][body] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/versions/3701cf739d2022fb {"status":"FINALIZED","config":{"rewrites":[{"glob":"**","path":"/index.html"}]}}
+[debug] [2025-08-28T22:56:58.027Z] <<< [apiv2][status] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/versions/3701cf739d2022fb 200
+[debug] [2025-08-28T22:56:58.027Z] <<< [apiv2][body] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/versions/3701cf739d2022fb {"name":"projects/605560352237/sites/predicadores-catolicos/versions/3701cf739d2022fb","status":"FINALIZED","config":{"rewrites":[{"glob":"**","path":"/index.html"}]},"labels":{"deployment-tool":"cli-firebase"},"createTime":"2025-08-28T22:56:52.915641Z","createUser":{"email":"william.comunidad@gmail.com"},"finalizeTime":"2025-08-28T22:56:57.042662Z","finalizeUser":{"email":"william.comunidad@gmail.com"}}
+[debug] [2025-08-28T22:56:58.028Z] [hosting] finalized version for predicadores-catolicos:[object Object]
+[info] +  hosting[predicadores-catolicos]: version finalized 
+[info] i  hosting[predicadores-catolicos]: releasing new version... 
+[debug] [2025-08-28T22:56:58.029Z] Checked if tokens are valid: true, expires at: 1756423248046
+[debug] [2025-08-28T22:56:58.030Z] Checked if tokens are valid: true, expires at: 1756423248046
+[debug] [2025-08-28T22:56:58.031Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/channels/live/releases versionName=projects%2F605560352237%2Fsites%2Fpredicadores-catolicos%2Fversions%2F3701cf739d2022fb
+[debug] [2025-08-28T22:56:58.031Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/channels/live/releases {}
+[debug] [2025-08-28T22:56:58.267Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/channels/live/releases 200
+[debug] [2025-08-28T22:56:58.267Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/channels/live/releases {"name":"projects/605560352237/sites/predicadores-catolicos/channels/live/releases/1756421816727000","version":{"name":"projects/605560352237/sites/predicadores-catolicos/versions/3701cf739d2022fb","status":"FINALIZED","config":{"rewrites":[{"glob":"**","path":"/index.html"}]},"labels":{"deployment-tool":"cli-firebase"},"createTime":"2025-08-28T22:56:52.915641Z","createUser":{"email":"william.comunidad@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocISYVVjQGJRyIZ-94TGwMX6V2GfvH1hsWQ-h91f5AEguVaGzKI"},"finalizeTime":"2025-08-28T22:56:57.042662Z","finalizeUser":{"email":"william.comunidad@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocISYVVjQGJRyIZ-94TGwMX6V2GfvH1hsWQ-h91f5AEguVaGzKI"}},"type":"DEPLOY","releaseTime":"2025-08-28T22:56:56.727Z","releaseUser":{"email":"william.comunidad@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocISYVVjQGJRyIZ-94TGwMX6V2GfvH1hsWQ-h91f5AEguVaGzKI"}}
+[debug] [2025-08-28T22:56:58.267Z] [hosting] release: {"name":"projects/605560352237/sites/predicadores-catolicos/channels/live/releases/1756421816727000","version":{"name":"projects/605560352237/sites/predicadores-catolicos/versions/3701cf739d2022fb","status":"FINALIZED","config":{"rewrites":[{"glob":"**","path":"/index.html"}]},"labels":{"deployment-tool":"cli-firebase"},"createTime":"2025-08-28T22:56:52.915641Z","createUser":{"email":"william.comunidad@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocISYVVjQGJRyIZ-94TGwMX6V2GfvH1hsWQ-h91f5AEguVaGzKI"},"finalizeTime":"2025-08-28T22:56:57.042662Z","finalizeUser":{"email":"william.comunidad@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocISYVVjQGJRyIZ-94TGwMX6V2GfvH1hsWQ-h91f5AEguVaGzKI"}},"type":"DEPLOY","releaseTime":"2025-08-28T22:56:56.727Z","releaseUser":{"email":"william.comunidad@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocISYVVjQGJRyIZ-94TGwMX6V2GfvH1hsWQ-h91f5AEguVaGzKI"}}
+[info] +  hosting[predicadores-catolicos]: release complete 
+[info] 
+[info] +  Deploy complete! 
+[info] 
+[info] Project Console: https://console.firebase.google.com/project/predicadores-catolicos/overview
+[info] Hosting URL: https://predicadores-catolicos.web.app
+[debug] [2025-08-28T23:06:08.566Z] ----------------------------------------------------------------------
+[debug] [2025-08-28T23:06:08.568Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\willi\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy
+[debug] [2025-08-28T23:06:08.569Z] CLI Version:   14.15.0
+[debug] [2025-08-28T23:06:08.569Z] Platform:      win32
+[debug] [2025-08-28T23:06:08.569Z] Node Version:  v22.17.1
+[debug] [2025-08-28T23:06:08.569Z] Time:          Thu Aug 28 2025 18:06:08 GMT-0500 (hora estándar de Colombia)
+[debug] [2025-08-28T23:06:08.569Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-08-28T23:06:08.762Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-08-28T23:06:08.763Z] > authorizing via signed-in user (william.comunidad@gmail.com)
+[debug] [2025-08-28T23:06:08.763Z] [iam] checking project predicadores-catolicos for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2025-08-28T23:06:08.764Z] Checked if tokens are valid: false, expires at: 1756423248046
+[debug] [2025-08-28T23:06:08.765Z] Checked if tokens are valid: false, expires at: 1756423248046
+[debug] [2025-08-28T23:06:08.765Z] > refreshing access token with scopes: []
+[debug] [2025-08-28T23:06:08.767Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-08-28T23:06:08.767Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-08-28T23:06:09.332Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-08-28T23:06:09.333Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-08-28T23:06:09.353Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/predicadores-catolicos:testIamPermissions [none]
+[debug] [2025-08-28T23:06:09.353Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/predicadores-catolicos:testIamPermissions x-goog-quota-user=projects/predicadores-catolicos
+[debug] [2025-08-28T23:06:09.354Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/predicadores-catolicos:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2025-08-28T23:06:09.940Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/predicadores-catolicos:testIamPermissions 200
+[debug] [2025-08-28T23:06:09.940Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/predicadores-catolicos:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2025-08-28T23:06:09.942Z] Checked if tokens are valid: true, expires at: 1756425968333
+[debug] [2025-08-28T23:06:09.943Z] Checked if tokens are valid: true, expires at: 1756425968333
+[debug] [2025-08-28T23:06:09.943Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/predicadores-catolicos [none]
+[debug] [2025-08-28T23:06:10.389Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/predicadores-catolicos 200
+[debug] [2025-08-28T23:06:10.390Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/predicadores-catolicos {"projectId":"predicadores-catolicos","projectNumber":"605560352237","displayName":"predicadores catolicos","name":"projects/predicadores-catolicos","resources":{"hostingSite":"predicadores-catolicos"},"state":"ACTIVE","etag":"1_b68e1542-d368-43c3-a7c5-73f235cccc8f"}
+[info] 
+[info] === Deploying to 'predicadores-catolicos'...
+[info] 
+[info] i  deploying hosting 
+[debug] [2025-08-28T23:06:10.403Z] Checked if tokens are valid: true, expires at: 1756425968333
+[debug] [2025-08-28T23:06:10.403Z] Checked if tokens are valid: true, expires at: 1756425968333
+[debug] [2025-08-28T23:06:10.404Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/versions [none]
+[debug] [2025-08-28T23:06:10.404Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/versions {"status":"CREATED","labels":{"deployment-tool":"cli-firebase"}}
+[debug] [2025-08-28T23:06:11.331Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/versions 200
+[debug] [2025-08-28T23:06:11.331Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/versions {"name":"projects/605560352237/sites/predicadores-catolicos/versions/a8e6eaf40ee62e14","status":"CREATED","config":{},"labels":{"deployment-tool":"cli-firebase"}}
+[info] i  hosting[predicadores-catolicos]: beginning deploy... 
+[info] i  hosting[predicadores-catolicos]: found 17 files in build 
+[debug] [2025-08-28T23:06:11.377Z] [hosting] uploading with 200 concurrency
+[debug] [2025-08-28T23:06:11.837Z] Checked if tokens are valid: true, expires at: 1756425968333
+[debug] [2025-08-28T23:06:11.838Z] Checked if tokens are valid: true, expires at: 1756425968333
+[debug] [2025-08-28T23:06:11.839Z] [hosting] hash cache [YnVpbGQ] stored for 17 files
+[debug] [2025-08-28T23:06:11.840Z] [hosting][hash queue][FINAL] {"max":453,"min":1,"avg":34.88235294117647,"active":0,"complete":17,"success":17,"errored":0,"retried":0,"total":17,"elapsed":460}
+[debug] [2025-08-28T23:06:11.840Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/605560352237/sites/predicadores-catolicos/versions/a8e6eaf40ee62e14:populateFiles [none]
+[debug] [2025-08-28T23:06:11.841Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/605560352237/sites/predicadores-catolicos/versions/a8e6eaf40ee62e14:populateFiles {"files":{"/robots.txt":"bfe106a3fb878dc83461c86818bf74fc1bdc7f28538ba613cd3e775516ce8b49","/manifest.json":"ee04fb47e525c67d8424ffe9b4d8a8a24e434504478afca4e0ca602146836d4c","/logo512.png":"212b102aa09e51b3b3e06647e81f7801a61333e171f6582e8124379aabccb41d","/logo192.png":"79e2b749561016bc8af300ea19f48347ceed3cb1a54f48ae456172eca45e08f0","/favicon.ico":"27edce7be5922cf0bef7d4136f69b5bfbdd5bf8c13c7b026f71187d41a00aa7d","/assets/modo predicacion.png":"46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e","/assets/Modo inicio.png":"46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e","/assets/modo estudio.png":"46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e","/asset-manifest.json":"51d3b977f307b54c9cc103277020e2c2661e95468fec9b5426fb5705832d31bd","/index.html":"361e2d784bdb5c588eee33ab27e3603fc1f66e8195252c9b2ede6c1d8b3b6f8b","/static/js/main.1734ca71.js.LICENSE.txt":"fa91e71397d9873bc792b8580026b06a06ed4e195c0cf15d95cc8943770acc5f","/static/js/453.29e888ec.chunk.js":"cd40bffc74a95194f68346bcefe57dcce69693af78da9c0db7500061c9008c56","/static/js/453.29e888ec.chunk.js.map":"7b9d972a45ca6a9c009b30603021191aa09c7a92c0fd26387c7d54be3306a4bc","/static/css/main.3d368d28.css.map":"4aeed6fc2ff62d651c888599cb9dc3fa19bd1b7be6b8403c425456a47ec256e7","/static/css/main.3d368d28.css":"7c907b52d70ce5b5e5a43ab12f043bb590ee65ec9c45c848457e6bf3f3a31cf8","/static/js/main.1734ca71.js":"0242f379e78a81059827508d962513773dabbbffbe2d7185f1350800f007483c","/static/js/main.1734ca71.js.map":"851277bd03687151e2c63007a19bce2d5735b57fde80ec5b902529d9518b9555"}}
+[info] i  hosting: adding files to version [0/17] (0%) 
+[debug] [2025-08-28T23:06:14.043Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/605560352237/sites/predicadores-catolicos/versions/a8e6eaf40ee62e14:populateFiles 200
+[debug] [2025-08-28T23:06:14.043Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/605560352237/sites/predicadores-catolicos/versions/a8e6eaf40ee62e14:populateFiles {"uploadRequiredHashes":["4aeed6fc2ff62d651c888599cb9dc3fa19bd1b7be6b8403c425456a47ec256e7","361e2d784bdb5c588eee33ab27e3603fc1f66e8195252c9b2ede6c1d8b3b6f8b"],"uploadUrl":"https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/a8e6eaf40ee62e14/files"}
+[debug] [2025-08-28T23:06:14.044Z] Checked if tokens are valid: true, expires at: 1756425968333
+[debug] [2025-08-28T23:06:14.045Z] Checked if tokens are valid: true, expires at: 1756425968333
+[debug] [2025-08-28T23:06:14.046Z] Checked if tokens are valid: true, expires at: 1756425968333
+[debug] [2025-08-28T23:06:14.046Z] Checked if tokens are valid: true, expires at: 1756425968333
+[debug] [2025-08-28T23:06:14.047Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/a8e6eaf40ee62e14/files/4aeed6fc2ff62d651c888599cb9dc3fa19bd1b7be6b8403c425456a47ec256e7 [none]
+[debug] [2025-08-28T23:06:14.047Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/a8e6eaf40ee62e14/files/4aeed6fc2ff62d651c888599cb9dc3fa19bd1b7be6b8403c425456a47ec256e7 [stream]
+[debug] [2025-08-28T23:06:14.051Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/a8e6eaf40ee62e14/files/361e2d784bdb5c588eee33ab27e3603fc1f66e8195252c9b2ede6c1d8b3b6f8b [none]
+[debug] [2025-08-28T23:06:14.051Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/a8e6eaf40ee62e14/files/361e2d784bdb5c588eee33ab27e3603fc1f66e8195252c9b2ede6c1d8b3b6f8b [stream]
+[debug] [2025-08-28T23:06:14.055Z] [hosting][populate queue][FINAL] {"max":2210,"min":2210,"avg":2210,"active":0,"complete":1,"success":1,"errored":0,"retried":0,"total":1,"elapsed":2218}
+[debug] [2025-08-28T23:06:14.056Z] [hosting] uploads queued: 2
+[info] i  hosting: uploading new files [0/2] (0%) 
+[debug] [2025-08-28T23:06:15.435Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/a8e6eaf40ee62e14/files/4aeed6fc2ff62d651c888599cb9dc3fa19bd1b7be6b8403c425456a47ec256e7 200
+[debug] [2025-08-28T23:06:15.435Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/a8e6eaf40ee62e14/files/4aeed6fc2ff62d651c888599cb9dc3fa19bd1b7be6b8403c425456a47ec256e7 [stream]
+[debug] [2025-08-28T23:06:15.682Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/a8e6eaf40ee62e14/files/361e2d784bdb5c588eee33ab27e3603fc1f66e8195252c9b2ede6c1d8b3b6f8b 200
+[debug] [2025-08-28T23:06:15.682Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/a8e6eaf40ee62e14/files/361e2d784bdb5c588eee33ab27e3603fc1f66e8195252c9b2ede6c1d8b3b6f8b [stream]
+[debug] [2025-08-28T23:06:15.683Z] [hosting][upload queue][FINAL] {"max":1638,"min":1393,"avg":1515.5,"active":0,"complete":2,"success":2,"errored":0,"retried":0,"total":2,"elapsed":1640}
+[info] i  hosting: upload complete 
+[info] +  hosting[predicadores-catolicos]: file upload complete 
+[debug] [2025-08-28T23:06:15.684Z] [hosting] deploy completed after 4345ms
+[debug] [2025-08-28T23:06:15.684Z] [
+  {
+    "config": {
+      "public": "build",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "rewrites": [
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ],
+      "site": "predicadores-catolicos"
+    },
+    "version": "projects/605560352237/sites/predicadores-catolicos/versions/a8e6eaf40ee62e14"
+  }
+]
+[info] i  hosting[predicadores-catolicos]: finalizing version... 
+[debug] [2025-08-28T23:06:15.690Z] Checked if tokens are valid: true, expires at: 1756425968333
+[debug] [2025-08-28T23:06:15.691Z] Checked if tokens are valid: true, expires at: 1756425968333
+[debug] [2025-08-28T23:06:15.691Z] >>> [apiv2][query] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/versions/a8e6eaf40ee62e14 updateMask=status%2Cconfig
+[debug] [2025-08-28T23:06:15.691Z] >>> [apiv2][body] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/versions/a8e6eaf40ee62e14 {"status":"FINALIZED","config":{"rewrites":[{"glob":"**","path":"/index.html"}]}}
+[debug] [2025-08-28T23:06:15.878Z] <<< [apiv2][status] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/versions/a8e6eaf40ee62e14 200
+[debug] [2025-08-28T23:06:15.879Z] <<< [apiv2][body] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/versions/a8e6eaf40ee62e14 {"name":"projects/605560352237/sites/predicadores-catolicos/versions/a8e6eaf40ee62e14","status":"FINALIZED","config":{"rewrites":[{"glob":"**","path":"/index.html"}]},"labels":{"deployment-tool":"cli-firebase"},"createTime":"2025-08-28T23:06:10.122567Z","createUser":{"email":"william.comunidad@gmail.com"},"finalizeTime":"2025-08-28T23:06:14.893274Z","finalizeUser":{"email":"william.comunidad@gmail.com"}}
+[debug] [2025-08-28T23:06:15.879Z] [hosting] finalized version for predicadores-catolicos:[object Object]
+[info] +  hosting[predicadores-catolicos]: version finalized 
+[info] i  hosting[predicadores-catolicos]: releasing new version... 
+[debug] [2025-08-28T23:06:15.880Z] Checked if tokens are valid: true, expires at: 1756425968333
+[debug] [2025-08-28T23:06:15.880Z] Checked if tokens are valid: true, expires at: 1756425968333
+[debug] [2025-08-28T23:06:15.881Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/channels/live/releases versionName=projects%2F605560352237%2Fsites%2Fpredicadores-catolicos%2Fversions%2Fa8e6eaf40ee62e14
+[debug] [2025-08-28T23:06:15.881Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/channels/live/releases {}
+[debug] [2025-08-28T23:06:16.104Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/channels/live/releases 200
+[debug] [2025-08-28T23:06:16.105Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/channels/live/releases {"name":"projects/605560352237/sites/predicadores-catolicos/channels/live/releases/1756422374573000","version":{"name":"projects/605560352237/sites/predicadores-catolicos/versions/a8e6eaf40ee62e14","status":"FINALIZED","config":{"rewrites":[{"glob":"**","path":"/index.html"}]},"labels":{"deployment-tool":"cli-firebase"},"createTime":"2025-08-28T23:06:10.122567Z","createUser":{"email":"william.comunidad@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocISYVVjQGJRyIZ-94TGwMX6V2GfvH1hsWQ-h91f5AEguVaGzKI"},"finalizeTime":"2025-08-28T23:06:14.893274Z","finalizeUser":{"email":"william.comunidad@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocISYVVjQGJRyIZ-94TGwMX6V2GfvH1hsWQ-h91f5AEguVaGzKI"}},"type":"DEPLOY","releaseTime":"2025-08-28T23:06:14.573Z","releaseUser":{"email":"william.comunidad@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocISYVVjQGJRyIZ-94TGwMX6V2GfvH1hsWQ-h91f5AEguVaGzKI"}}
+[debug] [2025-08-28T23:06:16.106Z] [hosting] release: {"name":"projects/605560352237/sites/predicadores-catolicos/channels/live/releases/1756422374573000","version":{"name":"projects/605560352237/sites/predicadores-catolicos/versions/a8e6eaf40ee62e14","status":"FINALIZED","config":{"rewrites":[{"glob":"**","path":"/index.html"}]},"labels":{"deployment-tool":"cli-firebase"},"createTime":"2025-08-28T23:06:10.122567Z","createUser":{"email":"william.comunidad@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocISYVVjQGJRyIZ-94TGwMX6V2GfvH1hsWQ-h91f5AEguVaGzKI"},"finalizeTime":"2025-08-28T23:06:14.893274Z","finalizeUser":{"email":"william.comunidad@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocISYVVjQGJRyIZ-94TGwMX6V2GfvH1hsWQ-h91f5AEguVaGzKI"}},"type":"DEPLOY","releaseTime":"2025-08-28T23:06:14.573Z","releaseUser":{"email":"william.comunidad@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocISYVVjQGJRyIZ-94TGwMX6V2GfvH1hsWQ-h91f5AEguVaGzKI"}}
+[info] +  hosting[predicadores-catolicos]: release complete 
+[info] 
+[info] +  Deploy complete! 
+[info] 
+[info] Project Console: https://console.firebase.google.com/project/predicadores-catolicos/overview
+[info] Hosting URL: https://predicadores-catolicos.web.app
+[debug] [2025-08-29T03:40:53.263Z] ----------------------------------------------------------------------
+[debug] [2025-08-29T03:40:53.266Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\willi\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy --only hosting
+[debug] [2025-08-29T03:40:53.266Z] CLI Version:   14.15.0
+[debug] [2025-08-29T03:40:53.266Z] Platform:      win32
+[debug] [2025-08-29T03:40:53.267Z] Node Version:  v22.17.1
+[debug] [2025-08-29T03:40:53.267Z] Time:          Thu Aug 28 2025 22:40:53 GMT-0500 (hora estándar de Colombia)
+[debug] [2025-08-29T03:40:53.267Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-08-29T03:40:53.469Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-08-29T03:40:53.470Z] > authorizing via signed-in user (william.comunidad@gmail.com)
+[debug] [2025-08-29T03:40:53.470Z] [iam] checking project predicadores-catolicos for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2025-08-29T03:40:53.472Z] Checked if tokens are valid: false, expires at: 1756425968333
+[debug] [2025-08-29T03:40:53.472Z] Checked if tokens are valid: false, expires at: 1756425968333
+[debug] [2025-08-29T03:40:53.472Z] > refreshing access token with scopes: []
+[debug] [2025-08-29T03:40:53.474Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-08-29T03:40:53.475Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-08-29T03:40:53.729Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-08-29T03:40:53.729Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-08-29T03:40:53.736Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/predicadores-catolicos:testIamPermissions [none]
+[debug] [2025-08-29T03:40:53.736Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/predicadores-catolicos:testIamPermissions x-goog-quota-user=projects/predicadores-catolicos
+[debug] [2025-08-29T03:40:53.736Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/predicadores-catolicos:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2025-08-29T03:40:54.268Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/predicadores-catolicos:testIamPermissions 200
+[debug] [2025-08-29T03:40:54.269Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/predicadores-catolicos:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2025-08-29T03:40:54.271Z] Checked if tokens are valid: true, expires at: 1756442452729
+[debug] [2025-08-29T03:40:54.271Z] Checked if tokens are valid: true, expires at: 1756442452729
+[debug] [2025-08-29T03:40:54.272Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/predicadores-catolicos [none]
+[debug] [2025-08-29T03:40:54.649Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/predicadores-catolicos 200
+[debug] [2025-08-29T03:40:54.649Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/predicadores-catolicos {"projectId":"predicadores-catolicos","projectNumber":"605560352237","displayName":"predicadores catolicos","name":"projects/predicadores-catolicos","resources":{"hostingSite":"predicadores-catolicos"},"state":"ACTIVE","etag":"1_b68e1542-d368-43c3-a7c5-73f235cccc8f"}
+[info] 
+[info] === Deploying to 'predicadores-catolicos'...
+[info] 
+[info] i  deploying hosting 
+[debug] [2025-08-29T03:40:54.667Z] Checked if tokens are valid: true, expires at: 1756442452729
+[debug] [2025-08-29T03:40:54.668Z] Checked if tokens are valid: true, expires at: 1756442452729
+[debug] [2025-08-29T03:40:54.668Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/versions [none]
+[debug] [2025-08-29T03:40:54.668Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/versions {"status":"CREATED","labels":{"deployment-tool":"cli-firebase"}}
+[debug] [2025-08-29T03:40:55.626Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/versions 200
+[debug] [2025-08-29T03:40:55.626Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/versions {"name":"projects/605560352237/sites/predicadores-catolicos/versions/c7f72e87be05b559","status":"CREATED","config":{},"labels":{"deployment-tool":"cli-firebase"}}
+[info] i  hosting[predicadores-catolicos]: beginning deploy... 
+[info] i  hosting[predicadores-catolicos]: found 17 files in build 
+[debug] [2025-08-29T03:40:55.653Z] [hosting] uploading with 200 concurrency
+[debug] [2025-08-29T03:40:56.418Z] Checked if tokens are valid: true, expires at: 1756442452729
+[debug] [2025-08-29T03:40:56.418Z] Checked if tokens are valid: true, expires at: 1756442452729
+[debug] [2025-08-29T03:40:56.422Z] [hosting] hash cache [YnVpbGQ] stored for 17 files
+[debug] [2025-08-29T03:40:56.423Z] [hosting][hash queue][FINAL] {"max":759,"min":0,"avg":52.470588235294116,"active":0,"complete":17,"success":17,"errored":0,"retried":0,"total":17,"elapsed":768}
+[debug] [2025-08-29T03:40:56.424Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/605560352237/sites/predicadores-catolicos/versions/c7f72e87be05b559:populateFiles [none]
+[debug] [2025-08-29T03:40:56.424Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/605560352237/sites/predicadores-catolicos/versions/c7f72e87be05b559:populateFiles {"files":{"/robots.txt":"bfe106a3fb878dc83461c86818bf74fc1bdc7f28538ba613cd3e775516ce8b49","/manifest.json":"ee04fb47e525c67d8424ffe9b4d8a8a24e434504478afca4e0ca602146836d4c","/logo512.png":"212b102aa09e51b3b3e06647e81f7801a61333e171f6582e8124379aabccb41d","/logo192.png":"79e2b749561016bc8af300ea19f48347ceed3cb1a54f48ae456172eca45e08f0","/favicon.ico":"27edce7be5922cf0bef7d4136f69b5bfbdd5bf8c13c7b026f71187d41a00aa7d","/assets/modo predicacion.png":"46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e","/assets/Modo inicio.png":"46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e","/assets/modo estudio.png":"46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e","/index.html":"b2363ad9a18d5c394bcdbdec5398338a06bdfea5802e0b9a39e302e55d2169b1","/asset-manifest.json":"22aa199a5aad3d65f9aa7ed2d57a5b12b647eaecb23dc53f654daf8ac44b66f7","/static/js/main.a0bab296.js.LICENSE.txt":"fa91e71397d9873bc792b8580026b06a06ed4e195c0cf15d95cc8943770acc5f","/static/js/453.29e888ec.chunk.js.map":"7b9d972a45ca6a9c009b30603021191aa09c7a92c0fd26387c7d54be3306a4bc","/static/js/453.29e888ec.chunk.js":"cd40bffc74a95194f68346bcefe57dcce69693af78da9c0db7500061c9008c56","/static/css/main.e451a526.css.map":"41ffbbb6be6d246534c0b481301496e0a03b41cb26f28dd2c46e93149b5a62db","/static/css/main.e451a526.css":"fed958e4c642efad6bbf40f44d318b25225032f8fdf58942d2603609514363f6","/static/js/main.a0bab296.js":"6d9872df2961b22341d86b1d3abddc9c096b79dc387268aa5659719d30971a36","/static/js/main.a0bab296.js.map":"35cd76ea4bb1f19871f6772a42764cf9cbf818350401654fa0fd0e5d4520d0f1"}}
+[debug] [2025-08-29T03:40:56.636Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/605560352237/sites/predicadores-catolicos/versions/c7f72e87be05b559:populateFiles 200
+[debug] [2025-08-29T03:40:56.636Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/605560352237/sites/predicadores-catolicos/versions/c7f72e87be05b559:populateFiles {"uploadRequiredHashes":["b2363ad9a18d5c394bcdbdec5398338a06bdfea5802e0b9a39e302e55d2169b1","fed958e4c642efad6bbf40f44d318b25225032f8fdf58942d2603609514363f6","41ffbbb6be6d246534c0b481301496e0a03b41cb26f28dd2c46e93149b5a62db","22aa199a5aad3d65f9aa7ed2d57a5b12b647eaecb23dc53f654daf8ac44b66f7","35cd76ea4bb1f19871f6772a42764cf9cbf818350401654fa0fd0e5d4520d0f1","6d9872df2961b22341d86b1d3abddc9c096b79dc387268aa5659719d30971a36"],"uploadUrl":"https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/c7f72e87be05b559/files"}
+[debug] [2025-08-29T03:40:56.638Z] Checked if tokens are valid: true, expires at: 1756442452729
+[debug] [2025-08-29T03:40:56.639Z] Checked if tokens are valid: true, expires at: 1756442452729
+[debug] [2025-08-29T03:40:56.640Z] Checked if tokens are valid: true, expires at: 1756442452729
+[debug] [2025-08-29T03:40:56.640Z] Checked if tokens are valid: true, expires at: 1756442452729
+[debug] [2025-08-29T03:40:56.641Z] Checked if tokens are valid: true, expires at: 1756442452729
+[debug] [2025-08-29T03:40:56.641Z] Checked if tokens are valid: true, expires at: 1756442452729
+[debug] [2025-08-29T03:40:56.641Z] Checked if tokens are valid: true, expires at: 1756442452729
+[debug] [2025-08-29T03:40:56.641Z] Checked if tokens are valid: true, expires at: 1756442452729
+[debug] [2025-08-29T03:40:56.642Z] Checked if tokens are valid: true, expires at: 1756442452729
+[debug] [2025-08-29T03:40:56.642Z] Checked if tokens are valid: true, expires at: 1756442452729
+[debug] [2025-08-29T03:40:56.642Z] Checked if tokens are valid: true, expires at: 1756442452729
+[debug] [2025-08-29T03:40:56.643Z] Checked if tokens are valid: true, expires at: 1756442452729
+[debug] [2025-08-29T03:40:56.643Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/c7f72e87be05b559/files/b2363ad9a18d5c394bcdbdec5398338a06bdfea5802e0b9a39e302e55d2169b1 [none]
+[debug] [2025-08-29T03:40:56.643Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/c7f72e87be05b559/files/b2363ad9a18d5c394bcdbdec5398338a06bdfea5802e0b9a39e302e55d2169b1 [stream]
+[debug] [2025-08-29T03:40:56.647Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/c7f72e87be05b559/files/fed958e4c642efad6bbf40f44d318b25225032f8fdf58942d2603609514363f6 [none]
+[debug] [2025-08-29T03:40:56.648Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/c7f72e87be05b559/files/fed958e4c642efad6bbf40f44d318b25225032f8fdf58942d2603609514363f6 [stream]
+[debug] [2025-08-29T03:40:56.651Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/c7f72e87be05b559/files/41ffbbb6be6d246534c0b481301496e0a03b41cb26f28dd2c46e93149b5a62db [none]
+[debug] [2025-08-29T03:40:56.652Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/c7f72e87be05b559/files/41ffbbb6be6d246534c0b481301496e0a03b41cb26f28dd2c46e93149b5a62db [stream]
+[debug] [2025-08-29T03:40:56.656Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/c7f72e87be05b559/files/22aa199a5aad3d65f9aa7ed2d57a5b12b647eaecb23dc53f654daf8ac44b66f7 [none]
+[debug] [2025-08-29T03:40:56.656Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/c7f72e87be05b559/files/22aa199a5aad3d65f9aa7ed2d57a5b12b647eaecb23dc53f654daf8ac44b66f7 [stream]
+[debug] [2025-08-29T03:40:56.661Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/c7f72e87be05b559/files/35cd76ea4bb1f19871f6772a42764cf9cbf818350401654fa0fd0e5d4520d0f1 [none]
+[debug] [2025-08-29T03:40:56.662Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/c7f72e87be05b559/files/35cd76ea4bb1f19871f6772a42764cf9cbf818350401654fa0fd0e5d4520d0f1 [stream]
+[debug] [2025-08-29T03:40:56.665Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/c7f72e87be05b559/files/6d9872df2961b22341d86b1d3abddc9c096b79dc387268aa5659719d30971a36 [none]
+[debug] [2025-08-29T03:40:56.665Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/c7f72e87be05b559/files/6d9872df2961b22341d86b1d3abddc9c096b79dc387268aa5659719d30971a36 [stream]
+[debug] [2025-08-29T03:40:56.668Z] [hosting][populate queue][FINAL] {"max":226,"min":226,"avg":226,"active":0,"complete":1,"success":1,"errored":0,"retried":0,"total":1,"elapsed":251}
+[debug] [2025-08-29T03:40:56.668Z] [hosting] uploads queued: 6
+[debug] [2025-08-29T03:40:57.405Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/c7f72e87be05b559/files/b2363ad9a18d5c394bcdbdec5398338a06bdfea5802e0b9a39e302e55d2169b1 200
+[debug] [2025-08-29T03:40:57.405Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/c7f72e87be05b559/files/b2363ad9a18d5c394bcdbdec5398338a06bdfea5802e0b9a39e302e55d2169b1 [stream]
+[debug] [2025-08-29T03:40:57.646Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/c7f72e87be05b559/files/41ffbbb6be6d246534c0b481301496e0a03b41cb26f28dd2c46e93149b5a62db 200
+[debug] [2025-08-29T03:40:57.646Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/c7f72e87be05b559/files/41ffbbb6be6d246534c0b481301496e0a03b41cb26f28dd2c46e93149b5a62db [stream]
+[info] i  hosting: uploading new files [2/6] (33%) 
+[debug] [2025-08-29T03:40:57.703Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/c7f72e87be05b559/files/fed958e4c642efad6bbf40f44d318b25225032f8fdf58942d2603609514363f6 200
+[debug] [2025-08-29T03:40:57.704Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/c7f72e87be05b559/files/fed958e4c642efad6bbf40f44d318b25225032f8fdf58942d2603609514363f6 [stream]
+[debug] [2025-08-29T03:40:57.709Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/c7f72e87be05b559/files/22aa199a5aad3d65f9aa7ed2d57a5b12b647eaecb23dc53f654daf8ac44b66f7 200
+[debug] [2025-08-29T03:40:57.709Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/c7f72e87be05b559/files/22aa199a5aad3d65f9aa7ed2d57a5b12b647eaecb23dc53f654daf8ac44b66f7 [stream]
+[debug] [2025-08-29T03:40:57.847Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/c7f72e87be05b559/files/6d9872df2961b22341d86b1d3abddc9c096b79dc387268aa5659719d30971a36 200
+[debug] [2025-08-29T03:40:57.848Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/c7f72e87be05b559/files/6d9872df2961b22341d86b1d3abddc9c096b79dc387268aa5659719d30971a36 [stream]
+[debug] [2025-08-29T03:40:58.449Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/c7f72e87be05b559/files/35cd76ea4bb1f19871f6772a42764cf9cbf818350401654fa0fd0e5d4520d0f1 200
+[debug] [2025-08-29T03:40:58.450Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/c7f72e87be05b559/files/35cd76ea4bb1f19871f6772a42764cf9cbf818350401654fa0fd0e5d4520d0f1 [stream]
+[debug] [2025-08-29T03:40:58.450Z] [hosting][upload queue][FINAL] {"max":1808,"min":768,"avg":1153.6666666666667,"active":0,"complete":6,"success":6,"errored":0,"retried":0,"total":6,"elapsed":1813}
+[info] i  hosting: upload complete 
+[info] +  hosting[predicadores-catolicos]: file upload complete 
+[debug] [2025-08-29T03:40:58.452Z] [hosting] deploy completed after 2820ms
+[debug] [2025-08-29T03:40:58.452Z] [
+  {
+    "config": {
+      "public": "build",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "rewrites": [
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ],
+      "site": "predicadores-catolicos"
+    },
+    "version": "projects/605560352237/sites/predicadores-catolicos/versions/c7f72e87be05b559"
+  }
+]
+[info] i  hosting[predicadores-catolicos]: finalizing version... 
+[debug] [2025-08-29T03:40:58.457Z] Checked if tokens are valid: true, expires at: 1756442452729
+[debug] [2025-08-29T03:40:58.457Z] Checked if tokens are valid: true, expires at: 1756442452729
+[debug] [2025-08-29T03:40:58.458Z] >>> [apiv2][query] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/versions/c7f72e87be05b559 updateMask=status%2Cconfig
+[debug] [2025-08-29T03:40:58.458Z] >>> [apiv2][body] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/versions/c7f72e87be05b559 {"status":"FINALIZED","config":{"rewrites":[{"glob":"**","path":"/index.html"}]}}
+[debug] [2025-08-29T03:40:58.723Z] <<< [apiv2][status] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/versions/c7f72e87be05b559 200
+[debug] [2025-08-29T03:40:58.723Z] <<< [apiv2][body] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/versions/c7f72e87be05b559 {"name":"projects/605560352237/sites/predicadores-catolicos/versions/c7f72e87be05b559","status":"FINALIZED","config":{"rewrites":[{"glob":"**","path":"/index.html"}]},"labels":{"deployment-tool":"cli-firebase"},"createTime":"2025-08-29T03:40:55.333172Z","createUser":{"email":"william.comunidad@gmail.com"},"finalizeTime":"2025-08-29T03:40:58.662408Z","finalizeUser":{"email":"william.comunidad@gmail.com"}}
+[debug] [2025-08-29T03:40:58.723Z] [hosting] finalized version for predicadores-catolicos:[object Object]
+[info] +  hosting[predicadores-catolicos]: version finalized 
+[info] i  hosting[predicadores-catolicos]: releasing new version... 
+[debug] [2025-08-29T03:40:58.724Z] Checked if tokens are valid: true, expires at: 1756442452729
+[debug] [2025-08-29T03:40:58.725Z] Checked if tokens are valid: true, expires at: 1756442452729
+[debug] [2025-08-29T03:40:58.725Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/channels/live/releases versionName=projects%2F605560352237%2Fsites%2Fpredicadores-catolicos%2Fversions%2Fc7f72e87be05b559
+[debug] [2025-08-29T03:40:58.725Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/channels/live/releases {}
+[debug] [2025-08-29T03:40:58.964Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/channels/live/releases 200
+[debug] [2025-08-29T03:40:58.964Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/channels/live/releases {"name":"projects/605560352237/sites/predicadores-catolicos/channels/live/releases/1756438858333000","version":{"name":"projects/605560352237/sites/predicadores-catolicos/versions/c7f72e87be05b559","status":"FINALIZED","config":{"rewrites":[{"glob":"**","path":"/index.html"}]},"labels":{"deployment-tool":"cli-firebase"},"createTime":"2025-08-29T03:40:55.333172Z","createUser":{"email":"william.comunidad@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocISYVVjQGJRyIZ-94TGwMX6V2GfvH1hsWQ-h91f5AEguVaGzKI"},"finalizeTime":"2025-08-29T03:40:58.662408Z","finalizeUser":{"email":"william.comunidad@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocISYVVjQGJRyIZ-94TGwMX6V2GfvH1hsWQ-h91f5AEguVaGzKI"}},"type":"DEPLOY","releaseTime":"2025-08-29T03:40:58.333Z","releaseUser":{"email":"william.comunidad@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocISYVVjQGJRyIZ-94TGwMX6V2GfvH1hsWQ-h91f5AEguVaGzKI"}}
+[debug] [2025-08-29T03:40:58.964Z] [hosting] release: {"name":"projects/605560352237/sites/predicadores-catolicos/channels/live/releases/1756438858333000","version":{"name":"projects/605560352237/sites/predicadores-catolicos/versions/c7f72e87be05b559","status":"FINALIZED","config":{"rewrites":[{"glob":"**","path":"/index.html"}]},"labels":{"deployment-tool":"cli-firebase"},"createTime":"2025-08-29T03:40:55.333172Z","createUser":{"email":"william.comunidad@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocISYVVjQGJRyIZ-94TGwMX6V2GfvH1hsWQ-h91f5AEguVaGzKI"},"finalizeTime":"2025-08-29T03:40:58.662408Z","finalizeUser":{"email":"william.comunidad@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocISYVVjQGJRyIZ-94TGwMX6V2GfvH1hsWQ-h91f5AEguVaGzKI"}},"type":"DEPLOY","releaseTime":"2025-08-29T03:40:58.333Z","releaseUser":{"email":"william.comunidad@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocISYVVjQGJRyIZ-94TGwMX6V2GfvH1hsWQ-h91f5AEguVaGzKI"}}
+[info] +  hosting[predicadores-catolicos]: release complete 
+[info] 
+[info] +  Deploy complete! 
+[info] 
+[info] Project Console: https://console.firebase.google.com/project/predicadores-catolicos/overview
+[info] Hosting URL: https://predicadores-catolicos.web.app
+[debug] [2025-08-29T03:42:23.586Z] ----------------------------------------------------------------------
+[debug] [2025-08-29T03:42:23.589Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\willi\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy --only hosting
+[debug] [2025-08-29T03:42:23.589Z] CLI Version:   14.15.0
+[debug] [2025-08-29T03:42:23.589Z] Platform:      win32
+[debug] [2025-08-29T03:42:23.589Z] Node Version:  v22.17.1
+[debug] [2025-08-29T03:42:23.590Z] Time:          Thu Aug 28 2025 22:42:23 GMT-0500 (hora estándar de Colombia)
+[debug] [2025-08-29T03:42:23.590Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-08-29T03:42:23.893Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-08-29T03:42:23.894Z] > authorizing via signed-in user (william.comunidad@gmail.com)
+[debug] [2025-08-29T03:42:23.894Z] [iam] checking project predicadores-catolicos for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2025-08-29T03:42:23.895Z] Checked if tokens are valid: true, expires at: 1756442452729
+[debug] [2025-08-29T03:42:23.896Z] Checked if tokens are valid: true, expires at: 1756442452729
+[debug] [2025-08-29T03:42:23.897Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/predicadores-catolicos:testIamPermissions [none]
+[debug] [2025-08-29T03:42:23.897Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/predicadores-catolicos:testIamPermissions x-goog-quota-user=projects/predicadores-catolicos
+[debug] [2025-08-29T03:42:23.898Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/predicadores-catolicos:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2025-08-29T03:42:24.417Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/predicadores-catolicos:testIamPermissions 200
+[debug] [2025-08-29T03:42:24.418Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/predicadores-catolicos:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2025-08-29T03:42:24.420Z] Checked if tokens are valid: true, expires at: 1756442452729
+[debug] [2025-08-29T03:42:24.420Z] Checked if tokens are valid: true, expires at: 1756442452729
+[debug] [2025-08-29T03:42:24.421Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/predicadores-catolicos [none]
+[debug] [2025-08-29T03:42:24.816Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/predicadores-catolicos 200
+[debug] [2025-08-29T03:42:24.816Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/predicadores-catolicos {"projectId":"predicadores-catolicos","projectNumber":"605560352237","displayName":"predicadores catolicos","name":"projects/predicadores-catolicos","resources":{"hostingSite":"predicadores-catolicos"},"state":"ACTIVE","etag":"1_b68e1542-d368-43c3-a7c5-73f235cccc8f"}
+[info] 
+[info] === Deploying to 'predicadores-catolicos'...
+[info] 
+[info] i  deploying hosting 
+[debug] [2025-08-29T03:42:24.830Z] Checked if tokens are valid: true, expires at: 1756442452729
+[debug] [2025-08-29T03:42:24.830Z] Checked if tokens are valid: true, expires at: 1756442452729
+[debug] [2025-08-29T03:42:24.830Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/versions [none]
+[debug] [2025-08-29T03:42:24.831Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/versions {"status":"CREATED","labels":{"deployment-tool":"cli-firebase"}}
+[debug] [2025-08-29T03:42:25.702Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/versions 200
+[debug] [2025-08-29T03:42:25.702Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/versions {"name":"projects/605560352237/sites/predicadores-catolicos/versions/a41527ff56a5d77a","status":"CREATED","config":{},"labels":{"deployment-tool":"cli-firebase"}}
+[info] i  hosting[predicadores-catolicos]: beginning deploy... 
+[info] i  hosting[predicadores-catolicos]: found 17 files in build 
+[debug] [2025-08-29T03:42:25.727Z] [hosting] uploading with 200 concurrency
+[debug] [2025-08-29T03:42:26.533Z] Checked if tokens are valid: true, expires at: 1756442452729
+[debug] [2025-08-29T03:42:26.534Z] Checked if tokens are valid: true, expires at: 1756442452729
+[debug] [2025-08-29T03:42:26.536Z] [hosting] hash cache [YnVpbGQ] stored for 17 files
+[debug] [2025-08-29T03:42:26.537Z] [hosting][hash queue][FINAL] {"max":802,"min":0,"avg":55,"active":0,"complete":17,"success":17,"errored":0,"retried":0,"total":17,"elapsed":809}
+[debug] [2025-08-29T03:42:26.538Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/605560352237/sites/predicadores-catolicos/versions/a41527ff56a5d77a:populateFiles [none]
+[debug] [2025-08-29T03:42:26.539Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/605560352237/sites/predicadores-catolicos/versions/a41527ff56a5d77a:populateFiles {"files":{"/robots.txt":"bfe106a3fb878dc83461c86818bf74fc1bdc7f28538ba613cd3e775516ce8b49","/manifest.json":"ee04fb47e525c67d8424ffe9b4d8a8a24e434504478afca4e0ca602146836d4c","/logo512.png":"212b102aa09e51b3b3e06647e81f7801a61333e171f6582e8124379aabccb41d","/logo192.png":"79e2b749561016bc8af300ea19f48347ceed3cb1a54f48ae456172eca45e08f0","/favicon.ico":"27edce7be5922cf0bef7d4136f69b5bfbdd5bf8c13c7b026f71187d41a00aa7d","/assets/modo predicacion.png":"46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e","/assets/Modo inicio.png":"46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e","/assets/modo estudio.png":"46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e","/index.html":"006df1fce488d833b788dfb5410ad482128c83b7776cd1f8198999f1fef427fc","/asset-manifest.json":"4343d4195f51da90b791c5da5ce0911fd9276a808c94d9aac06c88fc49547687","/static/js/main.391d697a.js.LICENSE.txt":"fa91e71397d9873bc792b8580026b06a06ed4e195c0cf15d95cc8943770acc5f","/static/js/453.29e888ec.chunk.js":"cd40bffc74a95194f68346bcefe57dcce69693af78da9c0db7500061c9008c56","/static/js/453.29e888ec.chunk.js.map":"7b9d972a45ca6a9c009b30603021191aa09c7a92c0fd26387c7d54be3306a4bc","/static/css/main.e451a526.css.map":"a48a171143dd9e463f332528a196ccb597edd2ece6c2cf0d2b93d98f6309a2fd","/static/css/main.e451a526.css":"fed958e4c642efad6bbf40f44d318b25225032f8fdf58942d2603609514363f6","/static/js/main.391d697a.js":"cbb94c62c07e177806488e2e43f96f2611d49da8f114070607c371cd8e20d4d1","/static/js/main.391d697a.js.map":"423df0d0d40f124d964432b1151294e9544b8e855cc39228037c7c32db9febb2"}}
+[debug] [2025-08-29T03:42:26.743Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/605560352237/sites/predicadores-catolicos/versions/a41527ff56a5d77a:populateFiles 200
+[debug] [2025-08-29T03:42:26.743Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/605560352237/sites/predicadores-catolicos/versions/a41527ff56a5d77a:populateFiles {"uploadRequiredHashes":["4343d4195f51da90b791c5da5ce0911fd9276a808c94d9aac06c88fc49547687","423df0d0d40f124d964432b1151294e9544b8e855cc39228037c7c32db9febb2","a48a171143dd9e463f332528a196ccb597edd2ece6c2cf0d2b93d98f6309a2fd","006df1fce488d833b788dfb5410ad482128c83b7776cd1f8198999f1fef427fc","cbb94c62c07e177806488e2e43f96f2611d49da8f114070607c371cd8e20d4d1"],"uploadUrl":"https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/a41527ff56a5d77a/files"}
+[debug] [2025-08-29T03:42:26.744Z] Checked if tokens are valid: true, expires at: 1756442452729
+[debug] [2025-08-29T03:42:26.745Z] Checked if tokens are valid: true, expires at: 1756442452729
+[debug] [2025-08-29T03:42:26.746Z] Checked if tokens are valid: true, expires at: 1756442452729
+[debug] [2025-08-29T03:42:26.747Z] Checked if tokens are valid: true, expires at: 1756442452729
+[debug] [2025-08-29T03:42:26.747Z] Checked if tokens are valid: true, expires at: 1756442452729
+[debug] [2025-08-29T03:42:26.748Z] Checked if tokens are valid: true, expires at: 1756442452729
+[debug] [2025-08-29T03:42:26.749Z] Checked if tokens are valid: true, expires at: 1756442452729
+[debug] [2025-08-29T03:42:26.749Z] Checked if tokens are valid: true, expires at: 1756442452729
+[debug] [2025-08-29T03:42:26.749Z] Checked if tokens are valid: true, expires at: 1756442452729
+[debug] [2025-08-29T03:42:26.749Z] Checked if tokens are valid: true, expires at: 1756442452729
+[debug] [2025-08-29T03:42:26.750Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/a41527ff56a5d77a/files/4343d4195f51da90b791c5da5ce0911fd9276a808c94d9aac06c88fc49547687 [none]
+[debug] [2025-08-29T03:42:26.750Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/a41527ff56a5d77a/files/4343d4195f51da90b791c5da5ce0911fd9276a808c94d9aac06c88fc49547687 [stream]
+[debug] [2025-08-29T03:42:26.754Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/a41527ff56a5d77a/files/423df0d0d40f124d964432b1151294e9544b8e855cc39228037c7c32db9febb2 [none]
+[debug] [2025-08-29T03:42:26.754Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/a41527ff56a5d77a/files/423df0d0d40f124d964432b1151294e9544b8e855cc39228037c7c32db9febb2 [stream]
+[debug] [2025-08-29T03:42:26.758Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/a41527ff56a5d77a/files/a48a171143dd9e463f332528a196ccb597edd2ece6c2cf0d2b93d98f6309a2fd [none]
+[debug] [2025-08-29T03:42:26.758Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/a41527ff56a5d77a/files/a48a171143dd9e463f332528a196ccb597edd2ece6c2cf0d2b93d98f6309a2fd [stream]
+[debug] [2025-08-29T03:42:26.761Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/a41527ff56a5d77a/files/006df1fce488d833b788dfb5410ad482128c83b7776cd1f8198999f1fef427fc [none]
+[debug] [2025-08-29T03:42:26.761Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/a41527ff56a5d77a/files/006df1fce488d833b788dfb5410ad482128c83b7776cd1f8198999f1fef427fc [stream]
+[debug] [2025-08-29T03:42:26.765Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/a41527ff56a5d77a/files/cbb94c62c07e177806488e2e43f96f2611d49da8f114070607c371cd8e20d4d1 [none]
+[debug] [2025-08-29T03:42:26.766Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/a41527ff56a5d77a/files/cbb94c62c07e177806488e2e43f96f2611d49da8f114070607c371cd8e20d4d1 [stream]
+[debug] [2025-08-29T03:42:26.771Z] [hosting][populate queue][FINAL] {"max":217,"min":217,"avg":217,"active":0,"complete":1,"success":1,"errored":0,"retried":0,"total":1,"elapsed":238}
+[debug] [2025-08-29T03:42:26.772Z] [hosting] uploads queued: 5
+[debug] [2025-08-29T03:42:27.397Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/a41527ff56a5d77a/files/4343d4195f51da90b791c5da5ce0911fd9276a808c94d9aac06c88fc49547687 200
+[debug] [2025-08-29T03:42:27.397Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/a41527ff56a5d77a/files/4343d4195f51da90b791c5da5ce0911fd9276a808c94d9aac06c88fc49547687 [stream]
+[debug] [2025-08-29T03:42:27.653Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/a41527ff56a5d77a/files/a48a171143dd9e463f332528a196ccb597edd2ece6c2cf0d2b93d98f6309a2fd 200
+[debug] [2025-08-29T03:42:27.653Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/a41527ff56a5d77a/files/a48a171143dd9e463f332528a196ccb597edd2ece6c2cf0d2b93d98f6309a2fd [stream]
+[debug] [2025-08-29T03:42:27.696Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/a41527ff56a5d77a/files/cbb94c62c07e177806488e2e43f96f2611d49da8f114070607c371cd8e20d4d1 200
+[debug] [2025-08-29T03:42:27.696Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/a41527ff56a5d77a/files/cbb94c62c07e177806488e2e43f96f2611d49da8f114070607c371cd8e20d4d1 [stream]
+[info] i  hosting: uploading new files [3/5] (60%) 
+[debug] [2025-08-29T03:42:28.178Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/a41527ff56a5d77a/files/006df1fce488d833b788dfb5410ad482128c83b7776cd1f8198999f1fef427fc 200
+[debug] [2025-08-29T03:42:28.179Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/a41527ff56a5d77a/files/006df1fce488d833b788dfb5410ad482128c83b7776cd1f8198999f1fef427fc [stream]
+[debug] [2025-08-29T03:42:28.213Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/a41527ff56a5d77a/files/423df0d0d40f124d964432b1151294e9544b8e855cc39228037c7c32db9febb2 200
+[debug] [2025-08-29T03:42:28.214Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/predicadores-catolicos/versions/a41527ff56a5d77a/files/423df0d0d40f124d964432b1151294e9544b8e855cc39228037c7c32db9febb2 [stream]
+[debug] [2025-08-29T03:42:28.215Z] [hosting][upload queue][FINAL] {"max":1469,"min":654,"avg":1081.4,"active":0,"complete":5,"success":5,"errored":0,"retried":0,"total":5,"elapsed":1472}
+[info] i  hosting: upload complete 
+[info] +  hosting[predicadores-catolicos]: file upload complete 
+[debug] [2025-08-29T03:42:28.216Z] [hosting] deploy completed after 2508ms
+[debug] [2025-08-29T03:42:28.216Z] [
+  {
+    "config": {
+      "public": "build",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "rewrites": [
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ],
+      "site": "predicadores-catolicos"
+    },
+    "version": "projects/605560352237/sites/predicadores-catolicos/versions/a41527ff56a5d77a"
+  }
+]
+[info] i  hosting[predicadores-catolicos]: finalizing version... 
+[debug] [2025-08-29T03:42:28.221Z] Checked if tokens are valid: true, expires at: 1756442452729
+[debug] [2025-08-29T03:42:28.222Z] Checked if tokens are valid: true, expires at: 1756442452729
+[debug] [2025-08-29T03:42:28.223Z] >>> [apiv2][query] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/versions/a41527ff56a5d77a updateMask=status%2Cconfig
+[debug] [2025-08-29T03:42:28.223Z] >>> [apiv2][body] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/versions/a41527ff56a5d77a {"status":"FINALIZED","config":{"rewrites":[{"glob":"**","path":"/index.html"}]}}
+[debug] [2025-08-29T03:42:28.400Z] <<< [apiv2][status] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/versions/a41527ff56a5d77a 200
+[debug] [2025-08-29T03:42:28.400Z] <<< [apiv2][body] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/versions/a41527ff56a5d77a {"name":"projects/605560352237/sites/predicadores-catolicos/versions/a41527ff56a5d77a","status":"FINALIZED","config":{"rewrites":[{"glob":"**","path":"/index.html"}]},"labels":{"deployment-tool":"cli-firebase"},"createTime":"2025-08-29T03:42:25.437934Z","createUser":{"email":"william.comunidad@gmail.com"},"finalizeTime":"2025-08-29T03:42:28.341940Z","finalizeUser":{"email":"william.comunidad@gmail.com"}}
+[debug] [2025-08-29T03:42:28.401Z] [hosting] finalized version for predicadores-catolicos:[object Object]
+[info] +  hosting[predicadores-catolicos]: version finalized 
+[info] i  hosting[predicadores-catolicos]: releasing new version... 
+[debug] [2025-08-29T03:42:28.402Z] Checked if tokens are valid: true, expires at: 1756442452729
+[debug] [2025-08-29T03:42:28.402Z] Checked if tokens are valid: true, expires at: 1756442452729
+[debug] [2025-08-29T03:42:28.402Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/channels/live/releases versionName=projects%2F605560352237%2Fsites%2Fpredicadores-catolicos%2Fversions%2Fa41527ff56a5d77a
+[debug] [2025-08-29T03:42:28.402Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/channels/live/releases {}
+[debug] [2025-08-29T03:42:28.617Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/channels/live/releases 200
+[debug] [2025-08-29T03:42:28.618Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/predicadores-catolicos/channels/live/releases {"name":"projects/605560352237/sites/predicadores-catolicos/channels/live/releases/1756438948008000","version":{"name":"projects/605560352237/sites/predicadores-catolicos/versions/a41527ff56a5d77a","status":"FINALIZED","config":{"rewrites":[{"glob":"**","path":"/index.html"}]},"labels":{"deployment-tool":"cli-firebase"},"createTime":"2025-08-29T03:42:25.437934Z","createUser":{"email":"william.comunidad@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocISYVVjQGJRyIZ-94TGwMX6V2GfvH1hsWQ-h91f5AEguVaGzKI"},"finalizeTime":"2025-08-29T03:42:28.341940Z","finalizeUser":{"email":"william.comunidad@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocISYVVjQGJRyIZ-94TGwMX6V2GfvH1hsWQ-h91f5AEguVaGzKI"}},"type":"DEPLOY","releaseTime":"2025-08-29T03:42:28.008Z","releaseUser":{"email":"william.comunidad@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocISYVVjQGJRyIZ-94TGwMX6V2GfvH1hsWQ-h91f5AEguVaGzKI"}}
+[debug] [2025-08-29T03:42:28.618Z] [hosting] release: {"name":"projects/605560352237/sites/predicadores-catolicos/channels/live/releases/1756438948008000","version":{"name":"projects/605560352237/sites/predicadores-catolicos/versions/a41527ff56a5d77a","status":"FINALIZED","config":{"rewrites":[{"glob":"**","path":"/index.html"}]},"labels":{"deployment-tool":"cli-firebase"},"createTime":"2025-08-29T03:42:25.437934Z","createUser":{"email":"william.comunidad@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocISYVVjQGJRyIZ-94TGwMX6V2GfvH1hsWQ-h91f5AEguVaGzKI"},"finalizeTime":"2025-08-29T03:42:28.341940Z","finalizeUser":{"email":"william.comunidad@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocISYVVjQGJRyIZ-94TGwMX6V2GfvH1hsWQ-h91f5AEguVaGzKI"}},"type":"DEPLOY","releaseTime":"2025-08-29T03:42:28.008Z","releaseUser":{"email":"william.comunidad@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocISYVVjQGJRyIZ-94TGwMX6V2GfvH1hsWQ-h91f5AEguVaGzKI"}}
+[info] +  hosting[predicadores-catolicos]: release complete 
+[info] 
+[info] +  Deploy complete! 
+[info] 
+[info] Project Console: https://console.firebase.google.com/project/predicadores-catolicos/overview
+[info] Hosting URL: https://predicadores-catolicos.web.app
