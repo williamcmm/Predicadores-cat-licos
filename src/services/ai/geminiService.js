@@ -119,8 +119,7 @@ export async function searchResourcesProgressive(query, onCategory, categories =
   return true;
 }
 
-export async function generateSermon(topic = '', searchResults = []) {
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
 
   const structurePrompt = `
     Tu tarea es generar la estructura principal de un sermón católico sobre el tema: "${topic}".
@@ -159,7 +158,6 @@ export async function generateSermon(topic = '', searchResults = []) {
   }
 }
 
-async function generateDisparadoresForIdea(idea, topic, model) {
   const prompt = `
     Dada la siguiente idea principal de un sermón: "${idea.h1}",
     y su texto de apoyo: "${idea.elementoApoyo.contenido}".
@@ -232,3 +230,4 @@ export async function generateDisparador(paragraph) {
     return `Error: ${e.message}`;
   }
 }
+
