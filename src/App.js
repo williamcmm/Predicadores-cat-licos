@@ -75,19 +75,6 @@ function App() {
       setIsSaving(false);
     }
   }, [sermon, currentUser]);
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      if (currentUser && sermon.title) {
-        handleSave();
-      }
-    }, 2000);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [sermon, currentUser, handleSave]);
-
   useEffect(() => {
     if (!currentUser) {
       localStorage.removeItem('currentSermon');
@@ -286,3 +273,5 @@ function App() {
 }
 
 export default App;
+
+
