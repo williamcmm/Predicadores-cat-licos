@@ -37,7 +37,7 @@ function App() {
   const [sermon, setSermon] = useState(() => {
     if (!currentUser) {
       localStorage.removeItem('currentSermon');
-      return getInitialSermonState();
+      return storageService.getInitialSermonState();
     }
     try {
       const savedSermon = localStorage.getItem('currentSermon');
@@ -50,7 +50,7 @@ function App() {
     } catch (error) {
       console.error("Error parsing sermon from localStorage:", error);
     }
-    return getInitialSermonState();
+    return storageService.getInitialSermonState();
   });
 
   useEffect(() => {
@@ -95,7 +95,7 @@ function App() {
     const loadInitialSermon = async () => {
       if (!currentUser) {
         storageService.clearUserData();
-        setSermon(storageService.getInitialSermonState());
+        setSermon(storageService.storageService.getInitialSermonState());
         return;
       }
       
@@ -105,7 +105,7 @@ function App() {
         setSermon(initialSermon);
       } catch (error) {
         console.error('Error cargando sermón inicial:', error);
-        setSermon(storageService.getInitialSermonState());
+        setSermon(storageService.storageService.getInitialSermonState());
       }
       setIsLoadingInitialSermon(false);
     };
@@ -123,10 +123,10 @@ function App() {
       }
 
       const finalSermon = {
-        ...getInitialSermonState(),
+        ...storageService.getInitialSermonState(),
         ...newSermonData,
         introduction: {
-          ...getInitialSermonState().introduction,
+          ...storageService.getInitialSermonState().introduction,
           ...(newSermonData.introduction || {})
         },
         ideas: (newSermonData.ideas || []).map((idea, index) => ({
@@ -150,7 +150,7 @@ function App() {
 
     const handleStartManualSermon = (event) => {
       const { topic } = event.detail;
-      setSermon({ ...getInitialSermonState(), title: topic || '' });
+      setSermon({ ...storageService.getInitialSermonState(), title: topic || '' });
       setModo('edicion');
     };
 
@@ -164,7 +164,7 @@ function App() {
   }, []);
 
   const handleClearSermon = () => {
-    setSermon(getInitialSermonState());
+    setSermon(storageService.getInitialSermonState());
     setModo('edicion');
   };
 
@@ -304,6 +304,9 @@ function App() {
 }
 
 export default App;
+
+
+
 
 
 

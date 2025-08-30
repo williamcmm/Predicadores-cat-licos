@@ -134,15 +134,9 @@ class StorageService {
   getInitialSermonState() {
     return {
       title: '',
-      theme: '',
-      targetAudience: '',
-      duration: 15,
-      content: {
-        introduction: '',
-        development: '',
-        conclusion: '',
-        personalReflection: ''
-      }
+      introduction: { presentation: '', motivation: '' },
+      ideas: [],
+      imperatives: ''
     };
   }
 
@@ -156,4 +150,5 @@ class StorageService {
 
 const storageServiceInstance = new StorageService();
 export default storageServiceInstance;
+
 
