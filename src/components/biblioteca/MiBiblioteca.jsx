@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+﻿import React, { useState, useEffect, useMemo } from 'react';
 import { obtenerSermones, eliminarSermon, guardarSermon } from '../../services/database/firestoreService';
 import { useAuth } from '../../context/AuthContext';
 
@@ -31,13 +31,13 @@ const MiBiblioteca = ({ onClose, onOpenSermon }) => {
   };
 
   const handleDeleteSermon = async (sermonId) => {
-    if (window.confirm("¿Estás seguro de que quieres eliminar este sermón? Esta acción no se puede deshacer.")) {
+    if (window.confirm("Â¿EstÃ¡s seguro de que quieres eliminar este sermÃ³n? Esta acciÃ³n no se puede deshacer.")) {
       try {
         await eliminarSermon(sermonId);
         setSermones(sermones.filter(s => s.id !== sermonId));
       } catch (error) {
         console.error("Error deleting sermon:", error);
-        alert("Hubo un error al eliminar el sermón.");
+        alert("Hubo un error al eliminar el sermÃ³n.");
       }
     }
   };
@@ -53,7 +53,7 @@ const MiBiblioteca = ({ onClose, onOpenSermon }) => {
       setSermones([newSermon, ...sermones]);
     } catch (error) {
       console.error("Error duplicating sermon:", error);
-      alert("Hubo un error al duplicar el sermón.");
+      alert("Hubo un error al duplicar el sermÃ³n.");
     }
   };
 
@@ -89,7 +89,7 @@ const MiBiblioteca = ({ onClose, onOpenSermon }) => {
         <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
           <input 
             type="text"
-            placeholder="Buscar por título..."
+            placeholder="Buscar por tÃ­tulo..."
             className="px-4 py-2 border rounded-md w-full sm:w-1/2"
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -98,9 +98,9 @@ const MiBiblioteca = ({ onClose, onOpenSermon }) => {
             onChange={(e) => setSortOrder(e.target.value)}
             value={sortOrder}
           >
-            <option value="reciente">Más recientes</option>
-            <option value="antiguo">Más antiguos</option>
-            <option value="titulo">Título (A-Z)</option>
+            <option value="reciente">MÃ¡s recientes</option>
+            <option value="antiguo">MÃ¡s antiguos</option>
+            <option value="titulo">TÃ­tulo (A-Z)</option>
           </select>
         </div>
 
@@ -150,3 +150,6 @@ const MiBiblioteca = ({ onClose, onOpenSermon }) => {
 };
 
 export default MiBiblioteca;
+
+
+

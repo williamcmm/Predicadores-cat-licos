@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, Fragment } from 'react';
+﻿import React, { useState, useEffect, useCallback, Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import Header from './components/ui/Header';
 import PanelResizer from './components/ui/PanelResizer';
@@ -10,6 +10,7 @@ import SermonPreachingView from './components/sermon/SermonPreachingView';
 import MiBiblioteca from './components/biblioteca/MiBiblioteca';
 import BottomNavBar from './components/ui/BottomNavBar';
 import { useAuth } from './context/AuthContext';
+import storageService from './services/storage/storageService';
 import { guardarSermon } from './services/database/firestoreService';
 
 const getInitialSermonState = () => ({
@@ -31,6 +32,7 @@ function App() {
   const [lastSaved, setLastSaved] = useState(null);
   const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < 768);
   const [activePanel, setActivePanel] = useState('editor');
+  const [isLoadingInitialSermon, setIsLoadingInitialSermon] = useState(false);
 
   const [sermon, setSermon] = useState(() => {
     if (!currentUser) {
@@ -75,19 +77,48 @@ function App() {
       setIsSaving(false);
     }
   }, [sermon, currentUser]);
+
   useEffect(() => {
-    if (!currentUser) {
-      localStorage.removeItem('currentSermon');
-      setSermon(getInitialSermonState());
-    }
+    const handler = setTimeout(() => {
+      if (currentUser && sermon.title) {
+        handleSave();
+      }
+    }, 2000);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [sermon, currentUser, handleSave]);
+
+  // Carga inicial inteligente del sermón
+  useEffect(() => {
+    const loadInitialSermon = async () => {
+      if (!currentUser) {
+        storageService.clearUserData();
+        setSermon(storageService.getInitialSermonState());
+        return;
+      }
+      
+      setIsLoadingInitialSermon(true);
+      try {
+        const initialSermon = await storageService.loadInitialSermon(currentUser.uid);
+        setSermon(initialSermon);
+      } catch (error) {
+        console.error('Error cargando sermón inicial:', error);
+        setSermon(storageService.getInitialSermonState());
+      }
+      setIsLoadingInitialSermon(false);
+    };
+
+    loadInitialSermon();
   }, [currentUser]);
 
   useEffect(() => {
     const handleSermonUpdate = (event) => {
       const newSermonData = event.detail;
       if (!newSermonData || typeof newSermonData !== 'object') {
-        console.error("Evento 'insertSermonIntoEditor' recibió datos inválidos:", newSermonData);
-        alert("La IA devolvió un formato de sermón inesperado. No se pudo cargar.");
+        console.error("Evento 'insertSermonIntoEditor' recibiÃ³ datos invÃ¡lidos:", newSermonData);
+        alert("La IA devolviÃ³ un formato de sermÃ³n inesperado. No se pudo cargar.");
         return;
       }
 
@@ -273,5 +304,11 @@ function App() {
 }
 
 export default App;
+
+
+
+
+
+
 
 
