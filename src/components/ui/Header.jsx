@@ -21,19 +21,22 @@ const Header = ({ onToggleBiblioteca, onOpenAdminPanel }) => {
             </h1>
           </div>
           
-          {/* Right - Share + Biblioteca + Menu/Login */}
+          {/* Right - Conditional based on user state */}
           <div className="flex items-center gap-2">
-            <ShareButton />
-            <button
-              onClick={onToggleBiblioteca}
-              className="px-2 py-1 text-xs bg-white text-purple-700 rounded-md hover:bg-gray-200 transition-colors font-semibold"
-            >
-              Biblioteca
-            </button>
-            
             {currentUser ? (
-              <UserMenu onOpenAdminPanel={onOpenAdminPanel} />
+              // LOGGED IN: Show Share + Biblioteca + UserMenu
+              <>
+                <ShareButton />
+                <button
+                  onClick={onToggleBiblioteca}
+                  className="px-2 py-1 text-xs bg-white text-purple-700 rounded-md hover:bg-gray-200 transition-colors font-semibold"
+                >
+                  Biblioteca
+                </button>
+                <UserMenu onOpenAdminPanel={onOpenAdminPanel} />
+              </>
             ) : (
+              // NOT LOGGED IN: Show only Login button
               <LoginButton />
             )}
           </div>
@@ -48,26 +51,37 @@ const Header = ({ onToggleBiblioteca, onOpenAdminPanel }) => {
             </h1>
           </div>
 
-          {/* Center - Share Button */}
-          <div className="flex-1 flex justify-center">
-            <ShareButton />
-          </div>
+          {currentUser ? (
+            // LOGGED IN: Show Share (center) + Biblioteca + UserMenu (right)
+            <>
+              {/* Center - Share Button */}
+              <div className="flex-1 flex justify-center">
+                <ShareButton />
+              </div>
 
-          {/* Right - Biblioteca + Menu/Login */}
-          <div className="flex items-center gap-3 flex-shrink-0">
-            <button
-              onClick={onToggleBiblioteca}
-              className="px-4 py-2 bg-white text-purple-700 rounded-md hover:bg-gray-200 transition-colors font-semibold"
-            >
-              Biblioteca
-            </button>
-            
-            {currentUser ? (
-              <UserMenu onOpenAdminPanel={onOpenAdminPanel} />
-            ) : (
-              <LoginButton />
-            )}
-          </div>
+              {/* Right - Biblioteca + UserMenu */}
+              <div className="flex items-center gap-3 flex-shrink-0">
+                <button
+                  onClick={onToggleBiblioteca}
+                  className="px-4 py-2 bg-white text-purple-700 rounded-md hover:bg-gray-200 transition-colors font-semibold"
+                >
+                  Biblioteca
+                </button>
+                <UserMenu onOpenAdminPanel={onOpenAdminPanel} />
+              </div>
+            </>
+          ) : (
+            // NOT LOGGED IN: Show only Login button (right)
+            <>
+              {/* Empty center space */}
+              <div className="flex-1"></div>
+              
+              {/* Right - Login button */}
+              <div className="flex items-center flex-shrink-0">
+                <LoginButton />
+              </div>
+            </>
+          )}
         </div>
       </div>
     </header>
