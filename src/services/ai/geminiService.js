@@ -56,7 +56,7 @@ const extractAndParseJson = (text) => {
 
 export async function searchResourcesProgressive(query, onCategory, categories = null, signal) {
   const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-  const DEFAULT_CATS = [ 'DOCTRINA CATÓLICA','CATECISMO','SANTORAL CATÓLICO','CITAS BÍBLICAS RELEVANTES','REFLEXIONES SOBRE EL TEMA', 'EJEMPLOS PRÁCTICOS','TESTIMONIOS Y EXPERIENCIAS','DATOS CIENTÍFICOS/HISTÓRICOS','VIDEOS DE YOUTUBE','REFERENCIAS DOCTRINALES','DOCUMENTOS OFICIALES DE LA IGLESIA' ];
+  const DEFAULT_CATS = [ 'DOCTRINA CATÓLICA','CATECISMO','SANTORAL CATÓLICO','CITAS BÍBLICAS RELEVANTES','REFLEXIONES SOBRE EL TEMA', 'EJEMPLOS PRÁCTICOS','TESTIMONIOS Y EXPERIENCIAS','DATOS CIENTÍFICOS/HISTÓRICOS','REFERENCIAS DOCTRINALES','DOCUMENTOS OFICIALES DE LA IGLESIA' ];
   const cats = Array.isArray(categories) && categories.length > 0 ? categories : DEFAULT_CATS;
   for (const cat of cats) {
     if (signal?.aborted) {

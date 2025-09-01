@@ -8,10 +8,12 @@ import ResourcePanel from './components/resources/ResourcePanel';
 import SermonStudyView from './components/sermon/SermonStudyView';
 import SermonPreachingView from './components/sermon/SermonPreachingView';
 import MiBiblioteca from './components/biblioteca/MiBiblioteca';
+import AdminPanel from './components/admin/AdminPanel';
 import BottomNavBar from './components/ui/BottomNavBar';
 import { useAuth } from './context/AuthContext';
 import storageService from './services/storage/storageService';
 import { guardarSermon } from './services/database/firestoreService';
+import { esAdministrador } from './services/admin/userService';
 
 const getInitialSermonState = () => ({
   title: '',
@@ -28,6 +30,7 @@ function App() {
   });
   const [modo, setModo] = useState('edicion');
   const [showBiblioteca, setShowBiblioteca] = useState(false);
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState(null);
   const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < 768);
@@ -90,12 +93,16 @@ function App() {
     };
   }, [sermon, currentUser, handleSave]);
 
-  // Carga inicial inteligente del sermón
+  // Carga inicial inteligente del sermón - PREVENIR DUPLICACIÓN
   useEffect(() => {
     const loadInitialSermon = async () => {
       if (!currentUser) {
+        // LIMPIEZA: Remover datos de usuario anterior para prevenir duplicación
         storageService.clearUserData();
-        setSermon(storageService.storageService.getInitialSermonState());
+        localStorage.removeItem('currentSermon');
+        localStorage.removeItem('sermonesCache');
+        localStorage.removeItem('cacheTimestamp');
+        setSermon(storageService.getInitialSermonState());
         return;
       }
       
@@ -105,7 +112,7 @@ function App() {
         setSermon(initialSermon);
       } catch (error) {
         console.error('Error cargando sermón inicial:', error);
-        setSermon(storageService.storageService.getInitialSermonState());
+        setSermon(storageService.getInitialSermonState());
       }
       setIsLoadingInitialSermon(false);
     };
@@ -176,6 +183,10 @@ function App() {
     setShowBiblioteca(!showBiblioteca);
   };
 
+  const toggleAdminPanel = () => {
+    setShowAdminPanel(!showAdminPanel);
+  };
+
   const handleOpenSermon = (sermonToOpen) => {
     setSermon(sermonToOpen);
     setModo('edicion');
@@ -186,7 +197,7 @@ function App() {
 
   return (
     <div className="h-screen flex flex-col bg-gray-100">
-      <Header onToggleBiblioteca={toggleBiblioteca} />
+      <Header onToggleBiblioteca={toggleBiblioteca} onOpenAdminPanel={toggleAdminPanel} />
       <div className="flex flex-1 overflow-hidden">
         {isSmallScreen ? (
           <main className="flex-1 overflow-y-auto pb-16">
@@ -299,6 +310,9 @@ function App() {
         <SermonPreachingView sermon={sermon} onClose={() => setModo('edicion')} />
       )}
       {showBiblioteca && <MiBiblioteca onClose={toggleBiblioteca} onOpenSermon={handleOpenSermon} />}
+      {showAdminPanel && esAdministrador(currentUser) && (
+        <AdminPanel onClose={toggleAdminPanel} />
+      )}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const SermonSaveButton = ({ onSave, isSaving, lastSaved, className = '' }) => {
+const SermonSaveButton = ({ onSave, isSaving, lastSaved, className = '', compact = false }) => {
   const [saveStatus, setSaveStatus] = useState(null);
 
   const handleSave = async () => {
@@ -27,27 +27,37 @@ const SermonSaveButton = ({ onSave, isSaving, lastSaved, className = '' }) => {
   };
 
   const getButtonText = () => {
+    if (compact) {
+      if (isSaving) return '...';
+      if (saveStatus === 'success') return '✓';
+      if (saveStatus === 'error') return '✗';
+      return '💾';
+    }
+    
     if (isSaving) return 'Guardando...';
     if (saveStatus === 'success') return ' Guardado';
     if (saveStatus === 'error') return ' Error';
     return 'Guardar';
   };
 
+  const buttonWidth = compact ? 'min-w-[32px]' : 'min-w-[100px]';
+
   return (
     <div className="flex items-center space-x-2">
       <button
         onClick={handleSave}
-        className={`font-medium text-white transition-all duration-300 min-w-[100px] px-4 py-2 rounded ${className} ${getButtonStyle()}`}
+        className={`font-medium text-white transition-all duration-300 ${buttonWidth} px-4 py-2 rounded ${className} ${getButtonStyle()}`}
         disabled={isSaving}
+        title={compact ? (isSaving ? 'Guardando...' : 'Guardar') : ''}
       >
         {getButtonText()}
       </button>
-      {lastSaved && (
+      {lastSaved && !compact && (
         <span className="text-gray-500 text-xs hidden sm:inline">
           Último guardado: {new Date(lastSaved).toLocaleTimeString()}
         </span>
       )}
-      {saveStatus === 'error' && (
+      {saveStatus === 'error' && !compact && (
         <span className="text-red-500 text-xs">
           Error al guardar. Intente nuevamente.
         </span>

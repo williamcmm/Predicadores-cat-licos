@@ -12,8 +12,18 @@ const MiBiblioteca = ({ onClose, onOpenSermon }) => {
   const fetchSermones = async () => {
     if (currentUser) {
       try {
+        // PREVENIR DUPLICACIÓN: Limpiar cache antes de cargar
+        const cacheKey = `sermones_cache_${currentUser.uid}`;
+        localStorage.removeItem(cacheKey);
+        
         const userSermons = await obtenerSermones(currentUser.uid);
-        setSermones(userSermons);
+        
+        // PREVENIR DUPLICACIÓN: Filtrar sermones únicos por ID
+        const uniqueSermons = userSermons.filter((sermon, index, self) => 
+          index === self.findIndex(s => s.id === sermon.id)
+        );
+        
+        setSermones(uniqueSermons);
       } catch (error) {
         console.error("Error fetching sermons:", error);
       }

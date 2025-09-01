@@ -42,20 +42,38 @@ class StorageService {
       // 1. Verificar si hay sermón local reciente
       const localSermon = this.getFromLocalStorage();
       
-      // 2. Si hay local y es del mismo usuario, usar ese
+      // 2. PREVENIR DUPLICACIÓN: Limpiar cache corrupto si no coincide el userId
+      if (localSermon && localSermon.userId !== userId) {
+        localStorage.removeItem(this.CURRENT_SERMON_KEY);
+        localStorage.removeItem(this.SERMONES_CACHE_KEY);
+        localStorage.removeItem(this.CACHE_TIMESTAMP_KEY);
+      }
+      
+      // 3. Si hay local válido del mismo usuario, usar ese
       if (localSermon && localSermon.userId === userId) {
         return localSermon;
       }
       
-      // 3. Cargar último sermón del usuario desde Firestore
+      // 4. Cargar último sermón del usuario desde Firestore (SIN duplicar)
       const sermones = await obtenerSermones(userId);
       if (sermones && sermones.length > 0) {
-        const ultimoSermon = sermones[0]; // Asumiendo orden descendente
-        this.saveToLocalStorage(ultimoSermon);
+        // PREVENIR DUPLICACIÓN: Solo tomar el más reciente
+        const sermonesOrdenados = sermones.sort((a, b) => {
+          const dateA = a.createdAt?.seconds || 0;
+          const dateB = b.createdAt?.seconds || 0;
+          return dateB - dateA;
+        });
+        const ultimoSermon = sermonesOrdenados[0];
+        
+        // PREVENIR DUPLICACIÓN: Verificar que no esté ya guardado localmente
+        const existingLocal = this.getFromLocalStorage();
+        if (!existingLocal || existingLocal.id !== ultimoSermon.id) {
+          this.saveToLocalStorage(ultimoSermon);
+        }
         return ultimoSermon;
       }
       
-      // 4. Nuevo usuario: estado inicial
+      // 5. Nuevo usuario: estado inicial
       return this.getInitialSermonState();
       
     } catch (error) {

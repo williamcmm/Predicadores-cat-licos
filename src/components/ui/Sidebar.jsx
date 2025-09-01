@@ -94,17 +94,18 @@ const Sidebar = ({ modo, setModo, onClearSermon, onSave, isSaving, lastSaved }) 
         ))}
       </div>
 
-      <div className={'flex items-center gap-2 sm:gap-4'}>
+      <div className={displayMode === 'collapsed' ? 'flex items-center gap-1' : 'flex items-center gap-2 sm:gap-4'}>
         <button
           onClick={onClearSermon}
-          className={`${actionButtonClassName} font-medium bg-transparent text-red-600 hover:bg-red-50 border border-red-200 hover:border-red-400`}>
-          Limpiar
+          className={`${displayMode === 'collapsed' ? 'px-2 py-1 text-xs' : actionButtonClassName} font-medium bg-transparent text-red-600 hover:bg-red-50 border border-red-200 hover:border-red-400 transition-all`}>
+          {displayMode === 'collapsed' ? 'X' : 'Limpiar'}
         </button>
         <SermonSaveButton 
             onSave={onSave} 
             isSaving={isSaving} 
             lastSaved={lastSaved} 
-            className={`${actionButtonClassName} border border-transparent`} 
+            className={`${displayMode === 'collapsed' ? 'px-2 py-1 text-xs' : actionButtonClassName} border border-transparent`} 
+            compact={displayMode === 'collapsed'}
         />
       </div>
     </>
