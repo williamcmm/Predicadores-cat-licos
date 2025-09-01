@@ -18,6 +18,9 @@
   },
   "scripts": {
     "start": "craco start",
+    "start:clean": "npm run clean && npm run start:nocache",
+    "start:nocache": "GENERATE_SOURCEMAP=false FAST_REFRESH=false craco start",
+    "clean": "rimraf build && rimraf node_modules/.cache && rimraf .craco",
     "build": "craco build",
     "test": "craco test",
     "eject": "react-scripts eject"

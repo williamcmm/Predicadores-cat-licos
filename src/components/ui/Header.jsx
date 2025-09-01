@@ -6,6 +6,8 @@ import { useAuth } from '../../context/AuthContext';
 
 const Header = ({ onToggleBiblioteca, onOpenAdminPanel }) => {
   const { currentUser } = useAuth();
+  // Anti-cache timestamp
+  const buildVersion = "2025-09-01-v2";
 
   return (
     <header className="bg-gradient-to-r from-purple-700 to-purple-500 shadow-lg p-4 text-white">
