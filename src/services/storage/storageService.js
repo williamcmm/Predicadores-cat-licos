@@ -1,4 +1,4 @@
-﻿// Servicio híbrido optimizado para guardado rápido y persistencia
+// Servicio híbrido optimizado para guardado rápido y persistencia
 import { guardarSermon as guardarEnFirestore, obtenerSermones } from '../database/firestoreService';
 
 class StorageService {
@@ -168,5 +168,3 @@ class StorageService {
 
 const storageServiceInstance = new StorageService();
 export default storageServiceInstance;
-
-

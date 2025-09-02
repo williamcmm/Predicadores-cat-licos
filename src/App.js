@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useCallback, Fragment } from 'react';
+import React, { useState, useEffect, useCallback, Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import Header from './components/ui/Header';
 import PanelResizer from './components/ui/PanelResizer';
@@ -7,20 +7,13 @@ import SermonEditor from './components/sermon/SermonEditor';
 import ResourcePanel from './components/resources/ResourcePanel';
 import SermonStudyView from './components/sermon/SermonStudyView';
 import SermonPreachingView from './components/sermon/SermonPreachingView';
-import MiBiblioteca from './components/biblioteca/MiBiblioteca';
+import Biblioteca from './components/biblioteca/Biblioteca';
 import AdminPanel from './components/admin/AdminPanel';
 import BottomNavBar from './components/ui/BottomNavBar';
 import { useAuth } from './context/AuthContext';
 import storageService from './services/storage/storageService';
 import { guardarSermon } from './services/database/firestoreService';
 import { esAdministrador } from './services/admin/userService';
-
-const getInitialSermonState = () => ({
-  title: '',
-  introduction: { presentation: '', motivation: '' },
-  ideas: [],
-  imperatives: '',
-});
 
 function App() {
   const { currentUser } = useAuth();
@@ -35,7 +28,6 @@ function App() {
   const [lastSaved, setLastSaved] = useState(null);
   const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < 768);
   const [activePanel, setActivePanel] = useState('editor');
-  const [isLoadingInitialSermon, setIsLoadingInitialSermon] = useState(false);
 
   const [sermon, setSermon] = useState(() => {
     if (!currentUser) {
@@ -106,7 +98,6 @@ function App() {
         return;
       }
       
-      setIsLoadingInitialSermon(true);
       try {
         const initialSermon = await storageService.loadInitialSermon(currentUser.uid);
         setSermon(initialSermon);
@@ -114,7 +105,6 @@ function App() {
         console.error('Error cargando sermón inicial:', error);
         setSermon(storageService.getInitialSermonState());
       }
-      setIsLoadingInitialSermon(false);
     };
 
     loadInitialSermon();
@@ -309,7 +299,7 @@ function App() {
       {modo === 'predicacion' && (
         <SermonPreachingView sermon={sermon} onClose={() => setModo('edicion')} />
       )}
-      {showBiblioteca && <MiBiblioteca onClose={toggleBiblioteca} onOpenSermon={handleOpenSermon} />}
+      {showBiblioteca && <Biblioteca onClose={toggleBiblioteca} onOpenSermon={handleOpenSermon} />}
       {showAdminPanel && esAdministrador(currentUser) && (
         <AdminPanel onClose={toggleAdminPanel} />
       )}
@@ -318,14 +308,3 @@ function App() {
 }
 
 export default App;
-
-
-
-
-
-
-
-
-
-
-

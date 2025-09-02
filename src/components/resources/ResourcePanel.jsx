@@ -42,7 +42,6 @@ export default function ResourcePanel() {
   const [showDropdown, setShowDropdown] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isSuggesting, setIsSuggesting] = useState(false);
-  const [error, setError] = useState(null);
   const [userToggledCategories, setUserToggledCategories] = useState({});
   const [generating, setGenerating] = useState(false);
   const [expandedResources, setExpandedResources] = useState({});
@@ -87,7 +86,7 @@ export default function ResourcePanel() {
   const handleToggleCategoryActive = (categoryName) => {let newCategories = categories.map(c => c.name === categoryName ? { ...c, active: !c.active } : c); newCategories.sort((a, b) => b.active - a.active); setCategories(newCategories); };
   const handleMoveCategory = (index, direction) => { const newCategories = [...categories]; const [movedCategory] = newCategories.splice(index, 1); newCategories.splice(index + direction, 0, movedCategory); setCategories(newCategories); };
   const onResourceUpdate = (catName, resources) => { const mapped = mapCategory(catName); setSearchResults(prevResults => { const partial = prevResults ? [...prevResults] : []; const existingIndex = partial.findIndex(p => (p.category || '') === mapped); const entry = { category: mapped, resources }; if (existingIndex === -1) { partial.push(entry); } else { partial[existingIndex] = entry; } return partial; }); setCategoryLoading(prev => ({ ...prev, [mapped]: false })); };
-  const handleFetchSingleCategory = async (categoryName) => { if (categoryName === PERSONAL_RESOURCE_CATEGORY) { alert("Para añadir un recurso personal, usa el botón 'Añadir Texto'."); return; } if (!searchTerm.trim()) { alert("Por favor, escribe un tema en la barra de búsqueda principal."); return; } const singleCategorySignal = new AbortController().signal; setCategoryLoading(prev => ({ ...prev, [categoryName]: true })); try { await searchResourcesProgressive(searchTerm, onResourceUpdate, [categoryName], singleCategorySignal); } catch (err) { if (err.name !== 'AbortError') { console.error(`Error fetching single category ${categoryName}:`, err); setError(err.message ? err.message : String(err)); setCategoryLoading(prev => ({ ...prev, [categoryName]: false })); } } };
+  const handleFetchSingleCategory = async (categoryName) => { if (categoryName === PERSONAL_RESOURCE_CATEGORY) { alert("Para añadir un recurso personal, usa el botón 'Añadir Texto'."); return; } if (!searchTerm.trim()) { alert("Por favor, escribe un tema en la barra de búsqueda principal."); return; } const singleCategorySignal = new AbortController().signal; setCategoryLoading(prev => ({ ...prev, [categoryName]: true })); try { await searchResourcesProgressive(searchTerm, onResourceUpdate, [categoryName], singleCategorySignal); } catch (err) { if (err.name !== 'AbortError') { console.error(`Error fetching single category ${categoryName}:`, err); setCategoryLoading(prev => ({ ...prev, [categoryName]: false })); } } };
   const shuffleArray = (arr) => { const a = Array.isArray(arr) ? [...arr] : []; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
   useEffect(() => { function handleClickOutside(e) { if (dropdownRef.current && !dropdownRef.current.contains(e.target)) { setShowDropdown(false); } } document.addEventListener('mousedown', handleClickOutside);
  return () => document.removeEventListener('mousedown', handleClickOutside);
@@ -99,7 +98,6 @@ export default function ResourcePanel() {
  const isSuggestionSearch = termToSearch.trim() === '';
  if (isSuggestionSearch) setIsSuggesting(true);
  else setIsLoading(true);
- setError(null);
  if (!isSuggestionSearch) setSearchResults(prev => (prev || []).filter(r => r.category === PERSONAL_RESOURCE_CATEGORY));
  setSuggestions([]);
  setShowDropdown(false);
@@ -126,7 +124,7 @@ export default function ResourcePanel() {
  await searchResourcesProgressive(termToSearch, onResourceUpdate, activeCategories, signal);
  }
  } catch (err) {
- if (err.name !== 'AbortError') setError(err.message ? err.message : String(err));
+ if (err.name !== 'AbortError') console.error('Error during search:', err);
  } finally {
  if (isSuggesting) setIsSuggesting(false);
  else setIsLoading(false);
@@ -143,7 +141,6 @@ export default function ResourcePanel() {
     setShowDropdown(false);
     setIsLoading(false);
     setIsSuggesting(false);
-    setError(null);
     setUserToggledCategories({});
     setGenerating(false);
     setExpandedResources({});
@@ -170,7 +167,6 @@ export default function ResourcePanel() {
     }
 
     setGenerating(true);
-    setError(null);
     try {
       const sermonData = await generateSermon(searchTerm || 'Sermón basado en recursos', filteredResults);
       
@@ -182,7 +178,6 @@ export default function ResourcePanel() {
       }
     } catch (err) {
       console.error('generateSermon error', err);
-      setError(err.message ? err.message : String(err));
       alert(`Error al generar sermón: ${err.message}`);
     } finally {
       setGenerating(false);

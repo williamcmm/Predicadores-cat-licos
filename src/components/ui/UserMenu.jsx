@@ -1,13 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { FaBars, FaUser, FaSignOutAlt, FaCog } from 'react-icons/fa';
+import { FaUser, FaSignOutAlt, FaCog } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import UserLevelBadge from './UserLevelBadge';
-import { esAdministrador } from '../../services/admin/userService';
+import { useAccessControl } from '../../hooks/useAccessControl';
 
-const UserMenu = () => {
+const UserMenu = ({ onOpenAdminPanel }) => {
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef(null);
   const { currentUser, logout } = useAuth();
+  const { hasAccess } = useAccessControl();
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -34,8 +35,9 @@ const UserMenu = () => {
   };
 
   const handleAdminPanel = () => {
-    // Aquí irá la lógica para abrir el panel de administrador
-    console.log('Abrir panel de administrador');
+    if (onOpenAdminPanel) {
+      onOpenAdminPanel();
+    }
     setShowMenu(false);
   };
 
@@ -46,7 +48,7 @@ const UserMenu = () => {
         className="flex items-center space-x-2 text-white hover:text-purple-200 transition-colors duration-200 p-2"
         aria-label="Menu de usuario"
       >
-        <FaBars size={18} />
+        <FaCog size={18} />
       </button>
 
       {showMenu && (
@@ -73,7 +75,7 @@ const UserMenu = () => {
 
           {/* Opciones del menú */}
           <div className="py-2">
-            {esAdministrador(currentUser?.uid) && (
+            {hasAccess.adminPanel && (
               <button
                 onClick={handleAdminPanel}
                 className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-150"

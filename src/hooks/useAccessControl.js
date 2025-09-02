@@ -4,6 +4,13 @@ import { useAuth } from '../context/AuthContext';
 export const useAccessControl = () => {
   const { currentUser, membershipLevel, userRole } = useAuth();
 
+  // DEBUG: Mostrar información en consola
+  console.log('=== DEBUG ACCESS CONTROL ===');
+  console.log('currentUser:', currentUser?.email);
+  console.log('membershipLevel:', membershipLevel);
+  console.log('userRole:', userRole);
+  console.log('============================');
+
   const hasAccess = {
     // Nivel 0: Solo crear sermones, no guardar
     createSermon: true,

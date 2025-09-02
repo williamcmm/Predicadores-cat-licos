@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaStar, FaUserShield, FaCrown, FaUser } from 'react-icons/fa';
+import { FaStar, FaUserShield, FaUser } from 'react-icons/fa';
 
 const UserLevelBadge = ({ level, size = 'sm' }) => {
   const levelConfig = {

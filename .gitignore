@@ -19,6 +19,11 @@
 .env.test.local
 .env.production.local
 
+# Firebase Admin SDK credentials
+admin-setup/*firebase-adminsdk*.json
+admin-setup/users.json
+
+# Logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

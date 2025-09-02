@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { obtenerSermones, eliminarSermon, guardarSermon } from '../../services/database/firestoreService';
 import { useAuth } from '../../context/AuthContext';
 
@@ -9,7 +9,7 @@ const MiBiblioteca = ({ onClose, onOpenSermon }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOrder, setSortOrder] = useState('reciente');
 
-  const fetchSermones = async () => {
+  const fetchSermones = useCallback(async () => {
     if (currentUser) {
       try {
         // PREVENIR DUPLICACIÓN: Limpiar cache antes de cargar
@@ -29,11 +29,11 @@ const MiBiblioteca = ({ onClose, onOpenSermon }) => {
       }
     }
     setLoading(false);
-  };
+  }, [currentUser]);
 
   useEffect(() => {
     fetchSermones();
-  }, [currentUser]);
+  }, [fetchSermones]);
 
   const handleOpenSermon = (sermon) => {
     onOpenSermon(sermon);
@@ -160,6 +160,3 @@ const MiBiblioteca = ({ onClose, onOpenSermon }) => {
 };
 
 export default MiBiblioteca;
-
-
-

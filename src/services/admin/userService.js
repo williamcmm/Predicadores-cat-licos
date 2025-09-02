@@ -55,7 +55,11 @@ export const obtenerEstadisticasUsuarios = async () => {
 
 // Verificar si un usuario tiene permisos de administrador
 export const esAdministrador = (usuario) => {
-  return usuario && usuario.userLevel === 'administrador';
+  // Verificar por userRole (custom claims) o userLevel (legacy)
+  return usuario && (
+    usuario.userRole === 'super_admin' || 
+    usuario.userLevel === 'administrador'
+  );
 };
 
 // Verificar nivel mínimo requerido
@@ -75,10 +79,12 @@ export const tieneNivelMinimo = (usuario, nivelRequerido) => {
   return nivelUsuario >= nivelMinimo;
 };
 
-export default {
+const userService = {
   obtenerTodosLosUsuarios,
   actualizarNivelUsuario,
   obtenerEstadisticasUsuarios,
   esAdministrador,
   tieneNivelMinimo
 };
+
+export default userService;

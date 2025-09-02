@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaUsers, FaCrown, FaChartBar, FaTimes, FaUserShield } from 'react-icons/fa';
+import { FaUsers, FaChartBar, FaTimes, FaUserShield } from 'react-icons/fa';
 import { obtenerTodosLosUsuarios, actualizarNivelUsuario, obtenerEstadisticasUsuarios } from '../../services/admin/userService';
 import { useAuth } from '../../context/AuthContext';
 

@@ -1,5 +1,4 @@
 // Servicio mejorado para guardar y recuperar sermones con cache
-import app from '../../config/firebase';
 import { getFirestore, collection, addDoc, getDocs, query, where, doc, deleteDoc } from 'firebase/firestore';
 
 const db = getFirestore();
@@ -9,17 +8,17 @@ const CACHE_DURATION = 5 * 60 * 1000; // 5 minutos
 
 export async function guardarSermon(sermon) {
   try {
-    console.log('Guardando sermón en Firestore...');
+    console.log('Guardando sermï¿½n en Firestore...');
     const docRef = await addDoc(collection(db, 'sermones'), sermon);
     
-    // Invalidar cache después de guardar
+    // Invalidar cache despuï¿½s de guardar
     sermonesCache = null;
     cacheTimestamp = null;
     
-    console.log('Sermón guardado exitosamente con ID:', docRef.id);
+    console.log('Sermï¿½n guardado exitosamente con ID:', docRef.id);
     return docRef.id;
   } catch (error) {
-    console.error('Error al guardar sermón:', error);
+    console.error('Error al guardar sermï¿½n:', error);
     throw error;
   }
 }
@@ -30,7 +29,7 @@ export async function obtenerSermones(userId) {
       return [];
     }
 
-    // Verificar si tenemos cache válido
+    // Verificar si tenemos cache vï¿½lido
     const now = Date.now();
     if (sermonesCache && cacheTimestamp && (now - cacheTimestamp) < CACHE_DURATION) {
       console.log('Usando sermones desde cache');
@@ -56,22 +55,22 @@ export async function obtenerSermones(userId) {
 
 export async function eliminarSermon(sermonId) {
   try {
-    console.log('Eliminando sermón:', sermonId);
+    console.log('Eliminando sermï¿½n:', sermonId);
     const sermonRef = doc(db, 'sermones', sermonId);
     await deleteDoc(sermonRef);
     
-    // Invalidar cache después de eliminar
+    // Invalidar cache despuï¿½s de eliminar
     sermonesCache = null;
     cacheTimestamp = null;
     
-    console.log('Sermón eliminado exitosamente');
+    console.log('Sermï¿½n eliminado exitosamente');
   } catch (error) {
-    console.error('Error al eliminar sermón:', error);
+    console.error('Error al eliminar sermï¿½n:', error);
     throw error;
   }
 }
 
-// Función para limpiar cache manualmente
+// Funciï¿½n para limpiar cache manualmente
 export function limpiarCache() {
   sermonesCache = null;
   cacheTimestamp = null;

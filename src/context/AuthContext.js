@@ -62,9 +62,30 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        // Usuario logueado - obtener perfil con nivel
+        // Usuario logueado - obtener perfil y rol
         const profile = await getUserProfile(user);
-        setCurrentUser({ ...user, userLevel: profile?.userLevel || 'básico' });
+        const idTokenResult = await user.getIdTokenResult();
+        let userRole = idTokenResult.claims.role || null;
+
+        // TEMPORAL: Hardcode super admin para william.comunidad@gmail.com
+        if (user.email === 'william.comunidad@gmail.com') {
+          userRole = 'super_admin';
+        }
+
+        // DEBUG: Mostrar información en consola
+        console.log('=== DEBUG AUTH ===');
+        console.log('User email:', user.email);
+        console.log('Custom claims:', idTokenResult.claims);
+        console.log('UserRole extraído:', userRole);
+        console.log('Profile from DB:', profile);
+        console.log('TEMPORAL: Super admin aplicado:', userRole);
+        console.log('==================');
+
+        setCurrentUser({ 
+          ...user, 
+          userLevel: profile?.userLevel || 'básico',
+          userRole: userRole 
+        });
         setUserProfile(profile);
         
         // Actualizar último login
@@ -95,12 +116,28 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Función para convertir userLevel a membershipLevel numérico
+  const getMembershipLevel = (userProfile) => {
+    if (!userProfile) return 0;
+    
+    const levelMap = {
+      'básico': 1,
+      'intermedio': 2, 
+      'avanzado': 3,
+      'administrador': 4
+    };
+    
+    return levelMap[userProfile.userLevel] || 0;
+  };
+
   const value = {
     currentUser,
     userProfile,
     loading,
     logout,
-    getUserProfile
+    getUserProfile,
+    userRole: currentUser?.userRole || null,
+    membershipLevel: getMembershipLevel(userProfile)
   };
 
   return (

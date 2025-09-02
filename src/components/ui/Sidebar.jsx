@@ -2,10 +2,12 @@ import React, { useState, useEffect, useRef, Fragment } from 'react';
 import { Popover, Transition } from '@headlessui/react';
 import { FaBars } from 'react-icons/fa';
 import SermonSaveButton from '../sermon/SermonSaveButton';
+import { useAccessControl } from '../../hooks/useAccessControl';
 
 const Sidebar = ({ modo, setModo, onClearSermon, onSave, isSaving, lastSaved }) => {
   const [displayMode, setDisplayMode] = useState('wide'); // wide, narrow, collapsed
   const sidebarRef = useRef(null);
+  const { hasAccess, getAccessMessage } = useAccessControl();
 
   const modes = [
     { id: 'edicion', name: 'Modo Edición', shortName: 'Edición' },
@@ -14,6 +16,7 @@ const Sidebar = ({ modo, setModo, onClearSermon, onSave, isSaving, lastSaved }) 
   ];
 
   useEffect(() => {
+    const element = sidebarRef.current;
     const observer = new ResizeObserver(entries => {
       for (let entry of entries) {
         const { width } = entry.contentRect;
@@ -27,13 +30,13 @@ const Sidebar = ({ modo, setModo, onClearSermon, onSave, isSaving, lastSaved }) 
       }
     });
 
-    if (sidebarRef.current) {
-      observer.observe(sidebarRef.current);
+    if (element) {
+      observer.observe(element);
     }
 
     return () => {
-      if (sidebarRef.current) {
-        observer.unobserve(sidebarRef.current);
+      if (element) {
+        observer.unobserve(element);
       }
     };
   }, []);
@@ -65,12 +68,22 @@ const Sidebar = ({ modo, setModo, onClearSermon, onSave, isSaving, lastSaved }) 
                         className={`${actionButtonClassName} w-full font-medium bg-transparent text-red-600 hover:bg-red-50 border border-red-200 hover:border-red-400`}>
                         Limpiar
                     </button>
-                    <SermonSaveButton 
-                        onSave={onSave} 
-                        isSaving={isSaving} 
-                        lastSaved={lastSaved} 
-                        className={`${actionButtonClassName} w-full border border-transparent`} 
-                    />
+                    {hasAccess.saveSermon ? (
+                        <SermonSaveButton 
+                            onSave={onSave} 
+                            isSaving={isSaving} 
+                            lastSaved={lastSaved} 
+                            className={`${actionButtonClassName} w-full border border-transparent`} 
+                        />
+                    ) : (
+                        <button
+                            onClick={() => alert(getAccessMessage('saveSermon'))}
+                            className={`${actionButtonClassName} w-full font-medium bg-gray-300 text-gray-500 cursor-not-allowed border border-gray-300`}
+                            disabled
+                        >
+                            🔒 Guardar (Bloqueado)
+                        </button>
+                    )}
                 </div>
             </>
         )
@@ -100,13 +113,24 @@ const Sidebar = ({ modo, setModo, onClearSermon, onSave, isSaving, lastSaved }) 
           className={`${displayMode === 'collapsed' ? 'px-2 py-1 text-xs' : actionButtonClassName} font-medium bg-transparent text-red-600 hover:bg-red-50 border border-red-200 hover:border-red-400 transition-all`}>
           {displayMode === 'collapsed' ? 'X' : 'Limpiar'}
         </button>
-        <SermonSaveButton 
-            onSave={onSave} 
-            isSaving={isSaving} 
-            lastSaved={lastSaved} 
-            className={`${displayMode === 'collapsed' ? 'px-2 py-1 text-xs' : actionButtonClassName} border border-transparent`} 
-            compact={displayMode === 'collapsed'}
-        />
+        {hasAccess.saveSermon ? (
+            <SermonSaveButton 
+                onSave={onSave} 
+                isSaving={isSaving} 
+                lastSaved={lastSaved} 
+                className={`${displayMode === 'collapsed' ? 'px-2 py-1 text-xs' : actionButtonClassName} border border-transparent`} 
+                compact={displayMode === 'collapsed'}
+            />
+        ) : (
+            <button
+                onClick={() => alert(getAccessMessage('saveSermon'))}
+                className={`${displayMode === 'collapsed' ? 'px-2 py-1 text-xs' : actionButtonClassName} font-medium bg-gray-300 text-gray-500 cursor-not-allowed border border-gray-300`}
+                disabled
+                title={getAccessMessage('saveSermon')}
+            >
+                {displayMode === 'collapsed' ? '🔒' : '🔒 Guardar'}
+            </button>
+        )}
       </div>
     </>
   )};
