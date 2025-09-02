@@ -63,7 +63,7 @@ const Biblioteca = ({ onClose, onOpenSermon }) => {
 
         {/* Content Area */}
         <div className="flex-grow overflow-y-auto">
-          {activeView === 'sermon_de_hoy' && <SermonDelDia />}
+          {activeView === 'sermon_de_hoy' && <SermonDelDia onClose={onClose} onOpenSermon={onOpenSermon} />}
           {activeView === 'mis_sermones' && <MiBiblioteca onClose={onClose} onOpenSermon={onOpenSermon} isSubView={true} />}
           {activeView === 'sermones_cmm' && <SermonesCMM />}
         </div>

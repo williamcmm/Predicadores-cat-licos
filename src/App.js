@@ -58,32 +58,52 @@ function App() {
 
   const handleSave = useCallback(async () => {
     if (!currentUser || !sermon.title) {
-      return;
+      return { success: false, error: 'No hay usuario o título' };
     }
     setIsSaving(true);
     try {
-      const sermonToSave = { ...sermon, userId: currentUser.uid, createdAt: new Date() };
+      const sermonToSave = { 
+        ...sermon, 
+        userId: currentUser.uid, 
+        // Solo asignar createdAt si es un sermón nuevo (sin ID)
+        createdAt: sermon.id ? sermon.createdAt : new Date(),
+        // Si es una copia de un sermón público, asignar fecha de modificación
+        modifiedAt: sermon.basadoEnSermonPublico ? new Date() : (sermon.modifiedAt || new Date())
+      };
+      
+      console.log('💾 Guardando sermón:', {
+        hasId: !!sermon.id,
+        title: sermon.title,
+        userId: sermonToSave.userId,
+        isPublicCopy: !!sermon.basadoEnSermonPublico
+      });
+      
       const docId = await guardarSermon(sermonToSave);
       setLastSaved(new Date());
-      console.log('Sermon saved with ID:', docId);
+      
+      // IMPORTANTE: Actualizar el estado del sermón con el nuevo ID
+      if (!sermon.id || sermon.basadoEnSermonPublico) {
+        console.log('🔄 Actualizando estado del sermón con nuevo ID:', docId);
+        setSermon(prevSermon => {
+          // Crear una copia limpia sin campos undefined
+          const { basadoEnSermonPublico, autorOriginalNombre, ...sermonLimpio } = prevSermon;
+          return {
+            ...sermonLimpio,
+            id: docId,
+            userId: currentUser.uid
+          };
+        });
+      }
+      
+      console.log('✅ Sermon saved with ID:', docId);
+      return { success: true, docId };
     } catch (error) {
-      console.error('Error saving sermon:', error);
+      console.error('❌ Error saving sermon:', error);
+      return { success: false, error: error.message };
     } finally {
       setIsSaving(false);
     }
-  }, [sermon, currentUser]);
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      if (currentUser && sermon.title) {
-        handleSave();
-      }
-    }, 2000);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [sermon, currentUser, handleSave]);
+  }, [sermon, currentUser, setSermon]);
 
   // Carga inicial inteligente del sermón - PREVENIR DUPLICACIÓN
   useEffect(() => {
@@ -178,7 +198,26 @@ function App() {
   };
 
   const handleOpenSermon = (sermonToOpen) => {
-    setSermon(sermonToOpen);
+    // Si es un sermón público (tiene autorOriginal), crear una copia para el usuario actual
+    if (sermonToOpen.esPublico || sermonToOpen.autorOriginal) {
+      console.log('📝 Abriendo sermón público como copia para el usuario actual');
+      const sermonCopy = {
+        ...sermonToOpen,
+        // Remover identificadores del sermón original para crear una copia nueva
+        id: undefined,
+        userId: currentUser?.uid,
+        createdAt: new Date(),
+        // Mantener referencia al original para fines informativos
+        basadoEnSermonPublico: sermonToOpen.id,
+        autorOriginalNombre: sermonToOpen.nombreAutor || sermonToOpen.autor,
+        // Marcar como copia en el título si no está ya marcado
+        title: sermonToOpen.title.includes('[Copia]') ? sermonToOpen.title : `[Copia] ${sermonToOpen.title}`
+      };
+      setSermon(sermonCopy);
+    } else {
+      // Sermón propio, abrir normalmente
+      setSermon(sermonToOpen);
+    }
     setModo('edicion');
     setShowBiblioteca(false);
   };

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { obtenerSermones, eliminarSermon, guardarSermon, publicarSermon, despublicarSermon, verificarSermonPublicado, encontrarSermonPublicoPorOriginal } from '../../services/database/firestoreService';
 import { useAuth } from '../../context/AuthContext';
 
@@ -9,9 +9,10 @@ const MiBiblioteca = ({ onClose, onOpenSermon, isSubView = false }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOrder, setSortOrder] = useState('reciente');
   const [sermonesPublicados, setSermonesPublicados] = useState(new Set());
+  const [openMenuId, setOpenMenuId] = useState(null); // Para controlar qué menú está abierto
 
   // Verificar si el usuario es super admin
-  const isSuperAdmin = currentUser?.customClaims?.role === 'super_admin' || currentUser?.email === 'admin@predicador.com';
+  const isSuperAdmin = currentUser?.customClaims?.role === 'super_admin' || currentUser?.email === 'william.comunidad@gmail.com';
 
   const fetchSermones = useCallback(async () => {
     if (currentUser) {
@@ -90,11 +91,32 @@ const MiBiblioteca = ({ onClose, onOpenSermon, isSubView = false }) => {
   const handlePublicarSermon = async (sermon) => {
     if (window.confirm(`¿Deseas publicar el sermón "${sermon.title}" para que todos los usuarios puedan verlo?`)) {
       try {
+        console.log('🔄 Iniciando publicación de sermón:', sermon.id, sermon.title);
         await publicarSermon(sermon);
+        console.log('✅ Sermón publicado exitosamente en Firestore');
+        
+        // Solo actualizar el estado de sermones publicados, NO recargar la lista
         setSermonesPublicados(prev => new Set(prev).add(sermon.id));
-        alert("¡Sermón publicado exitosamente!");
+        console.log('📊 Estado de sermones publicados actualizado');
+        
+        // Disparar evento personalizado para actualizar SermonDelDia
+        const event = new CustomEvent('sermonPublicado', { 
+          detail: { sermonId: sermon.id, action: 'published', timestamp: Date.now() } 
+        });
+        console.log('📡 Disparando evento personalizado:', event.detail);
+        window.dispatchEvent(event);
+        
+        // Agregar un pequeño delay y luego disparar otro evento como backup
+        setTimeout(() => {
+          console.log('🔄 Disparando evento de backup después de 2 segundos...');
+          window.dispatchEvent(new CustomEvent('sermonPublicado', { 
+            detail: { sermonId: sermon.id, action: 'published', timestamp: Date.now(), isBackup: true } 
+          }));
+        }, 2000);
+        
+        alert("¡Sermón publicado exitosamente! Ahora aparecerá en 'Sermones Públicos' para todos los usuarios.");
       } catch (error) {
-        console.error("Error publishing sermon:", error);
+        console.error("❌ Error publishing sermon:", error);
         alert("Hubo un error al publicar el sermón.");
       }
     }
@@ -107,12 +129,19 @@ const MiBiblioteca = ({ onClose, onOpenSermon, isSubView = false }) => {
         const sermonPublicoId = await encontrarSermonPublicoPorOriginal(sermonId);
         if (sermonPublicoId) {
           await despublicarSermon(sermonPublicoId);
+          // Solo actualizar el estado de sermones publicados, NO recargar la lista
           setSermonesPublicados(prev => {
             const newSet = new Set(prev);
             newSet.delete(sermonId);
             return newSet;
           });
-          alert("Sermón despublicado exitosamente.");
+          
+          // Disparar evento personalizado para actualizar SermonDelDia
+          window.dispatchEvent(new CustomEvent('sermonPublicado', { 
+            detail: { sermonId: sermonId, action: 'unpublished' } 
+          }));
+          
+          alert("Sermón despublicado exitosamente. Ya no aparecerá en 'Sermones Públicos'.");
         } else {
           alert("No se pudo encontrar el sermón público para despublicar.");
         }
@@ -122,6 +151,30 @@ const MiBiblioteca = ({ onClose, onOpenSermon, isSubView = false }) => {
       }
     }
   };
+
+  // Funciones para manejar el menú desplegable
+  const toggleMenu = (sermonId) => {
+    setOpenMenuId(openMenuId === sermonId ? null : sermonId);
+  };
+
+  const closeMenu = () => {
+    setOpenMenuId(null);
+  };
+
+  // Cerrar menú al hacer clic fuera
+  useEffect(() => {
+    const handleClickOutside = () => {
+      closeMenu();
+    };
+    
+    if (openMenuId) {
+      document.addEventListener('click', handleClickOutside);
+    }
+    
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [openMenuId]);
 
   const filteredAndSortedSermons = useMemo(() => {
     return sermones
@@ -187,42 +240,88 @@ const MiBiblioteca = ({ onClose, onOpenSermon, isSubView = false }) => {
                         Creado: {sermon.createdAt && sermon.createdAt.seconds ? new Date(sermon.createdAt.seconds * 1000).toLocaleDateString() : 'Fecha no disponible'}
                       </p>
                     </div>
-                    <div className="flex flex-wrap space-x-2 self-end sm:self-center">
+                    {/* Menú desplegable de acciones */}
+                    <div className="relative self-end sm:self-center">
                       <button 
-                        onClick={() => handleOpenSermon(sermon)}
-                        className="px-3 py-1 sm:px-4 sm:py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors text-sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleMenu(sermon.id);
+                        }}
+                        className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-md transition-colors"
+                        title="Opciones del sermón"
                       >
-                        Abrir
+                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"/>
+                        </svg>
                       </button>
-                      <button 
-                        onClick={() => handleDuplicateSermon(sermon)}
-                        className="px-3 py-1 sm:px-4 sm:py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition-colors text-sm"
-                      >
-                        Duplicar
-                      </button>
-                      {isSuperAdmin && (
-                        sermonesPublicados.has(sermon.id) ? (
-                          <button 
-                            onClick={() => handleDespublicarSermon(sermon.id)}
-                            className="px-3 py-1 sm:px-4 sm:py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors text-sm"
-                          >
-                            Despublicar
-                          </button>
-                        ) : (
-                          <button 
-                            onClick={() => handlePublicarSermon(sermon)}
-                            className="px-3 py-1 sm:px-4 sm:py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors text-sm"
-                          >
-                            Publicar
-                          </button>
-                        )
+                      
+                      {/* Menú desplegable */}
+                      {openMenuId === sermon.id && (
+                        <div 
+                          className="absolute right-0 top-full mt-1 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-10"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <div className="py-1">
+                            <button 
+                              onClick={() => {
+                                handleOpenSermon(sermon);
+                                closeMenu();
+                              }}
+                              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 flex items-center gap-2"
+                            >
+                              <span>📖</span> Abrir
+                            </button>
+                            
+                            <button 
+                              onClick={() => {
+                                handleDuplicateSermon(sermon);
+                                closeMenu();
+                              }}
+                              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-yellow-50 hover:text-yellow-700 flex items-center gap-2"
+                            >
+                              <span>📄</span> Duplicar
+                            </button>
+                            
+                            {isSuperAdmin && (
+                              <>
+                                <hr className="my-1 border-gray-200" />
+                                {sermonesPublicados.has(sermon.id) ? (
+                                  <button 
+                                    onClick={() => {
+                                      handleDespublicarSermon(sermon.id);
+                                      closeMenu();
+                                    }}
+                                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-700 flex items-center gap-2"
+                                  >
+                                    <span>🔒</span> Despublicar
+                                  </button>
+                                ) : (
+                                  <button 
+                                    onClick={() => {
+                                      handlePublicarSermon(sermon);
+                                      closeMenu();
+                                    }}
+                                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 flex items-center gap-2"
+                                  >
+                                    <span>🌍</span> Hacer Público
+                                  </button>
+                                )}
+                              </>
+                            )}
+                            
+                            <hr className="my-1 border-gray-200" />
+                            <button 
+                              onClick={() => {
+                                handleDeleteSermon(sermon.id);
+                                closeMenu();
+                              }}
+                              className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700 flex items-center gap-2"
+                            >
+                              <span>🗑️</span> Eliminar
+                            </button>
+                          </div>
+                        </div>
                       )}
-                      <button 
-                        onClick={() => handleDeleteSermon(sermon.id)}
-                        className="px-3 py-1 sm:px-4 sm:py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors text-sm"
-                      >
-                        Eliminar
-                      </button>
                     </div>
                   </li>
                 ))}
@@ -279,42 +378,88 @@ const MiBiblioteca = ({ onClose, onOpenSermon, isSubView = false }) => {
                           Creado: {sermon.createdAt && sermon.createdAt.seconds ? new Date(sermon.createdAt.seconds * 1000).toLocaleDateString() : 'Fecha no disponible'}
                         </p>
                       </div>
-                      <div className="flex flex-wrap space-x-2 self-end sm:self-center">
+                      {/* Menú desplegable de acciones */}
+                      <div className="relative self-end sm:self-center">
                         <button 
-                          onClick={() => handleOpenSermon(sermon)}
-                          className="px-3 py-1 sm:px-4 sm:py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors text-sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleMenu(sermon.id);
+                          }}
+                          className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-md transition-colors"
+                          title="Opciones del sermón"
                         >
-                          Abrir
+                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"/>
+                          </svg>
                         </button>
-                        <button 
-                          onClick={() => handleDuplicateSermon(sermon)}
-                          className="px-3 py-1 sm:px-4 sm:py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition-colors text-sm"
-                        >
-                          Duplicar
-                        </button>
-                        {isSuperAdmin && (
-                          sermonesPublicados.has(sermon.id) ? (
-                            <button 
-                              onClick={() => handleDespublicarSermon(sermon.id)}
-                              className="px-3 py-1 sm:px-4 sm:py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors text-sm"
-                            >
-                              Despublicar
-                            </button>
-                          ) : (
-                            <button 
-                              onClick={() => handlePublicarSermon(sermon)}
-                              className="px-3 py-1 sm:px-4 sm:py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors text-sm"
-                            >
-                              Publicar
-                            </button>
-                          )
+                        
+                        {/* Menú desplegable */}
+                        {openMenuId === sermon.id && (
+                          <div 
+                            className="absolute right-0 top-full mt-1 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-10"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <div className="py-1">
+                              <button 
+                                onClick={() => {
+                                  handleOpenSermon(sermon);
+                                  closeMenu();
+                                }}
+                                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 flex items-center gap-2"
+                              >
+                                <span>📖</span> Abrir
+                              </button>
+                              
+                              <button 
+                                onClick={() => {
+                                  handleDuplicateSermon(sermon);
+                                  closeMenu();
+                                }}
+                                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-yellow-50 hover:text-yellow-700 flex items-center gap-2"
+                              >
+                                <span>📄</span> Duplicar
+                              </button>
+                              
+                              {isSuperAdmin && (
+                                <>
+                                  <hr className="my-1 border-gray-200" />
+                                  {sermonesPublicados.has(sermon.id) ? (
+                                    <button 
+                                      onClick={() => {
+                                        handleDespublicarSermon(sermon.id);
+                                        closeMenu();
+                                      }}
+                                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-700 flex items-center gap-2"
+                                    >
+                                      <span>🔒</span> Despublicar
+                                    </button>
+                                  ) : (
+                                    <button 
+                                      onClick={() => {
+                                        handlePublicarSermon(sermon);
+                                        closeMenu();
+                                      }}
+                                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 flex items-center gap-2"
+                                    >
+                                      <span>🌍</span> Hacer Público
+                                    </button>
+                                  )}
+                                </>
+                              )}
+                              
+                              <hr className="my-1 border-gray-200" />
+                              <button 
+                                onClick={() => {
+                                  handleDeleteSermon(sermon.id);
+                                  closeMenu();
+                                }}
+                                className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700 flex items-center gap-2"
+                              >
+                                <span>🗑️</span> Eliminar
+                              </button>
+                            </div>
+                          </div>
                         )}
-                        <button 
-                          onClick={() => handleDeleteSermon(sermon.id)}
-                          className="px-3 py-1 sm:px-4 sm:py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors text-sm"
-                        >
-                          Eliminar
-                        </button>
                       </div>
                     </li>
                   ))}

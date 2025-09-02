@@ -5,15 +5,25 @@ const SermonSaveButton = ({ onSave, isSaving, lastSaved, className = '', compact
 
   const handleSave = async () => {
     try {
+      console.log('🔄 SermonSaveButton: Iniciando guardado...');
       const result = await onSave();
+      console.log('📋 SermonSaveButton: Resultado del guardado:', result);
+      
       if (result && result.success) {
+        console.log('✅ SermonSaveButton: Guardado exitoso');
         setSaveStatus('success');
         setTimeout(() => setSaveStatus(null), 3000);
       } else {
+        console.error('❌ SermonSaveButton: Guardado falló con resultado:', result);
         setSaveStatus('error');
         setTimeout(() => setSaveStatus(null), 5000);
+        // Mostrar el error específico si está disponible
+        if (result && result.error) {
+          console.error('❌ SermonSaveButton: Error específico:', result.error);
+        }
       }
     } catch (error) {
+      console.error('❌ SermonSaveButton: Excepción durante guardado:', error);
       setSaveStatus('error');
       setTimeout(() => setSaveStatus(null), 5000);
     }
@@ -35,9 +45,9 @@ const SermonSaveButton = ({ onSave, isSaving, lastSaved, className = '', compact
     }
     
     if (isSaving) return 'Guardando...';
-    if (saveStatus === 'success') return ' Guardado';
-    if (saveStatus === 'error') return ' Error';
-    return 'Guardar';
+    if (saveStatus === 'success') return '✅ Guardado exitosamente';
+    if (saveStatus === 'error') return '❌ Error al guardar';
+    return '💾 Guardar Sermón';
   };
 
   const buttonWidth = compact ? 'min-w-[32px]' : 'min-w-[100px]';
