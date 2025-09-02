@@ -1,7 +1,22 @@
 import React from 'react';
-import { FaStar, FaUserShield, FaUser } from 'react-icons/fa';
+import { FaStar, FaUserShield, FaUser, FaCrown } from 'react-icons/fa';
+import { useAuth } from '../../context/AuthContext';
 
-const UserLevelBadge = ({ level, size = 'sm' }) => {
+const UserLevelBadge = ({ userId, size = 'sm' }) => {
+  const { currentUser, userProfile } = useAuth();
+  
+  // Si es el usuario actual, usar la información del contexto
+  let level = 'básico';
+  
+  if (currentUser && userId === currentUser.uid) {
+    // Verificar si es super admin
+    if (currentUser.userRole === 'super_admin' || currentUser.email === 'william.comunidad@gmail.com') {
+      level = 'super_admin';
+    } else if (userProfile?.userLevel) {
+      level = userProfile.userLevel;
+    }
+  }
+
   const levelConfig = {
     'básico': {
       label: 'Básico',
@@ -30,6 +45,13 @@ const UserLevelBadge = ({ level, size = 'sm' }) => {
       color: 'text-purple-600',
       bgColor: 'bg-purple-100',
       borderColor: 'border-purple-300'
+    },
+    'super_admin': {
+      label: 'Super Admin',
+      icon: FaCrown,
+      color: 'text-yellow-600',
+      bgColor: 'bg-yellow-100',
+      borderColor: 'border-yellow-300'
     }
   };
 

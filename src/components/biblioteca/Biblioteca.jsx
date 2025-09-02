@@ -43,7 +43,7 @@ const Biblioteca = ({ onClose, onOpenSermon }) => {
         {/* Navigation Buttons */}
         <div className="flex space-x-2 mb-4 border-b pb-4">
           <button onClick={() => handleNavClick('sermon_de_hoy')} className={getButtonClass('sermon_de_hoy')}>
-            Sermón de Hoy
+            Sermones Públicos
           </button>
           <button 
             onClick={() => handleNavClick('mis_sermones')} 

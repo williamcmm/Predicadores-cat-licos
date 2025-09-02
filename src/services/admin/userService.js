@@ -1,4 +1,4 @@
-import { getFirestore, collection, getDocs, doc, updateDoc, query, orderBy } from 'firebase/firestore';
+import { getFirestore, collection, getDocs, doc, updateDoc, query, orderBy, deleteDoc } from 'firebase/firestore';
 import app from '../../config/firebase';
 
 const db = getFirestore(app);
@@ -79,12 +79,44 @@ export const tieneNivelMinimo = (usuario, nivelRequerido) => {
   return nivelUsuario >= nivelMinimo;
 };
 
+// Eliminar usuario
+export const eliminarUsuario = async (userId) => {
+  try {
+    const userRef = doc(db, 'users', userId);
+    await deleteDoc(userRef);
+    console.log('Usuario eliminado exitosamente');
+    return true;
+  } catch (error) {
+    console.error('Error eliminando usuario:', error);
+    throw error;
+  }
+};
+
+// Bloquear/Desbloquear usuario
+export const bloquearUsuario = async (userId, bloqueado = true) => {
+  try {
+    const userRef = doc(db, 'users', userId);
+    await updateDoc(userRef, {
+      bloqueado: bloqueado,
+      fechaBloqueo: bloqueado ? new Date() : null,
+      lastUpdated: new Date().toISOString()
+    });
+    console.log(`Usuario ${bloqueado ? 'bloqueado' : 'desbloqueado'} exitosamente`);
+    return true;
+  } catch (error) {
+    console.error('Error al bloquear/desbloquear usuario:', error);
+    throw error;
+  }
+};
+
 const userService = {
   obtenerTodosLosUsuarios,
   actualizarNivelUsuario,
   obtenerEstadisticasUsuarios,
   esAdministrador,
-  tieneNivelMinimo
+  tieneNivelMinimo,
+  eliminarUsuario,
+  bloquearUsuario
 };
 
 export default userService;

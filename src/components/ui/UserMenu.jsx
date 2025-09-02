@@ -56,8 +56,16 @@ const UserMenu = ({ onOpenAdminPanel }) => {
           {/* Información del usuario */}
           <div className="p-4 border-b border-gray-100">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
-                <FaUser className="text-purple-600" size={16} />
+              <div className="w-10 h-10 rounded-full overflow-hidden bg-purple-100 flex items-center justify-center">
+                {currentUser?.photoURL ? (
+                  <img 
+                    src={currentUser.photoURL} 
+                    alt={currentUser.displayName || currentUser.email}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <FaUser className="text-purple-600" size={16} />
+                )}
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-900 truncate">

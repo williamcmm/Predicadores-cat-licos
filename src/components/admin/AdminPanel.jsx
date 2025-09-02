@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { FaUsers, FaChartBar, FaTimes, FaUserShield } from 'react-icons/fa';
-import { obtenerTodosLosUsuarios, actualizarNivelUsuario, obtenerEstadisticasUsuarios } from '../../services/admin/userService';
+import { FaUsers, FaChartBar, FaTimes, FaUserShield, FaTrash, FaBan, FaCheck } from 'react-icons/fa';
+import { obtenerTodosLosUsuarios, actualizarNivelUsuario, obtenerEstadisticasUsuarios, eliminarUsuario, bloquearUsuario } from '../../services/admin/userService';
 import { useAuth } from '../../context/AuthContext';
 
 const AdminPanel = ({ onClose }) => {
@@ -65,6 +65,62 @@ const AdminPanel = ({ onClose }) => {
       alert('Error actualizando nivel de usuario');
     } finally {
       setUpdatingUser(null);
+    }
+  };
+
+  const handleEliminarUsuario = async (userId, email) => {
+    if (userId === currentUser.uid) {
+      alert('No puedes eliminar tu propia cuenta');
+      return;
+    }
+
+    if (window.confirm(`¿Estás seguro de eliminar al usuario ${email}? Esta acción no se puede deshacer.`)) {
+      setUpdatingUser(userId);
+      try {
+        await eliminarUsuario(userId);
+        
+        // Remover del estado local
+        setUsuarios(usuarios.filter(user => user.id !== userId));
+        
+        // Actualizar estadísticas
+        await fetchData();
+        
+        alert('Usuario eliminado exitosamente');
+      } catch (error) {
+        console.error('Error eliminando usuario:', error);
+        alert('Error al eliminar usuario');
+      } finally {
+        setUpdatingUser(null);
+      }
+    }
+  };
+
+  const handleBloquearUsuario = async (userId, email, bloqueado) => {
+    if (userId === currentUser.uid) {
+      alert('No puedes bloquear tu propia cuenta');
+      return;
+    }
+
+    const accion = bloqueado ? 'desbloquear' : 'bloquear';
+    if (window.confirm(`¿Estás seguro de ${accion} al usuario ${email}?`)) {
+      setUpdatingUser(userId);
+      try {
+        await bloquearUsuario(userId, !bloqueado);
+        
+        // Actualizar estado local
+        setUsuarios(usuarios.map(user => 
+          user.id === userId 
+            ? { ...user, bloqueado: !bloqueado }
+            : user
+        ));
+        
+        alert(`Usuario ${bloqueado ? 'desbloqueado' : 'bloqueado'} exitosamente`);
+      } catch (error) {
+        console.error('Error al bloquear/desbloquear usuario:', error);
+        alert('Error al modificar estado del usuario');
+      } finally {
+        setUpdatingUser(null);
+      }
     }
   };
 
@@ -186,6 +242,13 @@ const AdminPanel = ({ onClose }) => {
                   </div>
                   
                   <div className="flex items-center gap-3">
+                    {/* Indicador de estado bloqueado */}
+                    {usuario.bloqueado && (
+                      <span className="px-2 py-1 bg-red-100 text-red-600 text-xs rounded-full">
+                        Bloqueado
+                      </span>
+                    )}
+
                     {/* Nivel actual */}
                     <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                       niveles.find(n => n.key === usuario.userLevel)?.bg || 'bg-gray-100'
@@ -206,6 +269,36 @@ const AdminPanel = ({ onClose }) => {
                         </option>
                       ))}
                     </select>
+
+                    {/* Botón de bloquear/desbloquear */}
+                    {usuario.id !== currentUser.uid && (
+                      <button
+                        onClick={() => handleBloquearUsuario(usuario.id, usuario.email, usuario.bloqueado)}
+                        disabled={updatingUser === usuario.id}
+                        className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                          usuario.bloqueado 
+                            ? 'bg-green-500 text-white hover:bg-green-600' 
+                            : 'bg-yellow-500 text-white hover:bg-yellow-600'
+                        } ${updatingUser === usuario.id ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        title={usuario.bloqueado ? 'Desbloquear usuario' : 'Bloquear usuario'}
+                      >
+                        {usuario.bloqueado ? <FaCheck size={14} /> : <FaBan size={14} />}
+                      </button>
+                    )}
+
+                    {/* Botón de eliminar */}
+                    {usuario.id !== currentUser.uid && (
+                      <button
+                        onClick={() => handleEliminarUsuario(usuario.id, usuario.email)}
+                        disabled={updatingUser === usuario.id}
+                        className={`px-3 py-1 bg-red-500 text-white rounded-md text-sm font-medium hover:bg-red-600 transition-colors ${
+                          updatingUser === usuario.id ? 'opacity-50 cursor-not-allowed' : ''
+                        }`}
+                        title="Eliminar usuario"
+                      >
+                        <FaTrash size={14} />
+                      </button>
+                    )}
 
                     {updatingUser === usuario.id && (
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-600"></div>
