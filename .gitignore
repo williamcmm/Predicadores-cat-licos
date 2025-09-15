@@ -19,6 +19,9 @@
 .env.test.local
 .env.production.local
 
+# IDE
+/.vscode/
+
 # Firebase Admin SDK credentials
 admin-setup/*firebase-adminsdk*.json
 admin-setup/users.json
@@ -27,5 +30,3 @@ admin-setup/users.json
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-
-/.vscode/
