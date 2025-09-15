@@ -1,5 +1,5 @@
 {
-  "name": "predicador",
+  "name": "predicador-catolico",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -17,12 +17,12 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "craco start",
+    "start": "react-scripts start",
     "start:clean": "npm run clean && npm run start:nocache",
-    "start:nocache": "GENERATE_SOURCEMAP=false FAST_REFRESH=false craco start",
-    "clean": "rimraf build && rimraf node_modules/.cache && rimraf .craco",
-    "build": "craco build",
-    "test": "craco test",
+    "start:nocache": "GENERATE_SOURCEMAP=false FAST_REFRESH=false react-scripts start",
+    "clean": "rimraf build && rimraf node_modules/.cache",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -44,7 +44,6 @@
     ]
   },
   "devDependencies": {
-    "@craco/craco": "^7.1.0",
     "autoprefixer": "^10.4.19",
     "postcss": "^8.4.38",
     "tailwindcss": "^3.0.0"
