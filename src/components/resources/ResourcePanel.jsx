@@ -20,7 +20,7 @@ const INITIAL_CATEGORIES = [
   "REFERENCIAS DOCTRINALES",
   "DOCUMENTOS OFICIALES DE LA IGLESIA",
   PERSONAL_RESOURCE_CATEGORY,
-].map((name) => ({ name, active: true }));
+].map((name) => ({ name, active: false }));
 
 const initializeCategories = () => {
   try {
@@ -475,7 +475,7 @@ export default function ResourcePanel() {
         <div className="grid grid-cols-1 gap-2">
           {categories.map((cat, index) => {
             const found = searchResults ? getFoundForCategory(cat.name) : null;
-            const count = found || found.resources ? found.resources.length : 0;
+            const count = found || found?.resources ? found.resources.length : 0;
             const isExpanded = !!userToggledCategories[cat.name];
             const isLoadingCat = !!categoryLoading[cat.name];
             const isPersonalResource = cat.name === PERSONAL_RESOURCE_CATEGORY;
@@ -483,17 +483,17 @@ export default function ResourcePanel() {
             return (
               <div
                 key={cat.name}
-                className={`border rounded p-3 transition-opacity ${
+                className={`border rounded p-3 transition-opacity overflow-auto ${
                   !cat.active ? "opacity-50" : "bg-gray-50"
                 }`}
               >
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
-                  <div className="flex items-center mb-2 sm:mb-0">
+                  <div className="flex items-center mb-2 sm:mb-0 gap-2">
                     <input
                       type="checkbox"
                       checked={cat.active}
                       onChange={() => handleToggleCategoryActive(cat.name)}
-                      className="mr-3 h-5 w-5 rounded text-blue-600 focus:ring-blue-500"
+                      className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 flex-shrink-0"
                     />
                     <div className="flex items-center text-gray-400 mr-3">
                       <FaGripVertical />
@@ -523,7 +523,7 @@ export default function ResourcePanel() {
                     {isPersonalResource && (
                       <button
                         onClick={() => setIsPastingModalOpen(true)}
-                        className="ml-4 px-3 py-1.5 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600 flex items-center"
+                        className="mr-2 px-3 py-1.5 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600 flex items-center"
                       >
                         <FaPaste className="mr-2" />
                         Añadir Texto
@@ -535,7 +535,7 @@ export default function ResourcePanel() {
                       <button
                         onClick={() => handleFetchSingleCategory(cat.name)}
                         disabled={isLoadingCat || !cat.active}
-                        className="p-1 text-gray-400 hover:text-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="p-1 mx-1 text-gray-400 hover:text-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
                         title="Buscar en esta categoría"
                       >
                         <FaSync

@@ -1,20 +1,29 @@
-import { getFirestore, collection, getDocs, doc, updateDoc, query, orderBy, deleteDoc } from 'firebase/firestore';
-import app from '../../config/firebase';
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  doc,
+  updateDoc,
+  query,
+  orderBy,
+  deleteDoc,
+} from "firebase/firestore";
+import app from "../../config/firebase";
 
 const db = getFirestore(app);
 
 // Obtener todos los usuarios para el panel de administración
 export const obtenerTodosLosUsuarios = async () => {
   try {
-    const q = query(collection(db, 'users'), orderBy('createdAt', 'desc'));
+    const q = query(collection(db, "users"), orderBy("createdAt", "desc"));
     const querySnapshot = await getDocs(q);
-    const usuarios = querySnapshot.docs.map(doc => ({
+    const usuarios = querySnapshot.docs.map((doc) => ({
       id: doc.id,
-      ...doc.data()
+      ...doc.data(),
     }));
     return usuarios;
   } catch (error) {
-    console.error('Error obteniendo usuarios:', error);
+    console.error("Error obteniendo usuarios:", error);
     throw error;
   }
 };
@@ -22,15 +31,15 @@ export const obtenerTodosLosUsuarios = async () => {
 // Actualizar nivel de usuario
 export const actualizarNivelUsuario = async (userId, nuevoNivel) => {
   try {
-    const userDocRef = doc(db, 'users', userId);
+    const userDocRef = doc(db, "users", userId);
     await updateDoc(userDocRef, {
       userLevel: nuevoNivel,
-      updatedAt: new Date()
+      updatedAt: new Date(),
     });
     console.log(`Nivel actualizado para usuario ${userId}: ${nuevoNivel}`);
     return true;
   } catch (error) {
-    console.error('Error actualizando nivel de usuario:', error);
+    console.error("Error actualizando nivel de usuario:", error);
     throw error;
   }
 };
@@ -41,14 +50,15 @@ export const obtenerEstadisticasUsuarios = async () => {
     const usuarios = await obtenerTodosLosUsuarios();
     const estadisticas = {
       total: usuarios.length,
-      básico: usuarios.filter(u => u.userLevel === 'básico').length,
-      intermedio: usuarios.filter(u => u.userLevel === 'intermedio').length,
-      avanzado: usuarios.filter(u => u.userLevel === 'avanzado').length,
-      administrador: usuarios.filter(u => u.userLevel === 'administrador').length
+      básico: usuarios.filter((u) => u.userLevel === "básico").length,
+      intermedio: usuarios.filter((u) => u.userLevel === "intermedio").length,
+      avanzado: usuarios.filter((u) => u.userLevel === "avanzado").length,
+      administrador: usuarios.filter((u) => u.userLevel === "administrador")
+        .length,
     };
     return estadisticas;
   } catch (error) {
-    console.error('Error obteniendo estadísticas:', error);
+    console.error("Error obteniendo estadísticas:", error);
     throw error;
   }
 };
@@ -56,38 +66,39 @@ export const obtenerEstadisticasUsuarios = async () => {
 // Verificar si un usuario tiene permisos de administrador
 export const esAdministrador = (usuario) => {
   // Verificar por userRole (custom claims) o userLevel (legacy)
-  return usuario && (
-    usuario.userRole === 'super_admin' || 
-    usuario.userLevel === 'administrador'
+  return (
+    usuario &&
+    (usuario.userRole === "super_admin" ||
+      usuario.userLevel === "administrador")
   );
 };
 
 // Verificar nivel mínimo requerido
 export const tieneNivelMinimo = (usuario, nivelRequerido) => {
   if (!usuario) return false;
-  
+
   const jerarquia = {
-    'básico': 1,
-    'intermedio': 2,
-    'avanzado': 3,
-    'administrador': 4
+    básico: 1,
+    intermedio: 2,
+    avanzado: 3,
+    administrador: 4,
   };
-  
+
   const nivelUsuario = jerarquia[usuario.userLevel] || 0;
   const nivelMinimo = jerarquia[nivelRequerido] || 0;
-  
+
   return nivelUsuario >= nivelMinimo;
 };
 
 // Eliminar usuario
 export const eliminarUsuario = async (userId) => {
   try {
-    const userRef = doc(db, 'users', userId);
+    const userRef = doc(db, "users", userId);
     await deleteDoc(userRef);
-    console.log('Usuario eliminado exitosamente');
+    console.log("Usuario eliminado exitosamente");
     return true;
   } catch (error) {
-    console.error('Error eliminando usuario:', error);
+    console.error("Error eliminando usuario:", error);
     throw error;
   }
 };
@@ -95,16 +106,18 @@ export const eliminarUsuario = async (userId) => {
 // Bloquear/Desbloquear usuario
 export const bloquearUsuario = async (userId, bloqueado = true) => {
   try {
-    const userRef = doc(db, 'users', userId);
+    const userRef = doc(db, "users", userId);
     await updateDoc(userRef, {
       bloqueado: bloqueado,
       fechaBloqueo: bloqueado ? new Date() : null,
-      lastUpdated: new Date().toISOString()
+      lastUpdated: new Date().toISOString(),
     });
-    console.log(`Usuario ${bloqueado ? 'bloqueado' : 'desbloqueado'} exitosamente`);
+    console.log(
+      `Usuario ${bloqueado ? "bloqueado" : "desbloqueado"} exitosamente`
+    );
     return true;
   } catch (error) {
-    console.error('Error al bloquear/desbloquear usuario:', error);
+    console.error("Error al bloquear/desbloquear usuario:", error);
     throw error;
   }
 };
@@ -116,7 +129,7 @@ const userService = {
   esAdministrador,
   tieneNivelMinimo,
   eliminarUsuario,
-  bloquearUsuario
+  bloquearUsuario,
 };
 
 export default userService;

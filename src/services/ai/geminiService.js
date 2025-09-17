@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // geminiService: consolidated, single-definition module
-const API_KEY = process.env.REACT_APP_GEMINI_API_KEY;
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(API_KEY);
 
 const findBalanced = (str, startIdx, openChar, closeChar) => {

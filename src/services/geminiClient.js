@@ -1,9 +1,9 @@
 // WARNING: This client example is for local testing only. Do NOT use in production.
-// It reads the API key from process.env.REACT_APP_GEMINI_API_KEY and calls the Generative API directly.
+// It reads the API key from import.meta.env.VITE_GEMINI_API_KEY and calls the Generative API directly.
 
 export async function generateText(prompt) {
-  const key = process.env.REACT_APP_GEMINI_API_KEY;
-  if (!key) throw new Error('REACT_APP_GEMINI_API_KEY is not set in environment');
+  const key = import.meta.env.VITE_GEMINI_API_KEY;
+  if (!key) throw new Error('VITE_GEMINI_API_KEY is not set in environment');
 
   const model = 'models/text-bison-001'; // adjust model name if needed
   const url = `https://generativelanguage.googleapis.com/v1/${model}:generate?key=${key}`;
