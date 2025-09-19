@@ -36,7 +36,7 @@ export const actualizarNivelUsuario = async (userId, nuevoNivel) => {
       userLevel: nuevoNivel,
       updatedAt: new Date(),
     });
-    console.log(`Nivel actualizado para usuario ${userId}: ${nuevoNivel}`);
+
     return true;
   } catch (error) {
     console.error("Error actualizando nivel de usuario:", error);
@@ -95,7 +95,6 @@ export const eliminarUsuario = async (userId) => {
   try {
     const userRef = doc(db, "users", userId);
     await deleteDoc(userRef);
-    console.log("Usuario eliminado exitosamente");
     return true;
   } catch (error) {
     console.error("Error eliminando usuario:", error);
@@ -112,9 +111,7 @@ export const bloquearUsuario = async (userId, bloqueado = true) => {
       fechaBloqueo: bloqueado ? new Date() : null,
       lastUpdated: new Date().toISOString(),
     });
-    console.log(
-      `Usuario ${bloqueado ? "bloqueado" : "desbloqueado"} exitosamente`
-    );
+    `Usuario ${bloqueado ? "bloqueado" : "desbloqueado"} exitosamente`;
     return true;
   } catch (error) {
     console.error("Error al bloquear/desbloquear usuario:", error);

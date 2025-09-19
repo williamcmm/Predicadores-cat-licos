@@ -1,8 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { FaUser, FaSignOutAlt, FaCog } from 'react-icons/fa';
-import { useAuth } from '../../context/AuthContext';
-import UserLevelBadge from './UserLevelBadge';
-import { useAccessControl } from '../../hooks/useAccessControl';
+import React, { useState, useRef, useEffect } from "react";
+import { FaUser, FaSignOutAlt, FaCog } from "react-icons/fa";
+import { useAuth } from "../../context/AuthContext";
+import UserLevelBadge from "./UserLevelBadge";
+import { useAccessControl } from "../../hooks/useAccessControl";
 
 const UserMenu = ({ onOpenAdminPanel }) => {
   const [showMenu, setShowMenu] = useState(false);
@@ -17,20 +17,19 @@ const UserMenu = ({ onOpenAdminPanel }) => {
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
   const handleLogout = async () => {
-    console.log('Intentando cerrar sesión...');
     try {
       await logout();
-      console.log('Logout exitoso');
+
       setShowMenu(false);
     } catch (error) {
-      console.error('Error al cerrar sesión:', error);
+      console.error("Error al cerrar sesión:", error);
     }
   };
 
@@ -58,8 +57,8 @@ const UserMenu = ({ onOpenAdminPanel }) => {
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 rounded-full overflow-hidden bg-purple-100 flex items-center justify-center">
                 {currentUser?.photoURL ? (
-                  <img 
-                    src={currentUser.photoURL} 
+                  <img
+                    src={currentUser.photoURL}
                     alt={currentUser.displayName || currentUser.email}
                     className="w-full h-full object-cover"
                   />
@@ -69,7 +68,7 @@ const UserMenu = ({ onOpenAdminPanel }) => {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-900 truncate">
-                  {currentUser?.displayName || currentUser?.email || 'Usuario'}
+                  {currentUser?.displayName || currentUser?.email || "Usuario"}
                 </p>
                 <p className="text-xs text-gray-500 truncate">
                   {currentUser?.email}
@@ -92,7 +91,7 @@ const UserMenu = ({ onOpenAdminPanel }) => {
                 Panel de Administrador
               </button>
             )}
-            
+
             <button
               onClick={handleLogout}
               className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-150"

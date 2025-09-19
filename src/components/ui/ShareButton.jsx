@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { FaShare } from 'react-icons/fa';
 
 const ShareButton = () => {
@@ -39,7 +39,7 @@ const ShareButton = () => {
     <div className="relative">
       <button
         onClick={() => setShowShareMenu(!showShareMenu)}
-        className="px-3 py-2 text-xs sm:px-4 sm:py-2 sm:text-sm bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors font-semibold flex items-center gap-2"
+        className="custom-btn bg-green-600 hover:bg-green-700"
       >
         <FaShare className="text-xs" />
         Compartir

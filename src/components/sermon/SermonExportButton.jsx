@@ -106,7 +106,7 @@ const SermonExportButton = ({ sermon }) => {
   return (
     <button
       onClick={handleExport}
-      className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-sm font-medium"
+      className="custom-btn bg-green-600 hover:bg-green-700"
     >
       Descargar
     </button>

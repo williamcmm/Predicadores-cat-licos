@@ -1,44 +1,48 @@
-import { useState, useEffect, useCallback, Fragment } from 'react';
-import { Dialog, Transition } from '@headlessui/react';
-import Header from './components/ui/Header';
-import PanelResizer from './components/ui/PanelResizer';
-import Sidebar from './components/ui/Sidebar';
-import SermonEditor from './components/sermon/SermonEditor';
-import ResourcePanel from './components/resources/ResourcePanel';
-import SermonStudyView from './components/sermon/SermonStudyView';
-import SermonPreachingView from './components/sermon/SermonPreachingView';
-import Biblioteca from './components/biblioteca/Biblioteca';
-import AdminPanel from './components/admin/AdminPanel';
-import BottomNavBar from './components/ui/BottomNavBar';
-import { useAuth } from './context/AuthContext';
-import storageService from './services/storage/storageService';
-import { guardarSermon } from './services/database/firestoreService';
-import { esAdministrador } from './services/admin/userService';
+import { useState, useEffect, useCallback, Fragment } from "react";
+import { Dialog, Transition } from "@headlessui/react";
+import Header from "./components/ui/Header";
+import PanelResizer from "./components/ui/PanelResizer";
+import Sidebar from "./components/ui/Sidebar";
+import SermonEditor from "./components/sermon/SermonEditor";
+import ResourcePanel from "./components/resources/ResourcePanel";
+import SermonStudyView from "./components/sermon/SermonStudyView";
+import SermonPreachingView from "./components/sermon/SermonPreachingView";
+import Biblioteca from "./components/biblioteca/Biblioteca";
+import AdminPanel from "./components/admin/AdminPanel";
+import BottomNavBar from "./components/ui/BottomNavBar";
+import { useAuth } from "./context/AuthContext";
+import storageService from "./services/storage/storageService";
+import { guardarSermon } from "./services/database/firestoreService";
+import { esAdministrador } from "./services/admin/userService";
 
 function App() {
   const { currentUser } = useAuth();
   const [leftPanelWidth, setLeftPanelWidth] = useState(() => {
-    const storedWidth = localStorage.getItem('leftPanelWidth');
+    const storedWidth = localStorage.getItem("leftPanelWidth");
     return storedWidth ? parseFloat(storedWidth) : 60;
   });
-  const [modo, setModo] = useState('edicion');
+  const [modo, setModo] = useState("edicion");
   const [showBiblioteca, setShowBiblioteca] = useState(false);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState(null);
   const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < 768);
-  const [activePanel, setActivePanel] = useState('editor');
+  const [activePanel, setActivePanel] = useState("editor");
 
   const [sermon, setSermon] = useState(() => {
     if (!currentUser) {
-      localStorage.removeItem('currentSermon');
+      localStorage.removeItem("currentSermon");
       return storageService.getInitialSermonState();
     }
     try {
-      const savedSermon = localStorage.getItem('currentSermon');
+      const savedSermon = localStorage.getItem("currentSermon");
       if (savedSermon) {
         const parsed = JSON.parse(savedSermon);
-        if (parsed && typeof parsed === 'object' && parsed.title !== undefined) {
+        if (
+          parsed &&
+          typeof parsed === "object" &&
+          parsed.title !== undefined
+        ) {
           return parsed;
         }
       }
@@ -52,53 +56,50 @@ function App() {
     const handleResize = () => {
       setIsSmallScreen(window.innerWidth < 768);
     };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const handleSave = useCallback(async () => {
     if (!currentUser || !sermon.title) {
-      return { success: false, error: 'No hay usuario o título' };
+      return { success: false, error: "No hay usuario o título" };
     }
     setIsSaving(true);
     try {
-      const sermonToSave = { 
-        ...sermon, 
-        userId: currentUser.uid, 
+      const sermonToSave = {
+        ...sermon,
+        userId: currentUser.uid,
         // Solo asignar createdAt si es un sermón nuevo (sin ID)
         createdAt: sermon.id ? sermon.createdAt : new Date(),
         // Si es una copia de un sermón público, asignar fecha de modificación
-        modifiedAt: sermon.basadoEnSermonPublico ? new Date() : (sermon.modifiedAt || new Date())
+        modifiedAt: sermon.basadoEnSermonPublico
+          ? new Date()
+          : sermon.modifiedAt || new Date(),
       };
-      
-      console.log('💾 Guardando sermón:', {
-        hasId: !!sermon.id,
-        title: sermon.title,
-        userId: sermonToSave.userId,
-        isPublicCopy: !!sermon.basadoEnSermonPublico
-      });
-      
+
       const docId = await guardarSermon(sermonToSave);
       setLastSaved(new Date());
-      
+
       // IMPORTANTE: Actualizar el estado del sermón con el nuevo ID
       if (!sermon.id || sermon.basadoEnSermonPublico) {
-        console.log('🔄 Actualizando estado del sermón con nuevo ID:', docId);
-        setSermon(prevSermon => {
+        setSermon((prevSermon) => {
           // Crear una copia limpia sin campos undefined
-          const { basadoEnSermonPublico, autorOriginalNombre, ...sermonLimpio } = prevSermon;
+          const {
+            basadoEnSermonPublico,
+            autorOriginalNombre,
+            ...sermonLimpio
+          } = prevSermon;
           return {
             ...sermonLimpio,
             id: docId,
-            userId: currentUser.uid
+            userId: currentUser.uid,
           };
         });
       }
-      
-      console.log('✅ Sermon saved with ID:', docId);
+
       return { success: true, docId };
     } catch (error) {
-      console.error('❌ Error saving sermon:', error);
+      console.error("❌ Error saving sermon:", error);
       return { success: false, error: error.message };
     } finally {
       setIsSaving(false);
@@ -111,18 +112,20 @@ function App() {
       if (!currentUser) {
         // LIMPIEZA: Remover datos de usuario anterior para prevenir duplicación
         storageService.clearUserData();
-        localStorage.removeItem('currentSermon');
-        localStorage.removeItem('sermonesCache');
-        localStorage.removeItem('cacheTimestamp');
+        localStorage.removeItem("currentSermon");
+        localStorage.removeItem("sermonesCache");
+        localStorage.removeItem("cacheTimestamp");
         setSermon(storageService.getInitialSermonState());
         return;
       }
-      
+
       try {
-        const initialSermon = await storageService.loadInitialSermon(currentUser.uid);
+        const initialSermon = await storageService.loadInitialSermon(
+          currentUser.uid
+        );
         setSermon(initialSermon);
       } catch (error) {
-        console.error('Error cargando sermón inicial:', error);
+        console.error("Error cargando sermón inicial:", error);
         setSermon(storageService.getInitialSermonState());
       }
     };
@@ -133,9 +136,14 @@ function App() {
   useEffect(() => {
     const handleSermonUpdate = (event) => {
       const newSermonData = event.detail;
-      if (!newSermonData || typeof newSermonData !== 'object') {
-        console.error("Evento 'insertSermonIntoEditor' recibiÃ³ datos invÃ¡lidos:", newSermonData);
-        alert("La IA devolviÃ³ un formato de sermÃ³n inesperado. No se pudo cargar.");
+      if (!newSermonData || typeof newSermonData !== "object") {
+        console.error(
+          "Evento 'insertSermonIntoEditor' recibiÃ³ datos invÃ¡lidos:",
+          newSermonData
+        );
+        alert(
+          "La IA devolviÃ³ un formato de sermÃ³n inesperado. No se pudo cargar."
+        );
         return;
       }
 
@@ -144,45 +152,56 @@ function App() {
         ...newSermonData,
         introduction: {
           ...storageService.getInitialSermonState().introduction,
-          ...(newSermonData.introduction || {})
+          ...(newSermonData.introduction || {}),
         },
         ideas: (newSermonData.ideas || []).map((idea, index) => ({
           id: idea.id || Date.now() + index,
-          h1: idea.h1 || '',
+          h1: idea.h1 || "",
           elementoApoyo: {
-            tipo: (idea.elementoApoyo && idea.elementoApoyo.tipo) || 'cita_biblica',
-            contenido: (idea.elementoApoyo && idea.elementoApoyo.contenido) || ''
+            tipo:
+              (idea.elementoApoyo && idea.elementoApoyo.tipo) || "cita_biblica",
+            contenido:
+              (idea.elementoApoyo && idea.elementoApoyo.contenido) || "",
           },
           disparadores: (idea.disparadores || []).map((disp, dIndex) => ({
             id: disp.id || Date.now() + index + dIndex,
-            disparador: disp.disparador || '',
-            parrafo: disp.parrafo || ''
-          }))
-        }))
+            disparador: disp.disparador || "",
+            parrafo: disp.parrafo || "",
+          })),
+        })),
       };
 
       setSermon(finalSermon);
-      setModo('edicion');
+      setModo("edicion");
     };
 
     const handleStartManualSermon = (event) => {
       const { topic } = event.detail;
-      setSermon({ ...storageService.getInitialSermonState(), title: topic || '' });
-      setModo('edicion');
+      setSermon({
+        ...storageService.getInitialSermonState(),
+        title: topic || "",
+      });
+      setModo("edicion");
     };
 
-    window.addEventListener('insertSermonIntoEditor', handleSermonUpdate);
-    window.addEventListener('startManualSermonFromResources', handleStartManualSermon);
+    window.addEventListener("insertSermonIntoEditor", handleSermonUpdate);
+    window.addEventListener(
+      "startManualSermonFromResources",
+      handleStartManualSermon
+    );
 
     return () => {
-      window.removeEventListener('insertSermonIntoEditor', handleSermonUpdate);
-      window.removeEventListener('startManualSermonFromResources', handleStartManualSermon);
+      window.removeEventListener("insertSermonIntoEditor", handleSermonUpdate);
+      window.removeEventListener(
+        "startManualSermonFromResources",
+        handleStartManualSermon
+      );
     };
   }, []);
 
   const handleClearSermon = () => {
     setSermon(storageService.getInitialSermonState());
-    setModo('edicion');
+    setModo("edicion");
   };
 
   const handleResize = (newWidth) => {
@@ -200,7 +219,6 @@ function App() {
   const handleOpenSermon = (sermonToOpen) => {
     // Si es un sermón público (tiene autorOriginal), crear una copia para el usuario actual
     if (sermonToOpen.esPublico || sermonToOpen.autorOriginal) {
-      console.log('📝 Abriendo sermón público como copia para el usuario actual');
       const sermonCopy = {
         ...sermonToOpen,
         // Remover identificadores del sermón original para crear una copia nueva
@@ -211,14 +229,16 @@ function App() {
         basadoEnSermonPublico: sermonToOpen.id,
         autorOriginalNombre: sermonToOpen.nombreAutor || sermonToOpen.autor,
         // Marcar como copia en el título si no está ya marcado
-        title: sermonToOpen.title.includes('[Copia]') ? sermonToOpen.title : `[Copia] ${sermonToOpen.title}`
+        title: sermonToOpen.title.includes("[Copia]")
+          ? sermonToOpen.title
+          : `[Copia] ${sermonToOpen.title}`,
       };
       setSermon(sermonCopy);
     } else {
       // Sermón propio, abrir normalmente
       setSermon(sermonToOpen);
     }
-    setModo('edicion');
+    setModo("edicion");
     setShowBiblioteca(false);
   };
 
@@ -226,29 +246,36 @@ function App() {
 
   return (
     <div className="h-screen flex flex-col bg-gray-100">
-      <Header onToggleBiblioteca={toggleBiblioteca} onOpenAdminPanel={toggleAdminPanel} />
+      <Header
+        onToggleBiblioteca={toggleBiblioteca}
+        onOpenAdminPanel={toggleAdminPanel}
+      />
       <div className="flex flex-1 overflow-hidden">
         {isSmallScreen ? (
           <main className="flex-1 overflow-y-auto pb-16">
-            {activePanel === 'editor' && (
-              <div className="bg-white p-4 h-full flex flex-col">
-                <Sidebar 
-                  modo={modo} 
-                  setModo={setModo} 
-                  onClearSermon={handleClearSermon} 
-                  onSave={handleSave} 
-                  isSaving={isSaving} 
-                  lastSaved={lastSaved} 
+            {activePanel === "editor" && (
+              <div className="bg-white p-4 min-h-full flex flex-col">
+                <Sidebar
+                  modo={modo}
+                  setModo={setModo}
+                  onClearSermon={handleClearSermon}
+                  onSave={handleSave}
+                  isSaving={isSaving}
+                  lastSaved={lastSaved}
                 />
                 <div className="flex-1 mt-4">
-                  {modo === 'edicion' && (
+                  {modo === "edicion" && (
                     <SermonEditor sermon={sermon} setSermon={setSermon} />
                   )}
                 </div>
               </div>
             )}
-            <Transition.Root show={activePanel === 'resources'} as={Fragment}>
-              <Dialog as="div" className="relative z-50" onClose={() => setActivePanel('editor')}>
+            <Transition.Root show={activePanel === "resources"} as={Fragment}>
+              <Dialog
+                as="div"
+                className="relative z-50"
+                onClose={() => setActivePanel("editor")}
+              >
                 <Transition.Child
                   as={Fragment}
                   enter="ease-out duration-300"
@@ -298,26 +325,26 @@ function App() {
               className="bg-white p-4 md:p-6 overflow-y-auto flex flex-col"
               style={{ width: `${leftPanelWidth}%` }}
             >
-              <Sidebar 
-                modo={modo} 
-                setModo={setModo} 
-                onClearSermon={handleClearSermon} 
-                onSave={handleSave} 
-                isSaving={isSaving} 
-                lastSaved={lastSaved} 
+              <Sidebar
+                modo={modo}
+                setModo={setModo}
+                onClearSermon={handleClearSermon}
+                onSave={handleSave}
+                isSaving={isSaving}
+                lastSaved={lastSaved}
               />
               <div className="flex-1 mt-4">
-                {modo === 'edicion' && (
+                {modo === "edicion" && (
                   <SermonEditor sermon={sermon} setSermon={setSermon} />
                 )}
               </div>
             </div>
 
             <PanelResizer
-                initialLeftWidth={60}
-                minWidth={10}
-                maxWidth={90}
-                onResize={handleResize}
+              initialLeftWidth={60}
+              minWidth={10}
+              maxWidth={90}
+              onResize={handleResize}
             />
 
             <div
@@ -330,15 +357,28 @@ function App() {
         )}
       </div>
 
-      {isSmallScreen && <BottomNavBar activePanel={activePanel} setActivePanel={setActivePanel} />}
+      {isSmallScreen && (
+        <BottomNavBar
+          activePanel={activePanel}
+          setActivePanel={setActivePanel}
+        />
+      )}
 
-      {modo === 'estudio' && (
-        <SermonStudyView sermon={sermon} onClose={() => setModo('edicion')} />
+      {modo === "estudio" && (
+        <SermonStudyView sermon={sermon} onClose={() => setModo("edicion")} />
       )}
-      {modo === 'predicacion' && (
-        <SermonPreachingView sermon={sermon} onClose={() => setModo('edicion')} />
+      {modo === "predicacion" && (
+        <SermonPreachingView
+          sermon={sermon}
+          onClose={() => setModo("edicion")}
+        />
       )}
-      {showBiblioteca && <Biblioteca onClose={toggleBiblioteca} onOpenSermon={handleOpenSermon} />}
+      {showBiblioteca && (
+        <Biblioteca
+          onClose={toggleBiblioteca}
+          onOpenSermon={handleOpenSermon}
+        />
+      )}
       {showAdminPanel && esAdministrador(currentUser) && (
         <AdminPanel onClose={toggleAdminPanel} />
       )}

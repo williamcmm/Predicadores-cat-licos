@@ -14,7 +14,6 @@ export const usePWAInstall = () => {
     };
 
     const handleAppInstalled = () => {
-      console.log('PWA instalada exitosamente');
       setCanInstall(false);
       setDeferredPrompt(null);
     };
@@ -37,12 +36,6 @@ export const usePWAInstall = () => {
     
     // Esperar a que el usuario responda
     const { outcome } = await deferredPrompt.userChoice;
-    
-    if (outcome === 'accepted') {
-      console.log('Usuario aceptó instalar la PWA');
-    } else {
-      console.log('Usuario rechazó instalar la PWA');
-    }
 
     // Limpiar el prompt
     setDeferredPrompt(null);

@@ -218,7 +218,6 @@ export default function ResourcePanel() {
           .filter((c) => c.active && c.name !== PERSONAL_RESOURCE_CATEGORY)
           .map((c) => c.name);
         if (activeCategories.length === 0) {
-          console.log("No hay categorías activas para buscar.");
           setIsLoading(false);
           return;
         }
@@ -475,7 +474,8 @@ export default function ResourcePanel() {
         <div className="grid grid-cols-1 gap-2">
           {categories.map((cat, index) => {
             const found = searchResults ? getFoundForCategory(cat.name) : null;
-            const count = found || found?.resources ? found.resources.length : 0;
+            const count =
+              found || found?.resources ? found.resources.length : 0;
             const isExpanded = !!userToggledCategories[cat.name];
             const isLoadingCat = !!categoryLoading[cat.name];
             const isPersonalResource = cat.name === PERSONAL_RESOURCE_CATEGORY;

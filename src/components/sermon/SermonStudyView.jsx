@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import SermonExportButton from './SermonExportButton';
+import { IoSettings, IoClose } from "react-icons/io5";
 
 const SermonStudyView = ({ sermon, onClose, user }) => {
   const [fontSize, setFontSize] = useState(2.0);
@@ -73,7 +74,7 @@ const SermonStudyView = ({ sermon, onClose, user }) => {
         className="fixed top-4 right-4 bg-red-500 text-white rounded-full w-10 h-10 flex items-center justify-center text-2xl z-20"
         aria-label="Cerrar vista de estudio"
       >
-        &times;
+        <IoClose />
       </button>
 
       <div className="overflow-y-auto flex-grow pt-16 pb-28">
@@ -127,10 +128,10 @@ const SermonStudyView = ({ sermon, onClose, user }) => {
         <SermonExportButton sermon={sermon} />
         <button
           onClick={() => setShowSettings(!showSettings)}
-          className="bg-blue-500 text-white rounded-full w-12 h-12 flex items-center justify-center text-2xl"
+          className="bg-blue-500 hover:bg-blue-700 rounded-full p-3 text-white shadow flex items-center justify-center text-2xl transition-all"
           aria-label="Configuración de vista"
         >
-          ⚙️
+          <IoSettings />
         </button>
         {showSettings && (
           <div className="absolute bottom-20 right-4 bg-white p-4 rounded-lg shadow-lg border border-gray-200 w-full sm:w-64 left-4 sm:left-auto">

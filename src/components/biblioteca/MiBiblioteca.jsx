@@ -1,18 +1,32 @@
-import { useState, useCallback, useEffect, useMemo } from 'react';
-import { obtenerSermones, eliminarSermon, guardarSermon, publicarSermon, despublicarSermon, verificarSermonPublicado, encontrarSermonPublicoPorOriginal } from '../../services/database/firestoreService';
-import { useAuth } from '../../context/AuthContext';
+import { useState, useCallback, useEffect, useMemo } from "react";
+import {
+  obtenerSermones,
+  eliminarSermon,
+  guardarSermon,
+  publicarSermon,
+  despublicarSermon,
+  verificarSermonPublicado,
+  encontrarSermonPublicoPorOriginal,
+} from "../../services/database/firestoreService";
+import { useAuth } from "../../context/AuthContext";
 
 const MiBiblioteca = ({ onClose, onOpenSermon, isSubView = false }) => {
-  const { currentUser } = useAuth();
+  const { currentUser, userRole } = useAuth();
   const [sermones, setSermones] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortOrder, setSortOrder] = useState('reciente');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortOrder, setSortOrder] = useState("reciente");
   const [sermonesPublicados, setSermonesPublicados] = useState(new Set());
   const [openMenuId, setOpenMenuId] = useState(null); // Para controlar qué menú está abierto
 
   // Verificar si el usuario es super admin
-  const isSuperAdmin = currentUser?.customClaims?.role === 'super_admin' || currentUser?.email === 'william.comunidad@gmail.com';
+
+  console.log("🔍 Current User:", currentUser);
+
+  const isSuperAdmin =
+    import.meta.env.VITE_SUPER_ADMIN?.split(",").includes(currentUser.email) ||
+    currentUser.userRole === "super_admin" ||
+    userRole === "super_admin";
 
   const fetchSermones = useCallback(async () => {
     if (currentUser) {
@@ -20,14 +34,15 @@ const MiBiblioteca = ({ onClose, onOpenSermon, isSubView = false }) => {
         // PREVENIR DUPLICACIÓN: Limpiar cache antes de cargar
         const cacheKey = `sermones_cache_${currentUser.uid}`;
         localStorage.removeItem(cacheKey);
-        
+
         const userSermons = await obtenerSermones(currentUser.uid);
-        
+
         // PREVENIR DUPLICACIÓN: Filtrar sermones únicos por ID
-        const uniqueSermons = userSermons.filter((sermon, index, self) => 
-          index === self.findIndex(s => s.id === sermon.id)
+        const uniqueSermons = userSermons.filter(
+          (sermon, index, self) =>
+            index === self.findIndex((s) => s.id === sermon.id)
         );
-        
+
         setSermones(uniqueSermons);
 
         // Si es super admin, verificar cuáles sermones están publicados
@@ -62,10 +77,14 @@ const MiBiblioteca = ({ onClose, onOpenSermon, isSubView = false }) => {
   };
 
   const handleDeleteSermon = async (sermonId) => {
-    if (window.confirm("¿Estás seguro de que quieres eliminar este sermón? Esta acción no se puede deshacer.")) {
+    if (
+      window.confirm(
+        "¿Estás seguro de que quieres eliminar este sermón? Esta acción no se puede deshacer."
+      )
+    ) {
       try {
         await eliminarSermon(sermonId);
-        setSermones(sermones.filter(s => s.id !== sermonId));
+        setSermones(sermones.filter((s) => s.id !== sermonId));
       } catch (error) {
         console.error("Error deleting sermon:", error);
         alert("Hubo un error al eliminar el sermón.");
@@ -89,32 +108,45 @@ const MiBiblioteca = ({ onClose, onOpenSermon, isSubView = false }) => {
   };
 
   const handlePublicarSermon = async (sermon) => {
-    if (window.confirm(`¿Deseas publicar el sermón "${sermon.title}" para que todos los usuarios puedan verlo?`)) {
+    if (
+      window.confirm(
+        `¿Deseas publicar el sermón "${sermon.title}" para que todos los usuarios puedan verlo?`
+      )
+    ) {
       try {
-        console.log('🔄 Iniciando publicación de sermón:', sermon.id, sermon.title);
         await publicarSermon(sermon);
-        console.log('✅ Sermón publicado exitosamente en Firestore');
-        
+
         // Solo actualizar el estado de sermones publicados, NO recargar la lista
-        setSermonesPublicados(prev => new Set(prev).add(sermon.id));
-        console.log('📊 Estado de sermones publicados actualizado');
-        
+        setSermonesPublicados((prev) => new Set(prev).add(sermon.id));
+
         // Disparar evento personalizado para actualizar SermonDelDia
-        const event = new CustomEvent('sermonPublicado', { 
-          detail: { sermonId: sermon.id, action: 'published', timestamp: Date.now() } 
+        const event = new CustomEvent("sermonPublicado", {
+          detail: {
+            sermonId: sermon.id,
+            action: "published",
+            timestamp: Date.now(),
+          },
         });
-        console.log('📡 Disparando evento personalizado:', event.detail);
+
         window.dispatchEvent(event);
-        
+
         // Agregar un pequeño delay y luego disparar otro evento como backup
         setTimeout(() => {
-          console.log('🔄 Disparando evento de backup después de 2 segundos...');
-          window.dispatchEvent(new CustomEvent('sermonPublicado', { 
-            detail: { sermonId: sermon.id, action: 'published', timestamp: Date.now(), isBackup: true } 
-          }));
+          window.dispatchEvent(
+            new CustomEvent("sermonPublicado", {
+              detail: {
+                sermonId: sermon.id,
+                action: "published",
+                timestamp: Date.now(),
+                isBackup: true,
+              },
+            })
+          );
         }, 2000);
-        
-        alert("¡Sermón publicado exitosamente! Ahora aparecerá en 'Sermones Públicos' para todos los usuarios.");
+
+        alert(
+          "¡Sermón publicado exitosamente! Ahora aparecerá en 'Sermones Públicos' para todos los usuarios."
+        );
       } catch (error) {
         console.error("❌ Error publishing sermon:", error);
         alert("Hubo un error al publicar el sermón.");
@@ -123,25 +155,35 @@ const MiBiblioteca = ({ onClose, onOpenSermon, isSubView = false }) => {
   };
 
   const handleDespublicarSermon = async (sermonId) => {
-    if (window.confirm("¿Deseas despublicar este sermón? Ya no será visible para otros usuarios.")) {
+    if (
+      window.confirm(
+        "¿Deseas despublicar este sermón? Ya no será visible para otros usuarios."
+      )
+    ) {
       try {
         // Encontrar el ID del sermón público usando el ID original
-        const sermonPublicoId = await encontrarSermonPublicoPorOriginal(sermonId);
+        const sermonPublicoId = await encontrarSermonPublicoPorOriginal(
+          sermonId
+        );
         if (sermonPublicoId) {
           await despublicarSermon(sermonPublicoId);
           // Solo actualizar el estado de sermones publicados, NO recargar la lista
-          setSermonesPublicados(prev => {
+          setSermonesPublicados((prev) => {
             const newSet = new Set(prev);
             newSet.delete(sermonId);
             return newSet;
           });
-          
+
           // Disparar evento personalizado para actualizar SermonDelDia
-          window.dispatchEvent(new CustomEvent('sermonPublicado', { 
-            detail: { sermonId: sermonId, action: 'unpublished' } 
-          }));
-          
-          alert("Sermón despublicado exitosamente. Ya no aparecerá en 'Sermones Públicos'.");
+          window.dispatchEvent(
+            new CustomEvent("sermonPublicado", {
+              detail: { sermonId: sermonId, action: "unpublished" },
+            })
+          );
+
+          alert(
+            "Sermón despublicado exitosamente. Ya no aparecerá en 'Sermones Públicos'."
+          );
         } else {
           alert("No se pudo encontrar el sermón público para despublicar.");
         }
@@ -166,31 +208,31 @@ const MiBiblioteca = ({ onClose, onOpenSermon, isSubView = false }) => {
     const handleClickOutside = () => {
       closeMenu();
     };
-    
+
     if (openMenuId) {
-      document.addEventListener('click', handleClickOutside);
+      document.addEventListener("click", handleClickOutside);
     }
-    
+
     return () => {
-      document.removeEventListener('click', handleClickOutside);
+      document.removeEventListener("click", handleClickOutside);
     };
   }, [openMenuId]);
 
   const filteredAndSortedSermons = useMemo(() => {
     return sermones
-      .filter(sermon => 
+      .filter((sermon) =>
         sermon.title.toLowerCase().includes(searchTerm.toLowerCase())
       )
       .sort((a, b) => {
-        if (sortOrder === 'reciente') {
+        if (sortOrder === "reciente") {
           const dateA = a.createdAt?.seconds || 0;
           const dateB = b.createdAt?.seconds || 0;
           return dateB - dateA;
-        } else if (sortOrder === 'antiguo') {
+        } else if (sortOrder === "antiguo") {
           const dateA = a.createdAt?.seconds || 0;
           const dateB = b.createdAt?.seconds || 0;
           return dateA - dateB;
-        } else if (sortOrder === 'titulo') {
+        } else if (sortOrder === "titulo") {
           return a.title.localeCompare(b.title);
         }
         return 0;
@@ -203,13 +245,13 @@ const MiBiblioteca = ({ onClose, onOpenSermon, isSubView = false }) => {
         // Vista como subcomponente dentro de Biblioteca
         <div className="h-full flex flex-col">
           <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
-            <input 
+            <input
               type="text"
               placeholder="Buscar por título..."
               className="px-4 py-2 border rounded-md w-full sm:w-1/2"
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <select 
+            <select
               className="px-4 py-2 border rounded-md w-full sm:w-auto"
               onChange={(e) => setSortOrder(e.target.value)}
               value={sortOrder}
@@ -226,7 +268,10 @@ const MiBiblioteca = ({ onClose, onOpenSermon, isSubView = false }) => {
             ) : filteredAndSortedSermons.length > 0 ? (
               <ul className="divide-y divide-gray-200">
                 {filteredAndSortedSermons.map((sermon) => (
-                  <li key={sermon.id} className="p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center hover:bg-gray-50 gap-4">
+                  <li
+                    key={sermon.id}
+                    className="p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center hover:bg-gray-50 gap-4"
+                  >
                     <div className="mb-4 sm:mb-0">
                       <div className="flex items-center gap-2">
                         <h3 className="font-bold text-lg">{sermon.title}</h3>
@@ -237,12 +282,17 @@ const MiBiblioteca = ({ onClose, onOpenSermon, isSubView = false }) => {
                         )}
                       </div>
                       <p className="text-sm text-gray-500">
-                        Creado: {sermon.createdAt && sermon.createdAt.seconds ? new Date(sermon.createdAt.seconds * 1000).toLocaleDateString() : 'Fecha no disponible'}
+                        Creado:{" "}
+                        {sermon.createdAt && sermon.createdAt.seconds
+                          ? new Date(
+                              sermon.createdAt.seconds * 1000
+                            ).toLocaleDateString()
+                          : "Fecha no disponible"}
                       </p>
                     </div>
                     {/* Menú desplegable de acciones */}
                     <div className="relative self-end sm:self-center">
-                      <button 
+                      <button
                         onClick={(e) => {
                           e.stopPropagation();
                           toggleMenu(sermon.id);
@@ -250,19 +300,23 @@ const MiBiblioteca = ({ onClose, onOpenSermon, isSubView = false }) => {
                         className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-md transition-colors"
                         title="Opciones del sermón"
                       >
-                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"/>
+                        <svg
+                          className="w-5 h-5"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
                         </svg>
                       </button>
-                      
+
                       {/* Menú desplegable */}
                       {openMenuId === sermon.id && (
-                        <div 
+                        <div
                           className="absolute right-0 top-full mt-1 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-10"
                           onClick={(e) => e.stopPropagation()}
                         >
                           <div className="py-1">
-                            <button 
+                            <button
                               onClick={() => {
                                 handleOpenSermon(sermon);
                                 closeMenu();
@@ -271,8 +325,8 @@ const MiBiblioteca = ({ onClose, onOpenSermon, isSubView = false }) => {
                             >
                               <span>📖</span> Abrir
                             </button>
-                            
-                            <button 
+
+                            <button
                               onClick={() => {
                                 handleDuplicateSermon(sermon);
                                 closeMenu();
@@ -281,12 +335,12 @@ const MiBiblioteca = ({ onClose, onOpenSermon, isSubView = false }) => {
                             >
                               <span>📄</span> Duplicar
                             </button>
-                            
+
                             {isSuperAdmin && (
                               <>
                                 <hr className="my-1 border-gray-200" />
                                 {sermonesPublicados.has(sermon.id) ? (
-                                  <button 
+                                  <button
                                     onClick={() => {
                                       handleDespublicarSermon(sermon.id);
                                       closeMenu();
@@ -296,7 +350,7 @@ const MiBiblioteca = ({ onClose, onOpenSermon, isSubView = false }) => {
                                     <span>🔒</span> Despublicar
                                   </button>
                                 ) : (
-                                  <button 
+                                  <button
                                     onClick={() => {
                                       handlePublicarSermon(sermon);
                                       closeMenu();
@@ -308,9 +362,9 @@ const MiBiblioteca = ({ onClose, onOpenSermon, isSubView = false }) => {
                                 )}
                               </>
                             )}
-                            
+
                             <hr className="my-1 border-gray-200" />
-                            <button 
+                            <button
                               onClick={() => {
                                 handleDeleteSermon(sermon.id);
                                 closeMenu();
@@ -327,7 +381,9 @@ const MiBiblioteca = ({ onClose, onOpenSermon, isSubView = false }) => {
                 ))}
               </ul>
             ) : (
-              <p className="text-center text-gray-500 mt-10">No se encontraron sermones con ese criterio.</p>
+              <p className="text-center text-gray-500 mt-10">
+                No se encontraron sermones con ese criterio.
+              </p>
             )}
           </div>
         </div>
@@ -336,18 +392,22 @@ const MiBiblioteca = ({ onClose, onOpenSermon, isSubView = false }) => {
         <div className="fixed inset-0 bg-black bg-opacity-50 z-40 flex justify-center items-center p-4">
           <div className="bg-white rounded-lg shadow-2xl w-full md:w-3/4 lg:w-2/3 h-5/6 p-6 flex flex-col">
             <div className="flex justify-between items-center border-b pb-4 mb-4">
-              <h2 className="text-xl sm:text-2xl font-bold">Mi Biblioteca de Sermones</h2>
-              <button onClick={onClose} className="text-2xl font-bold">&times;</button>
+              <h2 className="text-xl sm:text-2xl font-bold">
+                Mi Biblioteca de Sermones
+              </h2>
+              <button onClick={onClose} className="text-2xl font-bold">
+                &times;
+              </button>
             </div>
 
             <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
-              <input 
+              <input
                 type="text"
                 placeholder="Buscar por título..."
                 className="px-4 py-2 border rounded-md w-full sm:w-1/2"
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
-              <select 
+              <select
                 className="px-4 py-2 border rounded-md w-full sm:w-auto"
                 onChange={(e) => setSortOrder(e.target.value)}
                 value={sortOrder}
@@ -364,23 +424,32 @@ const MiBiblioteca = ({ onClose, onOpenSermon, isSubView = false }) => {
               ) : filteredAndSortedSermons.length > 0 ? (
                 <ul className="divide-y divide-gray-200">
                   {filteredAndSortedSermons.map((sermon) => (
-                    <li key={sermon.id} className="p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center hover:bg-gray-50 gap-4">
+                    <li
+                      key={sermon.id}
+                      className="p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center hover:bg-gray-50 gap-4"
+                    >
                       <div className="mb-4 sm:mb-0">
                         <div className="flex items-center gap-2">
                           <h3 className="font-bold text-lg">{sermon.title}</h3>
-                          {isSuperAdmin && sermonesPublicados.has(sermon.id) && (
-                            <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
-                              PÚBLICO
-                            </span>
-                          )}
+                          {isSuperAdmin &&
+                            sermonesPublicados.has(sermon.id) && (
+                              <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                                PÚBLICO
+                              </span>
+                            )}
                         </div>
                         <p className="text-sm text-gray-500">
-                          Creado: {sermon.createdAt && sermon.createdAt.seconds ? new Date(sermon.createdAt.seconds * 1000).toLocaleDateString() : 'Fecha no disponible'}
+                          Creado:{" "}
+                          {sermon.createdAt && sermon.createdAt.seconds
+                            ? new Date(
+                                sermon.createdAt.seconds * 1000
+                              ).toLocaleDateString()
+                            : "Fecha no disponible"}
                         </p>
                       </div>
                       {/* Menú desplegable de acciones */}
                       <div className="relative self-end sm:self-center">
-                        <button 
+                        <button
                           onClick={(e) => {
                             e.stopPropagation();
                             toggleMenu(sermon.id);
@@ -388,19 +457,23 @@ const MiBiblioteca = ({ onClose, onOpenSermon, isSubView = false }) => {
                           className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-md transition-colors"
                           title="Opciones del sermón"
                         >
-                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"/>
+                          <svg
+                            className="w-5 h-5"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
                           </svg>
                         </button>
-                        
+
                         {/* Menú desplegable */}
                         {openMenuId === sermon.id && (
-                          <div 
+                          <div
                             className="absolute right-0 top-full mt-1 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-10"
                             onClick={(e) => e.stopPropagation()}
                           >
                             <div className="py-1">
-                              <button 
+                              <button
                                 onClick={() => {
                                   handleOpenSermon(sermon);
                                   closeMenu();
@@ -409,8 +482,8 @@ const MiBiblioteca = ({ onClose, onOpenSermon, isSubView = false }) => {
                               >
                                 <span>📖</span> Abrir
                               </button>
-                              
-                              <button 
+
+                              <button
                                 onClick={() => {
                                   handleDuplicateSermon(sermon);
                                   closeMenu();
@@ -419,12 +492,12 @@ const MiBiblioteca = ({ onClose, onOpenSermon, isSubView = false }) => {
                               >
                                 <span>📄</span> Duplicar
                               </button>
-                              
+
                               {isSuperAdmin && (
                                 <>
                                   <hr className="my-1 border-gray-200" />
                                   {sermonesPublicados.has(sermon.id) ? (
-                                    <button 
+                                    <button
                                       onClick={() => {
                                         handleDespublicarSermon(sermon.id);
                                         closeMenu();
@@ -434,7 +507,7 @@ const MiBiblioteca = ({ onClose, onOpenSermon, isSubView = false }) => {
                                       <span>🔒</span> Despublicar
                                     </button>
                                   ) : (
-                                    <button 
+                                    <button
                                       onClick={() => {
                                         handlePublicarSermon(sermon);
                                         closeMenu();
@@ -446,9 +519,9 @@ const MiBiblioteca = ({ onClose, onOpenSermon, isSubView = false }) => {
                                   )}
                                 </>
                               )}
-                              
+
                               <hr className="my-1 border-gray-200" />
-                              <button 
+                              <button
                                 onClick={() => {
                                   handleDeleteSermon(sermon.id);
                                   closeMenu();
@@ -465,7 +538,9 @@ const MiBiblioteca = ({ onClose, onOpenSermon, isSubView = false }) => {
                   ))}
                 </ul>
               ) : (
-                <p className="text-center text-gray-500 mt-10">No se encontraron sermones con ese criterio.</p>
+                <p className="text-center text-gray-500 mt-10">
+                  No se encontraron sermones con ese criterio.
+                </p>
               )}
             </div>
           </div>

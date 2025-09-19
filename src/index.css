@@ -29,3 +29,7 @@ code {
   -ms-user-select: none; /* IE 10+ */
   user-select: none; /* Standard syntax */
 }
+
+.custom-btn{
+  @apply text-sm px-3 py-2 md:px-4 md:py-2 rounded-md text-white shadow transition-all gap-2 font-semibold flex items-center;
+}

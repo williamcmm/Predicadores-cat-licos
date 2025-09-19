@@ -25,7 +25,7 @@ export async function establecerSermonDelDia(sermon, predicadorInfo = {}) {
     };
 
     await setDoc(sermonDelDiaRef, sermonDelDia);
-    console.log('Sermón del día establecido exitosamente');
+    
     return true;
   } catch (error) {
     console.error('Error estableciendo sermón del día:', error);
@@ -82,7 +82,7 @@ export async function desactivarSermonDelDia() {
   try {
     const sermonDelDiaRef = doc(db, 'configuracion', SERMON_DEL_DIA_DOC);
     await setDoc(sermonDelDiaRef, { activo: false }, { merge: true });
-    console.log('Sermón del día desactivado');
+    ('Sermón del día desactivado');
     return true;
   } catch (error) {
     console.error('Error desactivando sermón del día:', error);

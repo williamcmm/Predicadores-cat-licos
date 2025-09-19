@@ -27,19 +27,11 @@ export const AuthProvider = ({ children }) => {
         const result = await getConfig();
 
         setSuperAdminEmails(result.data.superAdminEmails);
-        console.log(
-          "✅ Super admins cargados desde Firebase:",
-          result.data.superAdminEmails
-        );
       } catch (error) {
         console.error("❌ Error cargando super admins desde Firebase:", error);
         // Fallback a .env.local
         const localEmails = import.meta.env.VITE_SUPER_ADMINS?.split(",") || [];
         setSuperAdminEmails(localEmails);
-        console.log(
-          "🔄 Usando super admins locales como fallback:",
-          localEmails
-        );
       }
     };
 
