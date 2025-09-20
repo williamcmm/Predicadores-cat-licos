@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import SermonIdea from './SermonIdea';
 import ConfirmationModal from '../ui/ConfirmationModal';
 import { useAuth } from '../../context/AuthContext';
+import { getEmptyIdea } from '../../models/sermonModel';
 
 const SermonEditor = ({ sermon, setSermon }) => {
   const { currentUser } = useAuth();
@@ -29,24 +30,10 @@ const SermonEditor = ({ sermon, setSermon }) => {
   };
 
   const addIdea = () => {
-    const newId = `idea_${Date.now()}`;
+    const newIdea = getEmptyIdea();
     setSermon({
       ...sermon,
-      ideas: [
-        ...sermon.ideas,
-        {
-          id: newId,
-          h1: '',
-          lineaInicial: '',
-          elementoApoyo: { 
-            tipo: 'cita_biblica', 
-            contenido: '' 
-          },
-          disparadores: [{ id: `disparador_${Date.now()}`, disparador: '', parrafo: '' }],
-          ejemploPractico: '',
-          resultadoEsperado: '',
-        },
-      ],
+      ideas: [...sermon.ideas, newIdea],
     });
   };
 

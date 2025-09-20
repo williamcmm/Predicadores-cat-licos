@@ -12,6 +12,12 @@ import AdminPanel from "./components/admin/AdminPanel";
 import BottomNavBar from "./components/ui/BottomNavBar";
 import { useAuth } from "./context/AuthContext";
 import storageService from "./services/storage/storageService";
+import { 
+  getEmptySermon, 
+  mergeSermonData, 
+  validateSermonStructure,
+  normalizeSermon 
+} from "./models/sermonModel";
 import { guardarSermon } from "./services/database/firestoreService";
 import { esAdministrador } from "./services/admin/userService";
 
@@ -32,7 +38,7 @@ function App() {
   const [sermon, setSermon] = useState(() => {
     if (!currentUser) {
       localStorage.removeItem("currentSermon");
-      return storageService.getInitialSermonState();
+      return getEmptySermon();
     }
     try {
       const savedSermon = localStorage.getItem("currentSermon");
@@ -43,13 +49,13 @@ function App() {
           typeof parsed === "object" &&
           parsed.title !== undefined
         ) {
-          return parsed;
+          return normalizeSermon(parsed);
         }
       }
     } catch (error) {
       console.error("Error parsing sermon from localStorage:", error);
     }
-    return storageService.getInitialSermonState();
+    return getEmptySermon();
   });
 
   useEffect(() => {
@@ -138,38 +144,24 @@ function App() {
       const newSermonData = event.detail;
       if (!newSermonData || typeof newSermonData !== "object") {
         console.error(
-          "Evento 'insertSermonIntoEditor' recibiÃ³ datos invÃ¡lidos:",
+          "Evento 'insertSermonIntoEditor' recibió datos inválidos:",
           newSermonData
         );
         alert(
-          "La IA devolviÃ³ un formato de sermÃ³n inesperado. No se pudo cargar."
+          "La IA devolvió un formato de sermón inesperado. No se pudo cargar."
         );
         return;
       }
 
-      const finalSermon = {
-        ...storageService.getInitialSermonState(),
-        ...newSermonData,
-        introduction: {
-          ...storageService.getInitialSermonState().introduction,
-          ...(newSermonData.introduction || {}),
-        },
-        ideas: (newSermonData.ideas || []).map((idea, index) => ({
-          id: idea.id || Date.now() + index,
-          h1: idea.h1 || "",
-          elementoApoyo: {
-            tipo:
-              (idea.elementoApoyo && idea.elementoApoyo.tipo) || "cita_biblica",
-            contenido:
-              (idea.elementoApoyo && idea.elementoApoyo.contenido) || "",
-          },
-          disparadores: (idea.disparadores || []).map((disp, dIndex) => ({
-            id: disp.id || Date.now() + index + dIndex,
-            disparador: disp.disparador || "",
-            parrafo: disp.parrafo || "",
-          })),
-        })),
-      };
+      // Usar la función centralizada para combinar datos
+      const finalSermon = mergeSermonData(newSermonData);
+      
+      // Validar estructura antes de usar
+      const errors = validateSermonStructure(finalSermon);
+      if (errors.length > 0) {
+        console.warn("Errores en estructura del sermón:", errors);
+        // Continúa pero con advertencias
+      }
 
       setSermon(finalSermon);
       setModo("edicion");
@@ -177,10 +169,11 @@ function App() {
 
     const handleStartManualSermon = (event) => {
       const { topic } = event.detail;
-      setSermon({
-        ...storageService.getInitialSermonState(),
+      const newSermon = {
+        ...getEmptySermon(),
         title: topic || "",
-      });
+      };
+      setSermon(newSermon);
       setModo("edicion");
     };
 
@@ -200,7 +193,7 @@ function App() {
   }, []);
 
   const handleClearSermon = () => {
-    setSermon(storageService.getInitialSermonState());
+    setSermon(getEmptySermon());
     setModo("edicion");
   };
 

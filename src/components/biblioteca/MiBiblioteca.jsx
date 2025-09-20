@@ -20,9 +20,6 @@ const MiBiblioteca = ({ onClose, onOpenSermon, isSubView = false }) => {
   const [openMenuId, setOpenMenuId] = useState(null); // Para controlar qué menú está abierto
 
   // Verificar si el usuario es super admin
-
-  console.log("🔍 Current User:", currentUser);
-
   const isSuperAdmin =
     import.meta.env.VITE_SUPER_ADMIN?.split(",").includes(currentUser.email) ||
     currentUser.userRole === "super_admin" ||

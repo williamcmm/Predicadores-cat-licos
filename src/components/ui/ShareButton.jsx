@@ -46,7 +46,7 @@ const ShareButton = () => {
       </button>
 
       {showShareMenu && (
-        <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+        <div className="absolute top-8 left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
           <div className="py-2">
             {shareOptions.map((option) => (
               <button

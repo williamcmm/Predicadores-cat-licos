@@ -3,6 +3,7 @@ import {
   guardarSermon as guardarEnFirestore,
   obtenerSermones,
 } from "../database/firestoreService";
+import { getEmptySermon, normalizeSermon } from "../../models/sermonModel";
 
 class StorageService {
   constructor() {
@@ -40,7 +41,7 @@ class StorageService {
     if (!userId) {
       // Sin usuario: limpiar y retornar estado inicial
       localStorage.removeItem(this.CURRENT_SERMON_KEY);
-      return this.getInitialSermonState();
+      return getEmptySermon();
     }
 
     try {
@@ -79,10 +80,10 @@ class StorageService {
       }
 
       // 5. Nuevo usuario: estado inicial
-      return this.getInitialSermonState();
+      return getEmptySermon();
     } catch (error) {
       console.error("Error cargando sermón inicial:", error);
-      return this.getFromLocalStorage() || this.getInitialSermonState();
+      return this.getFromLocalStorage() || getEmptySermon();
     }
   }
 
@@ -122,7 +123,12 @@ class StorageService {
   getFromLocalStorage() {
     try {
       const saved = localStorage.getItem(this.CURRENT_SERMON_KEY);
-      return saved ? JSON.parse(saved) : null;
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        // Normalizar para asegurar estructura correcta
+        return normalizeSermon(parsed);
+      }
+      return null;
     } catch (error) {
       console.error("Error parseando localStorage:", error);
       return null;
@@ -157,12 +163,8 @@ class StorageService {
   }
 
   getInitialSermonState() {
-    return {
-      title: "",
-      introduction: { presentation: "", motivation: "" },
-      ideas: [],
-      imperatives: "",
-    };
+    // Deprecated: usar getEmptySermon() del modelo
+    return getEmptySermon();
   }
 
   // Limpiar al cerrar sesión

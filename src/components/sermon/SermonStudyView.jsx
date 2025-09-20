@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import SermonExportButton from './SermonExportButton';
 import { IoSettings, IoClose } from "react-icons/io5";
+import { MdFlashOn, MdWork, MdGpsFixed } from "react-icons/md";
+import { FaBook } from 'react-icons/fa';
 
 const SermonStudyView = ({ sermon, onClose, user }) => {
   const [fontSize, setFontSize] = useState(2.0);
@@ -82,43 +84,112 @@ const SermonStudyView = ({ sermon, onClose, user }) => {
           className="sermon-study-view mx-auto font-serif text-gray-800 transition-all duration-300"
           style={{ maxWidth: `${contentWidth}%`, fontSize: `${fontSize}em` }}
         >
-          <h1 className="font-bold mb-8 text-center text-gray-900" style={{ fontSize: '2.25em' }}>{sermon.title}</h1>
+          <h1 className="font-bold mb-8 text-center text-gray-900 text-5xl">{sermon.title}</h1>
 
           <div className="mb-10 pb-6 border-b border-gray-200">
-            <h2 className="font-semibold mb-4 text-gray-800 border-l-4 border-purple-500 pl-4" style={{ fontSize: '1.75em' }}>Introducción</h2>
+            <h2 className="font-semibold mb-4 text-gray-800 border-l-4 border-blue-500 pl-4 text-4xl">Introducción</h2>
             <div className="ml-5 leading-relaxed space-y-4">
-              <p><strong>Presentación:</strong> {sermon.introduction?.presentation}</p>
-              <p><strong>Motivación:</strong> {sermon.introduction?.motivation}</p>
+              <p><strong>Presentación:</strong> <span className="whitespace-pre-line">{sermon.introduction?.presentation}</span></p>
+              <p><strong>Motivación:</strong> <span className="whitespace-pre-line">{sermon.introduction?.motivation}</span></p>
             </div>
           </div>
 
           <div className="mb-10">
-            <h2 className="font-semibold mb-6 text-gray-800 border-l-4 border-purple-500 pl-4" style={{ fontSize: '1.75em' }}>Ideas Principales</h2>
+            <h2 className="font-semibold mb-6 text-gray-800 border-l-4 border-blue-500 pl-4 text-4xl">Ideas Principales</h2>
             <div className="space-y-12">
               {sermon.ideas?.map((idea, index) => (
                 <div key={idea.id || index} className="p-6 border border-gray-200 rounded-lg shadow-sm">
-                  <h3 className="font-bold mb-4 text-purple-800" style={{ fontSize: '1.5em' }}>{`Idea ${index + 1}: ${idea.h1}`}</h3>
+                  <h3 className="font-bold mb-4 text-blue-800 text-3xl">{`Idea ${index + 1}: ${idea.h1}`}</h3>
+                  
+                  {/* Línea Inicial Impactante */}
+                  {idea.lineaInicial && (
+                    <div className="mb-6 p-4 bg-purple-50 border-l-4 border-purple-500 rounded-r-lg">
+                      <div className="flex items-center mb-2">
+                        <MdFlashOn className="text-lg mr-2 text-purple-600" />
+                        <p className="font-semibold text-purple-800">Línea Inicial Impactante</p>
+                      </div>
+                      <p className="text-gray-800 leading-relaxed whitespace-pre-line">
+                        {idea.lineaInicial}
+                      </p>
+                    </div>
+                  )}
+
                   <div className="mb-6 p-4 bg-gray-50 border-l-4 border-gray-400 italic">
                     <p className="font-semibold text-gray-700 mb-2">Elemento de Apoyo ({idea.elementoApoyo?.tipo?.replace('_', ' ')})</p>
-                    <p className="text-gray-800 leading-relaxed">{idea.elementoApoyo?.contenido}</p>
+                    <p className="text-gray-800 leading-relaxed whitespace-pre-line">{idea.elementoApoyo?.contenido}</p>
                   </div>
                   <div className="space-y-6">
                     {idea.disparadores?.map((disparador, dIndex) => (
                       <div key={disparador.id || dIndex} className="pl-4 border-l-2 border-purple-200">
-                        <p className="font-semibold text-purple-700">{disparador.disparador}</p>
-                        <p className="mt-1 leading-relaxed">{disparador.parrafo}</p>
+                        <p className="font-semibold text-blue-700">{disparador.disparador}</p>
+                        <p className="mt-1 leading-relaxed whitespace-pre-line">{disparador.parrafo}</p>
+                        
+                        {/* Elementos de Apoyo del Disparador */}
+                        {disparador.elementosApoyo && disparador.elementosApoyo.length > 0 && (
+                          <div className="mt-3 pl-4 border-l border-gray-300">
+                            <p 
+                              className="font-semibold text-gray-500 mb-2 uppercase flex items-center gap-1"
+                              style={{ fontSize: `${fontSize * 0.5}em` }}
+                            >
+                              <span className="text-blue-500"><FaBook /></span>
+                              Elementos de Apoyo
+                            </p>
+                            <div className="space-y-2">
+                              {disparador.elementosApoyo.map((elemento, eIndex) => (
+                                <div key={elemento.id || eIndex} className="bg-gray-50 rounded p-2">
+                                  <div 
+                                    className="font-medium text-gray-500 mb-1"
+                                    style={{ fontSize: `${fontSize * 0.5}em` }}
+                                  >
+                                    {elemento.tipo === 'cita_biblica' && 'Cita Bíblica'}
+                                    {elemento.tipo === 'catecismo' && 'Catecismo CIC'}
+                                    {elemento.tipo === 'reflexion' && 'Reflexión'}
+                                  </div>
+                                  <p 
+                                    className="text-gray-700 whitespace-pre-line"
+                                    style={{ fontSize: `${fontSize * 0.45}em` }}
+                                  >
+                                    {elemento.contenido}
+                                  </p>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
+
+                  {/* Ejemplo Práctico */}
+                  {idea.ejemploPractico && (
+                    <div className="mt-6 p-4 bg-amber-50 border-l-4 border-amber-500 rounded-r-lg">
+                      <div className="flex items-center mb-2">
+                        <MdWork className="text-lg mr-2 text-amber-600" />
+                        <p className="font-semibold text-amber-800">Ejemplo Práctico</p>
+                      </div>
+                      <p className="text-gray-800 leading-relaxed whitespace-pre-line">{idea.ejemploPractico}</p>
+                    </div>
+                  )}
+
+                  {/* Resultado Esperado */}
+                  {idea.resultadoEsperado && (
+                    <div className="mt-4 p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-lg">
+                      <div className="flex items-center mb-2">
+                        <MdGpsFixed className="text-lg mr-2 text-emerald-600" />
+                        <p className="font-semibold text-emerald-800">Resultado Esperado</p>
+                      </div>
+                      <p className="text-gray-800 leading-relaxed whitespace-pre-line">{idea.resultadoEsperado}</p>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
           </div>
 
           <div className="mt-12 pt-6 border-t border-gray-200">
-            <h2 className="font-semibold mb-4 text-gray-800 border-l-4 border-purple-500 pl-4" style={{ fontSize: '1.75em' }}>Imperativos</h2>
+            <h2 className="font-semibold mb-4 text-gray-800 border-l-4 border-purple-500 pl-4 text-3xl">Imperativos</h2>
             <div className="ml-5 leading-relaxed">
-              <p>{sermon.imperatives}</p>
+              <p className="whitespace-pre-line">{sermon.imperatives}</p>
             </div>
           </div>
         </div>

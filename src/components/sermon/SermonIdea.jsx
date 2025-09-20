@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { generateDisparador } from "../../services/ai/geminiService";
-import { FaXmark } from "react-icons/fa6";
+import { FaXmark, FaPlus, FaBook } from "react-icons/fa6";
+import { getEmptyDisparador, getEmptyElementoApoyo, SERMON_LIMITS } from "../../models/sermonModel";
 
 const SermonIdea = ({ idea, onUpdate, onDelete, index }) => {
   // Internal state for controlled components
@@ -53,23 +54,63 @@ const SermonIdea = ({ idea, onUpdate, onDelete, index }) => {
     handleUpdate("disparadores", updatedDisparadores);
   };
 
-  const addDisparador = () => {
-    if (disparadores.length >= 8) {
-      alert("Máximo 8 disparadores por idea");
+  const handleElementoApoyoChange = (disparadorId, elementoId, field, value) => {
+    const updatedDisparadores = disparadores.map((d) => {
+      if (d.id === disparadorId) {
+        const updatedElementos = d.elementosApoyo.map((e) =>
+          e.id === elementoId ? { ...e, [field]: value } : e
+        );
+        return { ...d, elementosApoyo: updatedElementos };
+      }
+      return d;
+    });
+    setDisparadores(updatedDisparadores);
+    handleUpdate("disparadores", updatedDisparadores);
+  };
+
+  const addElementoApoyo = (disparadorId) => {
+    const disparador = disparadores.find(d => d.id === disparadorId);
+    if (disparador && disparador.elementosApoyo.length >= 3) {
+      alert("Máximo 3 elementos de apoyo por disparador");
       return;
     }
-    const newId = `disparador_${Date.now()}`;
-    const newDisparadores = [
-      ...disparadores,
-      { id: newId, disparador: "", parrafo: "" },
-    ];
+    
+    const newElemento = getEmptyElementoApoyo();
+    const updatedDisparadores = disparadores.map((d) =>
+      d.id === disparadorId 
+        ? { ...d, elementosApoyo: [...d.elementosApoyo, newElemento] }
+        : d
+    );
+    setDisparadores(updatedDisparadores);
+    handleUpdate("disparadores", updatedDisparadores);
+  };
+
+  const deleteElementoApoyo = (disparadorId, elementoId) => {
+    const updatedDisparadores = disparadores.map((d) => {
+      if (d.id === disparadorId) {
+        const updatedElementos = d.elementosApoyo.filter((e) => e.id !== elementoId);
+        return { ...d, elementosApoyo: updatedElementos };
+      }
+      return d;
+    });
+    setDisparadores(updatedDisparadores);
+    handleUpdate("disparadores", updatedDisparadores);
+  };
+
+  const addDisparador = () => {
+    if (disparadores.length >= SERMON_LIMITS.MAX_DISPARADORES_POR_IDEA) {
+      alert(`Máximo ${SERMON_LIMITS.MAX_DISPARADORES_POR_IDEA} disparadores por idea`);
+      return;
+    }
+    const newDisparador = getEmptyDisparador();
+    const newDisparadores = [...disparadores, newDisparador];
     setDisparadores(newDisparadores);
     handleUpdate("disparadores", newDisparadores);
   };
 
   const deleteDisparador = (id) => {
-    if (disparadores.length <= 1) {
-      alert("Debe mantener al menos un disparador en cada idea");
+    if (disparadores.length <= SERMON_LIMITS.MIN_DISPARADORES_POR_IDEA) {
+      alert(`Debe mantener al menos ${SERMON_LIMITS.MIN_DISPARADORES_POR_IDEA} disparador en cada idea`);
       return;
     }
     const updatedDisparadores = disparadores.filter((d) => d.id !== id);
@@ -216,7 +257,7 @@ const SermonIdea = ({ idea, onUpdate, onDelete, index }) => {
                   </button>
                 </div>
               </div>
-              <div>
+              <div className="mb-4">
                 <textarea
                   value={disparador.parrafo}
                   onChange={(e) =>
@@ -230,6 +271,57 @@ const SermonIdea = ({ idea, onUpdate, onDelete, index }) => {
                   className="w-full p-3 border border-gray-300 rounded-md min-h-[100px] resize-y text-sm"
                 ></textarea>
               </div>
+
+              {/* Elementos de Apoyo del Disparador */}
+              {disparador.elementosApoyo && disparador.elementosApoyo.length > 0 && (
+                <div className="bg-white rounded-md border border-gray-200 p-4 mb-3">
+                  <h5 className="text-sm font-semibold text-gray-600 mb-3 flex items-center gap-2">
+                    <span className="text-blue-500"><FaBook /></span>
+                    Elementos de Apoyo ({disparador.elementosApoyo.length}/3)
+                  </h5>
+                  {disparador.elementosApoyo.map((elemento, e_index) => (
+                    <div key={elemento.id} className="bg-gray-50 rounded-md p-3 mb-3 relative">
+                      <button
+                        onClick={() => deleteElementoApoyo(disparador.id, elemento.id)}
+                        className="absolute top-2 right-2 bg-red-400 text-white border-none w-5 h-5 rounded-full cursor-pointer text-xs flex items-center justify-center transition-colors hover:bg-red-500"
+                      >
+                        <FaXmark size={10}/>
+                      </button>
+                      <div className="pr-8">
+                        <div className="mb-2">
+                          <select
+                            value={elemento.tipo}
+                            onChange={(e) => handleElementoApoyoChange(disparador.id, elemento.id, "tipo", e.target.value)}
+                            className="w-full p-1.5 border border-gray-300 rounded text-xs bg-white"
+                          >
+                            <option value="cita_biblica">Cita Bíblica</option>
+                            <option value="catecismo">Catecismo CIC</option>
+                            <option value="reflexion">Reflexión</option>
+                          </select>
+                        </div>
+                        <textarea
+                          value={elemento.contenido}
+                          onChange={(e) => handleElementoApoyoChange(disparador.id, elemento.id, "contenido", e.target.value)}
+                          placeholder="Contenido del elemento de apoyo..."
+                          className="w-full p-2 border border-gray-300 rounded text-xs resize-y"
+                          rows={2}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Botón para agregar elemento de apoyo */}
+              {(!disparador.elementosApoyo || disparador.elementosApoyo.length < 3) && (
+                <button
+                  onClick={() => addElementoApoyo(disparador.id)}
+                  className="bg-gray-300 text-gray-700 border-none py-2 px-3 rounded text-xs font-medium transition-colors hover:bg-gray-400 flex items-center gap-1"
+                >
+                  <FaPlus size={10} />
+                  Elemento de Apoyo
+                </button>
+              )}
             </div>
           </div>
         ))}
