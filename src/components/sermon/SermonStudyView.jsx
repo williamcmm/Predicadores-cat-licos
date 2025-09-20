@@ -129,7 +129,7 @@ const SermonStudyView = ({ sermon, onClose, user }) => {
                           <div className="mt-3 pl-4 border-l border-gray-300">
                             <p 
                               className="font-semibold text-gray-500 mb-2 uppercase flex items-center gap-1"
-                              style={{ fontSize: `${fontSize * 0.5}em` }}
+                              style={{ fontSize: `${fontSize * 0.6}em` }}
                             >
                               <span className="text-blue-500"><FaBook /></span>
                               Elementos de Apoyo
@@ -148,7 +148,7 @@ const SermonStudyView = ({ sermon, onClose, user }) => {
                                   <div key={elemento.id || eIndex} className={`${backgroundClass} rounded p-2`}>
                                     <div 
                                       className="font-medium text-gray-500 mb-1 italic"
-                                      style={{ fontSize: `${fontSize * 0.5}em` }}
+                                      style={{ fontSize: `${fontSize * 0.6}em` }}
                                     >
                                       {elemento.tipo === 'cita_biblica' && 'Cita Bíblica'}
                                       {elemento.tipo === 'catecismo' && 'Catecismo CIC'}
@@ -158,7 +158,7 @@ const SermonStudyView = ({ sermon, onClose, user }) => {
                                     </div>
                                     <p 
                                       className="text-gray-700 whitespace-pre-line italic"
-                                      style={{ fontSize: `${fontSize * 0.45}em` }}
+                                      style={{ fontSize: `${fontSize * 0.55}em` }}
                                     >
                                       {elemento.contenido}
                                     </p>

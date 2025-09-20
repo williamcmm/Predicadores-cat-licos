@@ -77,7 +77,7 @@ const SermonEditor = ({ sermon, setSermon }) => {
         <p>¿Está seguro que desea eliminar esta idea? Esta acción no se puede deshacer.</p>
       </ConfirmationModal>
 
-      <div className="p-6 bg-gray-50 rounded-lg">
+      <div className="p-6 bg-gray-50 rounded-lg overflow-auto">
         {/* TÍTULO DEL SERMÓN */}
         <div className="mb-8">
           <label htmlFor="sermonTitle" className="block text-gray-800 text-base font-bold mb-2 uppercase">
@@ -133,7 +133,7 @@ const SermonEditor = ({ sermon, setSermon }) => {
 
         {/* IDEAS PRINCIPALES */}
         <div className="mb-8">
-          <label className="block text-gray-800 text-base font-bold mb-4 uppercase">
+          <label className="block text-gray-800 text-base font-bold mb-4 uppercase overflow-auto">
             IDEAS PRINCIPALES
           </label>
           <div className="space-y-8">

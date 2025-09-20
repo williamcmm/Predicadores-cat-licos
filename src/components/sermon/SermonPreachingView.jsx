@@ -204,7 +204,7 @@ const SermonPreachingView = ({ sermon, onClose, user }) => {
                                   <div className="mt-4 pt-4 border-t border-gray-200">
                                     <h4 
                                       className="font-semibold text-gray-600 mb-3 flex items-center gap-2"
-                                      style={{ fontSize: `${fontSize * 0.5}em` }}
+                                      style={{ fontSize: `${fontSize * 0.6}em` }}
                                     >
                                       <span className="text-blue-500"><FaBook /></span>
                                       Elementos de Apoyo
@@ -223,7 +223,7 @@ const SermonPreachingView = ({ sermon, onClose, user }) => {
                                           <div key={elemento.id || eIndex} className={`${backgroundClass} rounded p-3`}>
                                             <div 
                                               className="font-medium text-gray-500 mb-1 uppercase italic"
-                                              style={{ fontSize: `${fontSize * 0.5}em` }}
+                                              style={{ fontSize: `${fontSize * 0.6}em` }}
                                             >
                                               {elemento.tipo === 'cita_biblica' && 'Cita Bíblica'}
                                               {elemento.tipo === 'catecismo' && 'Catecismo CIC'}
@@ -233,7 +233,7 @@ const SermonPreachingView = ({ sermon, onClose, user }) => {
                                             </div>
                                             <p 
                                               className="text-gray-700 whitespace-pre-line italic"
-                                              style={{ fontSize: `${fontSize * 0.45}em` }}
+                                              style={{ fontSize: `${fontSize * 0.55}em` }}
                                             >
                                               {elemento.contenido}
                                             </p>

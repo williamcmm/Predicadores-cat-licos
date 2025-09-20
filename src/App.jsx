@@ -1,28 +1,36 @@
-import { useState, useEffect, useCallback, Fragment } from "react";
-import { Dialog, Transition } from "@headlessui/react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Header from "./components/ui/Header";
 import PanelResizer from "./components/ui/PanelResizer";
-import Sidebar from "./components/ui/Sidebar";
+import { EditorActionButtons } from "./components/ui/EditorActionButtons";
 import SermonEditor from "./components/sermon/SermonEditor";
 import ResourcePanel from "./components/resources/ResourcePanel";
 import SermonStudyView from "./components/sermon/SermonStudyView";
 import SermonPreachingView from "./components/sermon/SermonPreachingView";
 import Biblioteca from "./components/biblioteca/Biblioteca";
 import AdminPanel from "./components/admin/AdminPanel";
-import BottomNavBar from "./components/ui/BottomNavBar";
+import {BottomNavBar} from "./components/ui/BottomNavBar";
+import {MobileResourcesModal} from "./components/ui/MobileResourcesModal";
 import { useAuth } from "./context/AuthContext";
 import storageService from "./services/storage/storageService";
-import { 
-  getEmptySermon, 
-  mergeSermonData, 
+import {
+  getEmptySermon,
+  mergeSermonData,
   validateSermonStructure,
-  normalizeSermon 
+  normalizeSermon,
 } from "./models/sermonModel";
 import { guardarSermon } from "./services/database/firestoreService";
 import { esAdministrador } from "./services/admin/userService";
+import { ScrollToTopButton } from "./components/ui/ScrollToTop";
+import { FloatingSaveButton } from "./components/ui/FloatingSaveButton";
+import { useScrollViewStore } from "./store/scroll-view-store";
 
 function App() {
   const { currentUser } = useAuth();
+  const initScrollTracking = useScrollViewStore((state) => state.init);
+  const setScrollElement = useScrollViewStore(
+    (state) => state.setScrollElement
+  );
+  const editorContainerRef = useRef(null);
   const [leftPanelWidth, setLeftPanelWidth] = useState(() => {
     const storedWidth = localStorage.getItem("leftPanelWidth");
     return storedWidth ? parseFloat(storedWidth) : 60;
@@ -32,8 +40,8 @@ function App() {
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState(null);
-  const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < 768);
-  const [activePanel, setActivePanel] = useState("editor");
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [showMobileResources, setShowMobileResources] = useState(false);
 
   const [sermon, setSermon] = useState(() => {
     if (!currentUser) {
@@ -58,13 +66,28 @@ function App() {
     return getEmptySermon();
   });
 
+  // Manejo dinámico del responsive
   useEffect(() => {
     const handleResize = () => {
-      setIsSmallScreen(window.innerWidth < 768);
+      setIsMobile(window.innerWidth < 768);
     };
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Inicializar tracking del scroll
+  useEffect(() => {
+    const cleanup = initScrollTracking();
+    return cleanup;
+  }, [initScrollTracking]);
+
+  // Configurar el elemento de scroll cuando cambia el modo
+  useEffect(() => {
+    if (modo === "edicion" && editorContainerRef.current) {
+      setScrollElement(editorContainerRef.current);
+    }
+  }, [modo, setScrollElement]);
 
   const handleSave = useCallback(async () => {
     if (!currentUser || !sermon.title) {
@@ -155,7 +178,7 @@ function App() {
 
       // Usar la función centralizada para combinar datos
       const finalSermon = mergeSermonData(newSermonData);
-      
+
       // Validar estructura antes de usar
       const errors = validateSermonStructure(finalSermon);
       if (errors.length > 0) {
@@ -235,7 +258,7 @@ function App() {
     setShowBiblioteca(false);
   };
 
-  const rightPanelWidth = 100 - leftPanelWidth;
+  const rightPanelWidth = isMobile ? 100 : 100 - leftPanelWidth;
 
   return (
     <div className="h-screen flex flex-col bg-gray-100">
@@ -244,118 +267,65 @@ function App() {
         onOpenAdminPanel={toggleAdminPanel}
       />
       <div className="flex flex-1 overflow-hidden">
-        {isSmallScreen ? (
-          <main className="flex-1 overflow-y-auto pb-16">
-            {activePanel === "editor" && (
-              <div className="bg-white p-4 min-h-full flex flex-col">
-                <Sidebar
-                  modo={modo}
-                  setModo={setModo}
-                  onClearSermon={handleClearSermon}
+        {/* Editor Panel - Responsive width */}
+        <div
+          ref={editorContainerRef}
+          className="w-full md:flex-1 bg-white p-4 md:p-6 overflow-y-auto flex flex-col relative pb-16 md:pb-4"
+          style={{ width: window.innerWidth >= 768 ? `${leftPanelWidth}%` : '100%' }}
+        >
+          <EditorActionButtons
+            modo={modo}
+            setModo={setModo}
+            onClearSermon={handleClearSermon}
+            onSave={handleSave}
+            isSaving={isSaving}
+            lastSaved={lastSaved}
+          />
+          <div className="flex-1 mt-4 relative">
+            {modo === "edicion" && (
+              <>
+                <SermonEditor sermon={sermon} setSermon={setSermon} />
+                <ScrollToTopButton />
+                <FloatingSaveButton
                   onSave={handleSave}
                   isSaving={isSaving}
                   lastSaved={lastSaved}
                 />
-                <div className="flex-1 mt-4">
-                  {modo === "edicion" && (
-                    <SermonEditor sermon={sermon} setSermon={setSermon} />
-                  )}
-                </div>
-              </div>
+              </>
             )}
-            <Transition.Root show={activePanel === "resources"} as={Fragment}>
-              <Dialog
-                as="div"
-                className="relative z-50"
-                onClose={() => setActivePanel("editor")}
-              >
-                <Transition.Child
-                  as={Fragment}
-                  enter="ease-out duration-300"
-                  enterFrom="opacity-0"
-                  enterTo="opacity-100"
-                  leave="ease-in duration-200"
-                  leaveFrom="opacity-100"
-                  leaveTo="opacity-0"
-                >
-                  <div className="fixed inset-0 bg-black bg-opacity-50" />
-                </Transition.Child>
+          </div>
+        </div>
 
-                <div className="fixed inset-0 overflow-hidden">
-                  <div className="absolute inset-0 overflow-hidden">
-                    <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
-                      <Transition.Child
-                        as={Fragment}
-                        enter="transform transition ease-in-out duration-500 sm:duration-700"
-                        enterFrom="translate-x-full"
-                        enterTo="translate-x-0"
-                        leave="transform transition ease-in-out duration-500 sm:duration-700"
-                        leaveFrom="translate-x-0"
-                        leaveTo="translate-x-full"
-                      >
-                        <Dialog.Panel className="pointer-events-auto w-screen max-w-md">
-                          <div className="flex h-full flex-col overflow-y-scroll bg-[#F8F9FA] py-6 shadow-xl">
-                            <div className="px-4 sm:px-6">
-                              <Dialog.Title className="text-base font-semibold leading-6 text-gray-900">
-                                Buscador de Recursos
-                              </Dialog.Title>
-                            </div>
-                            <div className="relative mt-6 flex-1 px-4 sm:px-6">
-                              <ResourcePanel />
-                            </div>
-                          </div>
-                        </Dialog.Panel>
-                      </Transition.Child>
-                    </div>
-                  </div>
-                </div>
-              </Dialog>
-            </Transition.Root>
-          </main>
-        ) : (
-          <>
-            <div
-              className="bg-white p-4 md:p-6 overflow-y-auto flex flex-col"
-              style={{ width: `${leftPanelWidth}%` }}
-            >
-              <Sidebar
-                modo={modo}
-                setModo={setModo}
-                onClearSermon={handleClearSermon}
-                onSave={handleSave}
-                isSaving={isSaving}
-                lastSaved={lastSaved}
-              />
-              <div className="flex-1 mt-4">
-                {modo === "edicion" && (
-                  <SermonEditor sermon={sermon} setSermon={setSermon} />
-                )}
-              </div>
-            </div>
+        {/* Panel Resizer - Only visible on desktop */}
+        <PanelResizer
+          className="hidden md:block"
+          initialLeftWidth={60}
+          minWidth={10}
+          maxWidth={90}
+          onResize={handleResize}
+        />
 
-            <PanelResizer
-              initialLeftWidth={60}
-              minWidth={10}
-              maxWidth={90}
-              onResize={handleResize}
-            />
-
-            <div
-              className="bg-[#F8F9FA] p-4 md:p-5 overflow-y-auto"
-              style={{ width: `${rightPanelWidth}%` }}
-            >
-              <ResourcePanel />
-            </div>
-          </>
-        )}
+        {/* Resources Panel - Hidden on mobile, visible on desktop */}
+        <div
+          className="hidden md:block bg-[#F8F9FA] p-4 md:p-5 overflow-y-auto"
+          style={{ width: `${rightPanelWidth}%` }}
+        >
+          <ResourcePanel />
+        </div>
       </div>
 
-      {isSmallScreen && (
-        <BottomNavBar
-          activePanel={activePanel}
-          setActivePanel={setActivePanel}
-        />
-      )}
+      {/* Bottom Navigation - Only visible on mobile */}
+      <BottomNavBar 
+        className="md:hidden" 
+        onResourcesToggle={() => setShowMobileResources(!showMobileResources)}
+        isResourcesActive={showMobileResources}
+      />
+
+      {/* Mobile Resources Modal */}
+      <MobileResourcesModal 
+        isOpen={showMobileResources}
+        onClose={() => setShowMobileResources(false)}
+      />
 
       {modo === "estudio" && (
         <SermonStudyView sermon={sermon} onClose={() => setModo("edicion")} />

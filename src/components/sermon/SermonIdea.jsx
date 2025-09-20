@@ -139,9 +139,9 @@ const SermonIdea = ({ idea, onUpdate, onDelete, index }) => {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-4 sm:p-8 border-l-4 border-blue-600 mb-8">
+    <div className="bg-white rounded-xl shadow-lg p-4 sm:p-8 border-l-4 border-blue-600 mb-8 overflow-auto">
       {/* Header con título de la idea */}
-      <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-6 pb-4 border-b-2 border-gray-200">
+      <div className="flex flex-col flex-wrap sm:flex-row gap-2 justify-between sm:items-center mb-6 pb-4 border-b-2 border-gray-200">
         <div className="flex-1 mb-4 sm:mb-0">
           <label className="block font-bold text-gray-600 text-xs uppercase mb-2">
             IDEA PRINCIPAL #{index + 1}
@@ -159,7 +159,7 @@ const SermonIdea = ({ idea, onUpdate, onDelete, index }) => {
         </div>
         <button
           onClick={() => onDelete(idea.id)}
-          className="bg-red-500 text-white border-none py-2 px-4 rounded-md cursor-pointer text-sm sm:ml-4 transition-colors hover:bg-red-600 self-end sm:self-center"
+          className="bg-red-500 text-white border-none py-2 px-4 rounded-md cursor-pointer text-sm transition-colors hover:bg-red-600 self-end sm:self-center"
         >
           Eliminar Idea
         </button>
@@ -218,7 +218,7 @@ const SermonIdea = ({ idea, onUpdate, onDelete, index }) => {
         {disparadores.map((disparador, d_index) => (
           <div
             key={disparador.id}
-            className="bg-gray-50 border border-gray-200 rounded-lg p-5 mb-4 relative"
+            className="bg-gray-50 border border-gray-200 rounded-lg p-5 mb-4 relative overflow-auto"
           >
             <button
               onClick={() => deleteDisparador(disparador.id)}
@@ -234,7 +234,7 @@ const SermonIdea = ({ idea, onUpdate, onDelete, index }) => {
                 <label className="block font-semibold text-gray-500 mb-1 text-xs">
                   Disparador Mental
                 </label>
-                <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
+                <div className="flex flex-col flex-wrap sm:flex-row gap-2 items-stretch sm:items-center">
                   <input
                     type="text"
                     value={disparador.disparador}
@@ -246,7 +246,7 @@ const SermonIdea = ({ idea, onUpdate, onDelete, index }) => {
                       )
                     }
                     placeholder="Frase corta que ayuda a recordar el párrafo"
-                    className="flex-1 p-2 border border-gray-300 rounded-md font-semibold text-gray-800 bg-white"
+                    className="flex-1 max-w-full p-2 border border-gray-300 rounded-md font-semibold text-gray-800 bg-white"
                   />
                   <button
                     onClick={() => handleGenerateDisparador(disparador.id)}

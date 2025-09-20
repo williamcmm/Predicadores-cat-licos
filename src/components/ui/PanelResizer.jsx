@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
-const PanelResizer = ({ initialLeftWidth, minWidth, maxWidth, onResize }) => {
+const PanelResizer = ({ initialLeftWidth, minWidth, maxWidth, onResize, className }) => {
   const [isResizing, setIsResizing] = useState(false);
   const [leftWidth, setLeftWidth] = useState(() => {
     const storedWidth = localStorage.getItem('leftPanelWidth');
@@ -44,10 +44,9 @@ const PanelResizer = ({ initialLeftWidth, minWidth, maxWidth, onResize }) => {
 
   return (
     <div
-      className="relative w-1 bg-gray-300 hover:bg-blue-500 cursor-col-resize"
+      className={`${className} relative w-1 bg-gray-300 hover:bg-blue-500 cursor-col-resize flex-shrink-0`}
       onMouseDown={handleMouseDown}
       onDoubleClick={handleDoubleClick}
-      style={{ flexShrink: 0 }}
     >
       {isResizing && (
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black text-white text-xs px-2 py-1 rounded-md whitespace-nowrap">

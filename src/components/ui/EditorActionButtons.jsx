@@ -1,10 +1,9 @@
-import React, { useState, useEffect, useRef, Fragment } from "react";
+import { useState, useEffect, useRef, Fragment } from "react";
 import { Popover, Transition } from "@headlessui/react";
 import { FaBars } from "react-icons/fa";
-import { useAccessControl } from "../../hooks/useAccessControl";
 import { ActionButtons } from "./EditSermonActionButtons";
 
-const Sidebar = ({
+export const EditorActionButtons = ({
   modo,
   setModo,
   onClearSermon,
@@ -14,7 +13,6 @@ const Sidebar = ({
 }) => {
   const [displayMode, setDisplayMode] = useState("wide"); // wide, narrow, collapsed
   const sidebarRef = useRef(null);
-  const { hasAccess, getAccessMessage } = useAccessControl();
 
   const modes = [
     { id: "edicion", name: "Modo Edición", shortName: "Edición" },
@@ -96,7 +94,7 @@ const Sidebar = ({
             leaveFrom="opacity-100 translate-y-0"
             leaveTo="opacity-0 translate-y-1"
           >
-            <Popover.Panel className="absolute z-10 mt-2 w-auto bg-white shadow-lg rounded-lg ring-1 ring-black ring-opacity-5">
+            <Popover.Panel className="absolute z-10 mt-2 w-52 bg-white shadow-lg rounded-lg ring-1 ring-black ring-opacity-5">
               <div className="p-2 flex flex-col items-center gap-2">
                 <ModeButtons isPopover />
                 <ActionButtons 
@@ -127,5 +125,3 @@ const Sidebar = ({
     </div>
   );
 };
-
-export default Sidebar;

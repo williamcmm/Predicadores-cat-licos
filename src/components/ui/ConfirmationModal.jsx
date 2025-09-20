@@ -1,15 +1,17 @@
-import React from 'react';
-
 const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, children }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4" onClick={onClose}>
-      <div className="bg-white rounded-lg shadow-2xl p-6 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-lg shadow-2xl p-6 w-full max-w-md"
+        onClick={(e) => e.stopPropagation()}
+      >
         <h2 className="text-xl font-bold mb-4 text-gray-800">{title}</h2>
-        <div className="text-gray-600 mb-6">
-            {children}
-        </div>
+        <div className="text-gray-600 mb-6">{children}</div>
         <div className="flex justify-end gap-4">
           <button
             onClick={onClose}
