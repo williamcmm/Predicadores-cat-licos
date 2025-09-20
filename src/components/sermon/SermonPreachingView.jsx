@@ -210,24 +210,36 @@ const SermonPreachingView = ({ sermon, onClose, user }) => {
                                       Elementos de Apoyo
                                     </h4>
                                     <div className="space-y-3">
-                                      {disparador.elementosApoyo.map((elemento, eIndex) => (
-                                        <div key={elemento.id || eIndex} className="bg-gray-50 rounded p-3">
-                                          <div 
-                                            className="font-medium text-gray-500 mb-1 uppercase"
-                                            style={{ fontSize: `${fontSize * 0.5}em` }}
-                                          >
-                                            {elemento.tipo === 'cita_biblica' && 'Cita Bíblica'}
-                                            {elemento.tipo === 'catecismo' && 'Catecismo CIC'}
-                                            {elemento.tipo === 'reflexion' && 'Reflexión'}
+                                      {disparador.elementosApoyo.map((elemento, eIndex) => {
+                                        // Determinar clase de fondo basada en el tipo
+                                        let backgroundClass = "bg-gray-50";
+                                        if (elemento.tipo === 'testimonio') {
+                                          backgroundClass = "bg-purple-100";
+                                        } else if (elemento.tipo === 'ejemplo') {
+                                          backgroundClass = "bg-green-100";
+                                        }
+                                        
+                                        return (
+                                          <div key={elemento.id || eIndex} className={`${backgroundClass} rounded p-3`}>
+                                            <div 
+                                              className="font-medium text-gray-500 mb-1 uppercase italic"
+                                              style={{ fontSize: `${fontSize * 0.5}em` }}
+                                            >
+                                              {elemento.tipo === 'cita_biblica' && 'Cita Bíblica'}
+                                              {elemento.tipo === 'catecismo' && 'Catecismo CIC'}
+                                              {elemento.tipo === 'reflexion' && 'Reflexión'}
+                                              {elemento.tipo === 'ejemplo' && 'Ejemplo'}
+                                              {elemento.tipo === 'testimonio' && 'Testimonio'}
+                                            </div>
+                                            <p 
+                                              className="text-gray-700 whitespace-pre-line italic"
+                                              style={{ fontSize: `${fontSize * 0.45}em` }}
+                                            >
+                                              {elemento.contenido}
+                                            </p>
                                           </div>
-                                          <p 
-                                            className="text-gray-700 whitespace-pre-line"
-                                            style={{ fontSize: `${fontSize * 0.45}em` }}
-                                          >
-                                            {elemento.contenido}
-                                          </p>
-                                        </div>
-                                      ))}
+                                        );
+                                      })}
                                     </div>
                                   </div>
                                 )}

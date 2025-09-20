@@ -454,6 +454,8 @@ export const ELEMENTO_APOYO_TIPOS = {
   ANALOGIA: "analogia",
   ESTADISTICA: "estadistica",
   HISTORIA: "historia",
+  EJEMPLO: "ejemplo",
+  TESTIMONIO_DISPARADOR: "testimonio",
 };
 
 /**

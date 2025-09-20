@@ -297,6 +297,8 @@ const SermonIdea = ({ idea, onUpdate, onDelete, index }) => {
                             <option value="cita_biblica">Cita Bíblica</option>
                             <option value="catecismo">Catecismo CIC</option>
                             <option value="reflexion">Reflexión</option>
+                            <option value="ejemplo">Ejemplo</option>
+                            <option value="testimonio">Testimonio</option>
                           </select>
                         </div>
                         <textarea
