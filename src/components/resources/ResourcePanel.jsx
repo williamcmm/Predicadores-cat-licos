@@ -385,7 +385,13 @@ export default function ResourcePanel() {
               className="px-4 py-2 bg-blue-500 text-white rounded-r hover:bg-blue-600 transition-colors disabled:bg-blue-300"
               disabled={isLoading || isSuggesting}
             >
-              {isLoading ? "Buscando..." : isSuggesting ? "..." : "Buscar"}
+              {isLoading
+                ? "Buscando..."
+                : isSuggesting
+                ? "..."
+                : searchTerm === ""
+                ? "Sugerir"
+                : "Buscar"}
             </button>
             <button
               onClick={handleClearSearch}

@@ -1,30 +1,95 @@
-import { useState, useEffect } from 'react';
-import SermonIdea from './SermonIdea';
-import ConfirmationModal from '../ui/ConfirmationModal';
-import { useAuth } from '../../context/AuthContext';
-import { getEmptyIdea } from '../../models/sermonModel';
+import { useState, useEffect, useCallback } from "react";
+import { SermonIdea } from "../../ideas/SermonIdea";
+import ConfirmationModal from "@/components/ui/ConfirmationModal";
+import { EditorActionButtons } from "@/components/ui/EditorActionButtons";
+import { ScrollToTopButton } from "@/components/ui/ScrollToTop";
+import { FloatingSaveButton } from "@/components/ui/FloatingSaveButton";
+import { useAuth } from "@/context/AuthContext";
+import { getEmptyIdea } from "@/models/sermonModel";
+import { guardarSermon } from "@/services/database/firestoreService";
 
-const SermonEditor = ({ sermon, setSermon }) => {
+const SermonEditor = ({ 
+  sermon, 
+  setSermon, 
+  modo, 
+  setModo, 
+  onClearSermon
+}) => {
   const { currentUser } = useAuth();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [ideaToDelete, setIdeaToDelete] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [lastSaved, setLastSaved] = useState(null);
 
   // Save to localStorage on every sermon change
   useEffect(() => {
     if (currentUser) {
-      localStorage.setItem('currentSermon', JSON.stringify(sermon));
+      localStorage.setItem("currentSermon", JSON.stringify(sermon));
     }
   }, [sermon, currentUser]);
 
+  // Función de guardado interna
+  const handleSave = useCallback(async () => {
+    if (!currentUser || !sermon.title) {
+      return { success: false, error: "No hay usuario o título" };
+    }
+    setIsSaving(true);
+    try {
+      const sermonToSave = {
+        ...sermon,
+        userId: currentUser.uid,
+        // Solo asignar createdAt si es un sermón nuevo (sin ID)
+        createdAt: sermon.id ? sermon.createdAt : new Date(),
+        // Si es una copia de un sermón público, asignar fecha de modificación
+        modifiedAt: sermon.basadoEnSermonPublico
+          ? new Date()
+          : sermon.modifiedAt || new Date(),
+      };
+
+      const docId = await guardarSermon(sermonToSave);
+      setLastSaved(new Date());
+
+      // IMPORTANTE: Actualizar el estado del sermón con el nuevo ID
+      if (!sermon.id || sermon.basadoEnSermonPublico) {
+        setSermon((prevSermon) => {
+          // Crear una copia limpia sin campos undefined
+          const {
+            basadoEnSermonPublico,
+            autorOriginalNombre,
+            ...sermonLimpio
+          } = prevSermon;
+          return {
+            ...sermonLimpio,
+            id: docId,
+            userId: currentUser.uid,
+          };
+        });
+      }
+
+      return { success: true, docId };
+    } catch (error) {
+      console.error("❌ Error saving sermon:", error);
+      return { success: false, error: error.message };
+    } finally {
+      setIsSaving(false);
+    }
+  }, [sermon, currentUser, setSermon]);
+
   const handleInputChange = (e) => {
     const { id, value } = e.target;
-    if (id === 'sermonTitle') {
+    if (id === "sermonTitle") {
       setSermon({ ...sermon, title: value });
-    } else if (id === 'presentation') {
-      setSermon({ ...sermon, introduction: { ...sermon.introduction, presentation: value } });
-    } else if (id === 'motivation') {
-      setSermon({ ...sermon, introduction: { ...sermon.introduction, motivation: value } });
-    } else if (id === 'imperatives') {
+    } else if (id === "presentation") {
+      setSermon({
+        ...sermon,
+        introduction: { ...sermon.introduction, presentation: value },
+      });
+    } else if (id === "motivation") {
+      setSermon({
+        ...sermon,
+        introduction: { ...sermon.introduction, motivation: value },
+      });
+    } else if (id === "imperatives") {
       setSermon({ ...sermon, imperatives: value });
     }
   };
@@ -48,8 +113,8 @@ const SermonEditor = ({ sermon, setSermon }) => {
 
   const deleteIdea = (id) => {
     setSermon({
-        ...sermon,
-        ideas: sermon.ideas.filter((idea) => idea.id !== id),
+      ...sermon,
+      ideas: sermon.ideas.filter((idea) => idea.id !== id),
     });
   };
 
@@ -74,13 +139,29 @@ const SermonEditor = ({ sermon, setSermon }) => {
         onConfirm={handleConfirmDelete}
         title="Confirmar Eliminación"
       >
-        <p>¿Está seguro que desea eliminar esta idea? Esta acción no se puede deshacer.</p>
+        <p>
+          ¿Está seguro que desea eliminar esta idea? Esta acción no se puede
+          deshacer.
+        </p>
       </ConfirmationModal>
 
       <div className="p-6 bg-gray-50 rounded-lg overflow-auto">
+        {/* ACCIONES DEL EDITOR */}
+        <EditorActionButtons
+          modo={modo}
+          setModo={setModo}
+          onClearSermon={onClearSermon}
+          onSave={handleSave}
+          isSaving={isSaving}
+          lastSaved={lastSaved}
+        />
+
         {/* TÍTULO DEL SERMÓN */}
         <div className="mb-8">
-          <label htmlFor="sermonTitle" className="block text-gray-800 text-base font-bold mb-2 uppercase">
+          <label
+            htmlFor="sermonTitle"
+            className="block text-gray-800 text-base font-bold my-4 uppercase"
+          >
             TÍTULO DEL SERMÓN
           </label>
           <input
@@ -101,7 +182,10 @@ const SermonEditor = ({ sermon, setSermon }) => {
           <div className="space-y-6">
             {/* B.1 Presentación del Tema */}
             <div>
-              <label htmlFor="presentation" className="block text-gray-600 text-sm font-semibold mb-2">
+              <label
+                htmlFor="presentation"
+                className="block text-gray-600 text-sm font-semibold mb-2"
+              >
                 Presentación del Tema
               </label>
               <textarea
@@ -116,7 +200,10 @@ const SermonEditor = ({ sermon, setSermon }) => {
 
             {/* B.2 Motivación Inicial */}
             <div>
-              <label htmlFor="motivation" className="block text-gray-600 text-sm font-semibold mb-2">
+              <label
+                htmlFor="motivation"
+                className="block text-gray-600 text-sm font-semibold mb-2"
+              >
                 Motivación Inicial
               </label>
               <textarea
@@ -137,15 +224,15 @@ const SermonEditor = ({ sermon, setSermon }) => {
             IDEAS PRINCIPALES
           </label>
           <div className="space-y-8">
-              {sermon.ideas.map((idea, index) => (
-                <SermonIdea
-                  key={idea.id}
-                  idea={idea}
-                  index={index}
-                  onUpdate={updateIdea}
-                  onDelete={handleDeleteRequest}
-                />
-              ))}
+            {sermon.ideas.map((idea, index) => (
+              <SermonIdea
+                key={idea.id}
+                idea={idea}
+                index={index}
+                onUpdate={updateIdea}
+                onDelete={handleDeleteRequest}
+              />
+            ))}
           </div>
           <button
             onClick={addIdea}
@@ -157,7 +244,10 @@ const SermonEditor = ({ sermon, setSermon }) => {
 
         {/* IMPERATIVOS */}
         <div className="p-6 bg-white rounded-xl shadow-md">
-          <label htmlFor="imperatives" className="block text-gray-800 text-base font-bold mb-4 uppercase">
+          <label
+            htmlFor="imperatives"
+            className="block text-gray-800 text-base font-bold mb-4 uppercase"
+          >
             IMPERATIVOS
           </label>
           <textarea
@@ -170,6 +260,14 @@ const SermonEditor = ({ sermon, setSermon }) => {
           ></textarea>
         </div>
       </div>
+
+      {/* Botones flotantes */}
+      <ScrollToTopButton />
+      <FloatingSaveButton
+        onSave={handleSave}
+        isSaving={isSaving}
+        lastSaved={lastSaved}
+      />
     </>
   );
 };

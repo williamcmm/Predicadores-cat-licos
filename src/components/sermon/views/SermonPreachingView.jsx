@@ -4,7 +4,8 @@ import { FaBook, FaQuestionCircle } from "react-icons/fa";
 import { IoSettings, IoClose } from "react-icons/io5";
 import { MdFlashOn, MdWork, MdGpsFixed } from "react-icons/md";
 import { GoDotFill } from "react-icons/go";
-import SermonExportButton from "./SermonExportButton";
+import SermonExportButton from "../SermonExportButton";
+import { usePreventTouchGestures, touchPreventionStyles } from "../../../utils/touchGestures";
 
 const SermonPreachingView = ({ sermon, onClose, user }) => {
   const [fontSize, setFontSize] = useState(1.8);
@@ -47,6 +48,9 @@ const SermonPreachingView = ({ sermon, onClose, user }) => {
     };
   }, [onClose]);
 
+  // Prevenir gestos táctiles que puedan salir del fullscreen
+  usePreventTouchGestures(viewRef, true);
+
   useEffect(() => {
     localStorage.setItem("preachingViewFontSize", fontSize);
     localStorage.setItem("preachingViewContentWidth", contentWidth);
@@ -83,6 +87,7 @@ const SermonPreachingView = ({ sermon, onClose, user }) => {
       className={`fixed inset-0 bg-white z-50 flex flex-col ${
         !user ? "no-copy" : ""
       }`}
+      style={touchPreventionStyles}
     >
       <button
         onClick={handleClose}
@@ -92,7 +97,7 @@ const SermonPreachingView = ({ sermon, onClose, user }) => {
         <IoClose />
       </button>
 
-      <div className="overflow-y-auto flex-grow pt-16 pb-28">
+      <div className="overflow-y-auto flex-grow pt-16 pb-28" style={touchPreventionStyles}>
         <div
           className="sermon-preaching-view mx-auto font-sans text-gray-900 transition-all duration-300"
           style={{ maxWidth: `${contentWidth}%`, fontSize: `${fontSize}em` }}

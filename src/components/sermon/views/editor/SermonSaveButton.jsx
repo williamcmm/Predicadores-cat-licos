@@ -81,7 +81,7 @@ const SermonSaveButton = ({
   };
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center relative">
       <button
         onClick={handleSave}
         className={`custom-btn w-full ${className} ${getButtonStyle()}`}
@@ -90,8 +90,9 @@ const SermonSaveButton = ({
       >
         {getButtonContent()}
       </button>
+
       {lastSaved && !compact && (
-        <div className="text-gray-500 text-xs hidden sm:inline">
+        <div className="text-gray-500 text-xs hidden sm:block">
           Último guardado: {new Date(lastSaved).toLocaleTimeString()}
         </div>
       )}

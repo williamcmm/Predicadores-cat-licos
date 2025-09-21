@@ -78,7 +78,7 @@ export const EditorActionButtons = ({
   return (
     <div
       ref={sidebarRef}
-      className="flex justify-between items-center p-3 border-b border-gray-200 gap-4"
+      className="flex justify-between items-center p-3 border-b bg-white rounded-md shadow  gap-4"
     >
       {displayMode === "collapsed" ? (
         <Popover className="relative">

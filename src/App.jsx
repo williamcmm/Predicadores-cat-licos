@@ -1,11 +1,10 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import Header from "./components/ui/Header";
 import PanelResizer from "./components/ui/PanelResizer";
-import { EditorActionButtons } from "./components/ui/EditorActionButtons";
-import SermonEditor from "./components/sermon/SermonEditor";
+import SermonEditor from "@/components/sermon/views/editor/SermonEditor";
 import ResourcePanel from "./components/resources/ResourcePanel";
-import SermonStudyView from "./components/sermon/SermonStudyView";
-import SermonPreachingView from "./components/sermon/SermonPreachingView";
+import SermonStudyView from "./components/sermon/views/SermonStudyView";
+import SermonPreachingView from "./components/sermon/views/SermonPreachingView";
 import Biblioteca from "./components/biblioteca/Biblioteca";
 import AdminPanel from "./components/admin/AdminPanel";
 import {BottomNavBar} from "./components/ui/BottomNavBar";
@@ -18,10 +17,7 @@ import {
   validateSermonStructure,
   normalizeSermon,
 } from "./models/sermonModel";
-import { guardarSermon } from "./services/database/firestoreService";
 import { esAdministrador } from "./services/admin/userService";
-import { ScrollToTopButton } from "./components/ui/ScrollToTop";
-import { FloatingSaveButton } from "./components/ui/FloatingSaveButton";
 import { useScrollViewStore } from "./store/scroll-view-store";
 
 function App() {
@@ -38,8 +34,6 @@ function App() {
   const [modo, setModo] = useState("edicion");
   const [showBiblioteca, setShowBiblioteca] = useState(false);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [lastSaved, setLastSaved] = useState(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [showMobileResources, setShowMobileResources] = useState(false);
 
@@ -88,52 +82,6 @@ function App() {
       setScrollElement(editorContainerRef.current);
     }
   }, [modo, setScrollElement]);
-
-  const handleSave = useCallback(async () => {
-    if (!currentUser || !sermon.title) {
-      return { success: false, error: "No hay usuario o título" };
-    }
-    setIsSaving(true);
-    try {
-      const sermonToSave = {
-        ...sermon,
-        userId: currentUser.uid,
-        // Solo asignar createdAt si es un sermón nuevo (sin ID)
-        createdAt: sermon.id ? sermon.createdAt : new Date(),
-        // Si es una copia de un sermón público, asignar fecha de modificación
-        modifiedAt: sermon.basadoEnSermonPublico
-          ? new Date()
-          : sermon.modifiedAt || new Date(),
-      };
-
-      const docId = await guardarSermon(sermonToSave);
-      setLastSaved(new Date());
-
-      // IMPORTANTE: Actualizar el estado del sermón con el nuevo ID
-      if (!sermon.id || sermon.basadoEnSermonPublico) {
-        setSermon((prevSermon) => {
-          // Crear una copia limpia sin campos undefined
-          const {
-            basadoEnSermonPublico,
-            autorOriginalNombre,
-            ...sermonLimpio
-          } = prevSermon;
-          return {
-            ...sermonLimpio,
-            id: docId,
-            userId: currentUser.uid,
-          };
-        });
-      }
-
-      return { success: true, docId };
-    } catch (error) {
-      console.error("❌ Error saving sermon:", error);
-      return { success: false, error: error.message };
-    } finally {
-      setIsSaving(false);
-    }
-  }, [sermon, currentUser, setSermon]);
 
   // Carga inicial inteligente del sermón - PREVENIR DUPLICACIÓN
   useEffect(() => {
@@ -273,25 +221,15 @@ function App() {
           className="w-full md:flex-1 bg-white p-4 md:p-6 overflow-y-auto flex flex-col relative pb-16 md:pb-4"
           style={{ width: window.innerWidth >= 768 ? `${leftPanelWidth}%` : '100%' }}
         >
-          <EditorActionButtons
-            modo={modo}
-            setModo={setModo}
-            onClearSermon={handleClearSermon}
-            onSave={handleSave}
-            isSaving={isSaving}
-            lastSaved={lastSaved}
-          />
           <div className="flex-1 mt-4 relative">
             {modo === "edicion" && (
-              <>
-                <SermonEditor sermon={sermon} setSermon={setSermon} />
-                <ScrollToTopButton />
-                <FloatingSaveButton
-                  onSave={handleSave}
-                  isSaving={isSaving}
-                  lastSaved={lastSaved}
-                />
-              </>
+              <SermonEditor 
+                sermon={sermon} 
+                setSermon={setSermon}
+                modo={modo}
+                setModo={setModo}
+                onClearSermon={handleClearSermon}
+              />
             )}
           </div>
         </div>

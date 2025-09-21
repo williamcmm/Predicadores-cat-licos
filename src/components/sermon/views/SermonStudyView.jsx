@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import SermonExportButton from './SermonExportButton';
+import SermonExportButton from '../SermonExportButton';
 import { IoSettings, IoClose } from "react-icons/io5";
 import { MdFlashOn, MdWork, MdGpsFixed } from "react-icons/md";
 import { FaBook } from 'react-icons/fa';

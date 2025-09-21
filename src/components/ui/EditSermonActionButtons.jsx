@@ -1,4 +1,4 @@
-import SermonSaveButton from "../sermon/SermonSaveButton";
+import SermonSaveButton from "../sermon/views/editor/SermonSaveButton";
 import { useAccessControl } from "../../hooks/useAccessControl";
 
 export const ActionButtons = ({ 

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { FaSave, FaSpinner, FaCheck, FaTimes } from "react-icons/fa";
 import { useScrollViewStore } from "../../store/scroll-view-store";
 
-export const FloatingSaveButton = ({ onSave, isSaving, lastSaved }) => {
+export const FloatingSaveButton = ({ onSave, isSaving }) => {
   const [saveStatus, setSaveStatus] = useState(null);
 
   // Hook del scroll store para detectar cuando mostrar el botón flotante
