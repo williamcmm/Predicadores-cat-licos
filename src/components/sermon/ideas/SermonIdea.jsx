@@ -49,7 +49,7 @@ export const SermonIdea = ({ idea, onUpdate, onDelete, index }) => {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-4 sm:p-8 border-l-4 border-blue-600 mb-8 overflow-auto">
+    <div id={`idea-${idea.id}`} className="bg-white rounded-xl shadow-lg p-4 sm:p-8 border-l-4 border-blue-600 mb-8 overflow-auto">
       {/* Header con título de la idea */}
       <div className="flex flex-col flex-wrap sm:flex-row gap-2 justify-between sm:items-center mb-6 pb-4 border-b-2 border-gray-200">
         <div className="flex-1 mb-4 sm:mb-0">
@@ -57,6 +57,7 @@ export const SermonIdea = ({ idea, onUpdate, onDelete, index }) => {
             IDEA PRINCIPAL #{index + 1}
           </label>
           <input
+            id={`idea-${idea.id}-title`}
             type="text"
             value={h1}
             onChange={(e) => {

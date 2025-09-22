@@ -6,12 +6,17 @@ import { MdFlashOn, MdWork, MdGpsFixed } from "react-icons/md";
 import { GoDotFill } from "react-icons/go";
 import SermonExportButton from "../SermonExportButton";
 import { usePreventTouchGestures, touchPreventionStyles } from "../../../utils/touchGestures";
+import { SermonNavigateIndex } from "../ui/SermonNavigateIndex";
+import { useViewModeStore } from "@/store/view-mode-store";
 
-const SermonPreachingView = ({ sermon, onClose, user }) => {
+const SermonPreachingView = ({ sermon, user }) => {
   const [fontSize, setFontSize] = useState(1.8);
   const [contentWidth, setContentWidth] = useState(80);
   const [showSettings, setShowSettings] = useState(false);
   const viewRef = useRef(null);
+
+  // store
+  const { setMode } = useViewModeStore();
 
   useEffect(() => {
     const savedFontSize = localStorage.getItem("preachingViewFontSize");
@@ -34,7 +39,7 @@ const SermonPreachingView = ({ sermon, onClose, user }) => {
 
     const handleFullscreenChange = () => {
       if (document.fullscreenElement === null) {
-        onClose();
+        setMode("edicion");
       }
     };
 
@@ -46,7 +51,7 @@ const SermonPreachingView = ({ sermon, onClose, user }) => {
         document.exitFullscreen();
       }
     };
-  }, [onClose]);
+  }, [setMode]);
 
   // Prevenir gestos táctiles que puedan salir del fullscreen
   usePreventTouchGestures(viewRef, true);
@@ -60,7 +65,7 @@ const SermonPreachingView = ({ sermon, onClose, user }) => {
     if (document.fullscreenElement) {
       document.exitFullscreen();
     } else {
-      onClose();
+      setMode("edicion");
     }
   };
 

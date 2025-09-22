@@ -3,12 +3,16 @@ import SermonExportButton from '../SermonExportButton';
 import { IoSettings, IoClose } from "react-icons/io5";
 import { MdFlashOn, MdWork, MdGpsFixed } from "react-icons/md";
 import { FaBook } from 'react-icons/fa';
+import { useViewModeStore } from '@/store/view-mode-store';
 
-const SermonStudyView = ({ sermon, onClose, user }) => {
+const SermonStudyView = ({ sermon, user }) => {
   const [fontSize, setFontSize] = useState(2.0);
   const [contentWidth, setContentWidth] = useState(80);
   const [showSettings, setShowSettings] = useState(false);
   const viewRef = useRef(null);
+
+  // store
+  const { setMode } = useViewModeStore();
 
   useEffect(() => {
     const savedFontSize = localStorage.getItem('studyViewFontSize');
@@ -33,7 +37,7 @@ const SermonStudyView = ({ sermon, onClose, user }) => {
 
     const handleFullscreenChange = () => {
       if (document.fullscreenElement === null) {
-        onClose();
+        setMode("edicion");
       }
     };
 
@@ -45,7 +49,7 @@ const SermonStudyView = ({ sermon, onClose, user }) => {
         document.exitFullscreen();
       }
     };
-  }, [onClose]);
+  }, [setMode]);
 
   useEffect(() => {
     localStorage.setItem('studyViewFontSize', fontSize);
@@ -56,7 +60,7 @@ const SermonStudyView = ({ sermon, onClose, user }) => {
     if (document.fullscreenElement) {
       document.exitFullscreen();
     } else {
-      onClose();
+      setMode("edicion");
     }
   };
 

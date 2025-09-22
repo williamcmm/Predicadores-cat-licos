@@ -2,10 +2,9 @@ import { useState, useEffect, useRef, Fragment } from "react";
 import { Popover, Transition } from "@headlessui/react";
 import { FaBars } from "react-icons/fa";
 import { ActionButtons } from "./EditSermonActionButtons";
+import { ModeButtons } from "./ModeButtons";
 
-export const EditorActionButtons = ({
-  modo,
-  setModo,
+export const EditorActionBar = ({
   onClearSermon,
   onSave,
   isSaving,
@@ -14,11 +13,7 @@ export const EditorActionButtons = ({
   const [displayMode, setDisplayMode] = useState("wide"); // wide, narrow, collapsed
   const sidebarRef = useRef(null);
 
-  const modes = [
-    { id: "edicion", name: "Modo Edición", shortName: "Edición" },
-    { id: "estudio", name: "Modo Estudio", shortName: "Estudio" },
-    { id: "predicacion", name: "Modo Predicación", shortName: "Predicación" },
-  ];
+  
 
   useEffect(() => {
     const element = sidebarRef.current;
@@ -46,35 +41,6 @@ export const EditorActionButtons = ({
     };
   }, []);
 
-  // Componente para botones de modo
-  const ModeButtons = ({ isPopover = false }) => {
-    const containerClass = isPopover 
-      ? "flex flex-col items-center gap-2 w-full" 
-      : "items-center border border-gray-200 rounded-lg p-1 flex";
-    
-    const buttonClass = isPopover
-      ? "w-full px-3 py-2 rounded-md text-sm font-semibold transition-all duration-200 text-center"
-      : "px-3 py-2 rounded-md text-sm font-semibold transition-all duration-200 text-left";
-
-    return (
-      <div className={containerClass}>
-        {modes.map((m) => (
-          <button
-            key={m.id}
-            className={`${buttonClass} ${
-              modo === m.id
-                ? "bg-blue-600 text-white shadow-md"
-                : "bg-transparent text-gray-600 hover:bg-blue-50 hover:text-blue-700"
-            }`}
-            onClick={() => setModo(m.id)}
-          >
-            {isPopover || displayMode === "wide" ? m.name : m.shortName}
-          </button>
-        ))}
-      </div>
-    );
-  };
-
   return (
     <div
       ref={sidebarRef}
@@ -96,8 +62,8 @@ export const EditorActionButtons = ({
           >
             <Popover.Panel className="absolute z-10 mt-2 w-52 bg-white shadow-lg rounded-lg ring-1 ring-black ring-opacity-5">
               <div className="p-2 flex flex-col items-center gap-2">
-                <ModeButtons isPopover />
-                <ActionButtons 
+                <ModeButtons isPopover displayMode={displayMode} />
+                <ActionButtons
                   displayMode={displayMode}
                   onClearSermon={onClearSermon}
                   onSave={onSave}
@@ -111,8 +77,8 @@ export const EditorActionButtons = ({
         </Popover>
       ) : (
         <div className="flex flex-nowrap justify-between items-center gap-4 w-full overflow-hidden">
-          <ModeButtons />
-          <ActionButtons 
+          <ModeButtons displayMode={displayMode} />
+          <ActionButtons
             displayMode={displayMode}
             onClearSermon={onClearSermon}
             onSave={onSave}

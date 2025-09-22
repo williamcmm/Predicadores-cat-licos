@@ -7,8 +7,8 @@ import SermonStudyView from "./components/sermon/views/SermonStudyView";
 import SermonPreachingView from "./components/sermon/views/SermonPreachingView";
 import Biblioteca from "./components/biblioteca/Biblioteca";
 import AdminPanel from "./components/admin/AdminPanel";
-import {BottomNavBar} from "./components/ui/BottomNavBar";
-import {MobileResourcesModal} from "./components/ui/MobileResourcesModal";
+import { BottomNavBar } from "./components/ui/BottomNavBar";
+import { MobileResourcesModal } from "./components/ui/MobileResourcesModal";
 import { useAuth } from "./context/AuthContext";
 import storageService from "./services/storage/storageService";
 import {
@@ -18,20 +18,16 @@ import {
   normalizeSermon,
 } from "./models/sermonModel";
 import { esAdministrador } from "./services/admin/userService";
+import { useViewModeStore } from "./store/view-mode-store";
 import { useScrollViewStore } from "./store/scroll-view-store";
 
 function App() {
   const { currentUser } = useAuth();
-  const initScrollTracking = useScrollViewStore((state) => state.init);
-  const setScrollElement = useScrollViewStore(
-    (state) => state.setScrollElement
-  );
   const editorContainerRef = useRef(null);
   const [leftPanelWidth, setLeftPanelWidth] = useState(() => {
     const storedWidth = localStorage.getItem("leftPanelWidth");
     return storedWidth ? parseFloat(storedWidth) : 60;
   });
-  const [modo, setModo] = useState("edicion");
   const [showBiblioteca, setShowBiblioteca] = useState(false);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -60,14 +56,21 @@ function App() {
     return getEmptySermon();
   });
 
+  // STORE
+  const { mode, setMode } = useViewModeStore();
+  const initScrollTracking = useScrollViewStore((state) => state.init);
+  const setScrollElement = useScrollViewStore(
+    (state) => state.setScrollElement
+  );
+
   // Manejo dinámico del responsive
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
     };
-    
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   // Inicializar tracking del scroll
@@ -78,10 +81,10 @@ function App() {
 
   // Configurar el elemento de scroll cuando cambia el modo
   useEffect(() => {
-    if (modo === "edicion" && editorContainerRef.current) {
+    if (mode === "edicion" && editorContainerRef.current) {
       setScrollElement(editorContainerRef.current);
     }
-  }, [modo, setScrollElement]);
+  }, [mode, setScrollElement]);
 
   // Carga inicial inteligente del sermón - PREVENIR DUPLICACIÓN
   useEffect(() => {
@@ -135,7 +138,7 @@ function App() {
       }
 
       setSermon(finalSermon);
-      setModo("edicion");
+      setMode("edicion");
     };
 
     const handleStartManualSermon = (event) => {
@@ -145,7 +148,7 @@ function App() {
         title: topic || "",
       };
       setSermon(newSermon);
-      setModo("edicion");
+      setMode("edicion");
     };
 
     window.addEventListener("insertSermonIntoEditor", handleSermonUpdate);
@@ -165,7 +168,7 @@ function App() {
 
   const handleClearSermon = () => {
     setSermon(getEmptySermon());
-    setModo("edicion");
+    setMode("edicion");
   };
 
   const handleResize = (newWidth) => {
@@ -202,7 +205,7 @@ function App() {
       // Sermón propio, abrir normalmente
       setSermon(sermonToOpen);
     }
-    setModo("edicion");
+    setMode("edicion");
     setShowBiblioteca(false);
   };
 
@@ -219,15 +222,15 @@ function App() {
         <div
           ref={editorContainerRef}
           className="w-full md:flex-1 bg-white p-4 md:p-6 overflow-y-auto flex flex-col relative pb-16 md:pb-4"
-          style={{ width: window.innerWidth >= 768 ? `${leftPanelWidth}%` : '100%' }}
+          style={{
+            width: window.innerWidth >= 768 ? `${leftPanelWidth}%` : "100%",
+          }}
         >
           <div className="flex-1 mt-4 relative">
-            {modo === "edicion" && (
-              <SermonEditor 
-                sermon={sermon} 
+            {mode === "edicion" && (
+              <SermonEditor
+                sermon={sermon}
                 setSermon={setSermon}
-                modo={modo}
-                setModo={setModo}
                 onClearSermon={handleClearSermon}
               />
             )}
@@ -253,25 +256,24 @@ function App() {
       </div>
 
       {/* Bottom Navigation - Only visible on mobile */}
-      <BottomNavBar 
-        className="md:hidden" 
+      <BottomNavBar
+        className="md:hidden"
         onResourcesToggle={() => setShowMobileResources(!showMobileResources)}
         isResourcesActive={showMobileResources}
       />
 
       {/* Mobile Resources Modal */}
-      <MobileResourcesModal 
+      <MobileResourcesModal
         isOpen={showMobileResources}
         onClose={() => setShowMobileResources(false)}
       />
 
-      {modo === "estudio" && (
-        <SermonStudyView sermon={sermon} onClose={() => setModo("edicion")} />
+      {mode === "estudio" && (
+        <SermonStudyView sermon={sermon} />
       )}
-      {modo === "predicacion" && (
+      {mode === "predicacion" && (
         <SermonPreachingView
           sermon={sermon}
-          onClose={() => setModo("edicion")}
         />
       )}
       {showBiblioteca && (

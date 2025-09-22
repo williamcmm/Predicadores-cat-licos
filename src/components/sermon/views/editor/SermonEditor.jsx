@@ -1,12 +1,13 @@
 import { useState, useEffect, useCallback } from "react";
 import { SermonIdea } from "../../ideas/SermonIdea";
-import ConfirmationModal from "@/components/ui/ConfirmationModal";
-import { EditorActionButtons } from "@/components/ui/EditorActionButtons";
+import ConfirmationModal from "@/components/sermon/views/editor/ConfirmationModal";
+import { EditorActionBar } from "@/components/sermon/views/editor/EditorActionBar";
 import { ScrollToTopButton } from "@/components/ui/ScrollToTop";
 import { FloatingSaveButton } from "@/components/ui/FloatingSaveButton";
 import { useAuth } from "@/context/AuthContext";
 import { getEmptyIdea } from "@/models/sermonModel";
 import { guardarSermon } from "@/services/database/firestoreService";
+import { SermonNavigateIndex } from "../../ui/SermonNavigateIndex";
 
 const SermonEditor = ({ 
   sermon, 
@@ -147,14 +148,15 @@ const SermonEditor = ({
 
       <div className="p-6 bg-gray-50 rounded-lg overflow-auto">
         {/* ACCIONES DEL EDITOR */}
-        <EditorActionButtons
-          modo={modo}
-          setModo={setModo}
+        <EditorActionBar
           onClearSermon={onClearSermon}
           onSave={handleSave}
           isSaving={isSaving}
           lastSaved={lastSaved}
         />
+
+        {/* INDICE DE IDEAS: enlaces tipo 'etiqueta' que hacen scroll a cada idea */}
+        <SermonNavigateIndex sermon={sermon} />
 
         {/* TÍTULO DEL SERMÓN */}
         <div className="mb-8">
