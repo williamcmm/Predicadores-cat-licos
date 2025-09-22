@@ -9,10 +9,10 @@ import {
 const PERSONAL_RESOURCE_CATEGORY = "RECURSOS PERSONALES";
 
 const INITIAL_CATEGORIES = [
+  "CITAS BÍBLICAS RELEVANTES",
   "DOCTRINA CATÓLICA",
   "CATECISMO",
   "SANTORAL CATÓLICO",
-  "CITAS BÍBLICAS RELEVANTES",
   "REFLEXIONES SOBRE EL TEMA",
   "EJEMPLOS PRÁCTICOS",
   "TESTIMONIOS Y EXPERIENCIAS",
@@ -20,7 +20,17 @@ const INITIAL_CATEGORIES = [
   "REFERENCIAS DOCTRINALES",
   "DOCUMENTOS OFICIALES DE LA IGLESIA",
   PERSONAL_RESOURCE_CATEGORY,
-].map((name) => ({ name, active: false }));
+].map((name) => {
+  const category = {
+    name,
+    active: false,
+  };
+
+  // Categorias activas por defecto
+  if (name === "CITAS BÍBLICAS RELEVANTES") category.active = true;
+
+  return category;
+});
 
 const initializeCategories = () => {
   try {
@@ -382,7 +392,7 @@ export default function ResourcePanel() {
             />
             <button
               onClick={() => handleSearch(searchTerm)}
-              className="px-4 py-2 bg-blue-500 text-white rounded-r hover:bg-blue-600 transition-colors disabled:bg-blue-300"
+              className="custom-btn bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 !rounded-l-none"
               disabled={isLoading || isSuggesting}
             >
               {isLoading
@@ -395,13 +405,21 @@ export default function ResourcePanel() {
             </button>
             <button
               onClick={handleClearSearch}
-              className="ml-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+              className="custom-btn bg-red-500 hover:bg-red-600 ml-2"
               title="Limpiar tema y resultados"
             >
               Limpiar
             </button>
           </div>
-          <div className="text-sm text-gray-600 mt-2">
+          <div className="text-sm text-gray-600 mt-2 flex flex-col gap-2">
+            {isLoading && (
+              <button
+                onClick={handleStopSearch}
+                className="custom-btn bg-red-500 hover:bg-red-600 self-start"
+              >
+                Detener Búsqueda
+              </button>
+            )}
             <p>Forma 1: Escribe un tema y haz clic en Buscar.</p>
             <p>
               Forma 2: Haz clic en Buscar (sin escribir nada) para obtener
@@ -409,14 +427,6 @@ export default function ResourcePanel() {
             </p>
           </div>
         </div>
-        {isLoading && (
-          <button
-            onClick={handleStopSearch}
-            className="mt-2 sm:mt-0 sm:ml-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
-          >
-            Detener Búsqueda
-          </button>
-        )}
       </div>
 
       <div className="flex-1 bg-white p-4 rounded-md overflow-y-auto relative">
@@ -449,7 +459,7 @@ export default function ResourcePanel() {
             </div>
             <div className="mt-3 flex flex-col sm:flex-row gap-3">
               <button
-                className="px-4 py-2 bg-green-500 text-white rounded"
+                className="custom-btn bg-green-500 hover:bg-green-600"
                 onClick={handleGenerateSermon}
                 disabled={generating}
               >
@@ -458,7 +468,7 @@ export default function ResourcePanel() {
                   : "Pedir a la IA que te sugiera un sermón"}
               </button>
               <button
-                className="px-4 py-2 border border-green-500 text-green-700 rounded"
+                className="custom-btn border border-green-500 !text-green-700 hover:bg-green-100"
                 onClick={() =>
                   window.dispatchEvent(
                     new CustomEvent("startManualSermonFromResources", {
