@@ -184,16 +184,38 @@ export function validateIdeaStructure(idea) {
  * @returns {Boolean} true si es válido
  */
 export function validateDisparadorStructure(disparador) {
-  if (!disparador || typeof disparador !== 'object') return false;
-  
-  return (
-    typeof disparador.id === 'string' &&
-    typeof disparador.disparador === 'string' &&
-    typeof disparador.parrafo === 'string' &&
-    Array.isArray(disparador.elementosApoyo) &&
-    disparador.elementosApoyo.length <= 3 && // Máximo 3 elementos
-    disparador.elementosApoyo.every(validateElementoApoyoStructure)
-  );
+  const errors = [];
+
+  if (!disparador || typeof disparador !== 'object') {
+    errors.push('El disparador debe ser un objeto válido');
+    return errors;
+  }
+
+  if (typeof disparador.id !== 'string') {
+    errors.push('El campo "id" del disparador debe ser una cadena de texto');
+  }
+  if (typeof disparador.disparador !== 'string') {
+    errors.push('El campo "disparador" debe ser una cadena de texto');
+  }
+  if (typeof disparador.parrafo !== 'string') {
+    errors.push('El campo "parrafo" debe ser una cadena de texto');
+  }
+
+  if (!Array.isArray(disparador.elementosApoyo)) {
+    errors.push('El campo "elementosApoyo" debe ser un array');
+  } else {
+    if (disparador.elementosApoyo.length > 3) {
+      errors.push('El disparador no puede tener más de 3 elementos de apoyo');
+    }
+    disparador.elementosApoyo.forEach((elemento, idx) => {
+      const elemErrors = validateElementoApoyoStructure(elemento);
+      if (Array.isArray(elemErrors) && elemErrors.length > 0) {
+        elemErrors.forEach((ee) => errors.push(`Elemento ${idx + 1}: ${ee}`));
+      }
+    });
+  }
+
+  return errors;
 }
 
 /**
@@ -202,13 +224,24 @@ export function validateDisparadorStructure(disparador) {
  * @returns {Boolean} true si es válido
  */
 export function validateElementoApoyoStructure(elemento) {
-  if (!elemento || typeof elemento !== 'object') return false;
-  
-  return (
-    typeof elemento.id === 'string' &&
-    typeof elemento.tipo === 'string' &&
-    typeof elemento.contenido === 'string'
-  );
+  const errors = [];
+
+  if (!elemento || typeof elemento !== 'object') {
+    errors.push('El elemento de apoyo debe ser un objeto válido');
+    return errors;
+  }
+
+  if (typeof elemento.id !== 'string') {
+    errors.push('El campo "id" del elemento debe ser una cadena de texto');
+  }
+  if (typeof elemento.tipo !== 'string') {
+    errors.push('El campo "tipo" del elemento debe ser una cadena de texto');
+  }
+  if (typeof elemento.contenido !== 'string') {
+    errors.push('El campo "contenido" del elemento debe ser una cadena de texto');
+  }
+
+  return errors;
 }
 
 /**
@@ -279,10 +312,13 @@ export function mergeSermonData(newData, baseSermon = null) {
         ...baseIdea,
         ...idea,
         id: idea.id || `idea_${Date.now() + index}`,
-        // Combinar elementoApoyo de forma segura
+        // Combinar elementoApoyo de forma segura y normalizar campos a strings
         elementoApoyo: {
           ...baseIdea.elementoApoyo,
           ...(idea.elementoApoyo || {}),
+          id: (idea.elementoApoyo && String(idea.elementoApoyo.id || baseIdea.elementoApoyo.id)) || baseIdea.elementoApoyo.id,
+          tipo: (idea.elementoApoyo && String(idea.elementoApoyo.tipo || baseIdea.elementoApoyo.tipo)) || baseIdea.elementoApoyo.tipo,
+          contenido: (idea.elementoApoyo && String(idea.elementoApoyo.contenido || "")) || "",
         },
         // Procesar disparadores para asegurar estructura completa
         disparadores: (idea.disparadores || []).map((disparador, dIndex) => {
@@ -291,13 +327,18 @@ export function mergeSermonData(newData, baseSermon = null) {
             ...baseDisparador,
             ...disparador,
             id: disparador.id || `disparador_${Date.now() + index + dIndex}`,
-            // Procesar elementos de apoyo del disparador
+            // Procesar elementos de apoyo del disparador y normalizar strings
             elementosApoyo: (disparador.elementosApoyo || []).map((elemento, eIndex) => {
               const baseElemento = getEmptyElementoApoyo();
-              return {
+              const merged = {
                 ...baseElemento,
-                ...elemento,
-                id: elemento.id || `elemento_apoyo_${Date.now() + index + dIndex + eIndex}`,
+                ...(elemento || {}),
+              };
+              return {
+                ...merged,
+                id: String(merged.id || `elemento_apoyo_${Date.now() + index + dIndex + eIndex}`),
+                tipo: String(merged.tipo || baseElemento.tipo),
+                contenido: String(merged.contenido || ""),
               };
             }),
           };
