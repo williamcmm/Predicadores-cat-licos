@@ -1,18 +1,19 @@
 import { useState, useEffect, useRef, Fragment } from "react";
 import { Popover, Transition } from "@headlessui/react";
 import { FaBook, FaQuestionCircle } from "react-icons/fa";
-import { IoSettings, IoClose } from "react-icons/io5";
+import { IoClose } from "react-icons/io5";
 import { MdFlashOn, MdWork, MdGpsFixed } from "react-icons/md";
 import { GoDotFill } from "react-icons/go";
-import SermonExportButton from "../SermonExportButton";
-import { usePreventTouchGestures, touchPreventionStyles } from "../../../utils/touchGestures";
-import { SermonNavigateIndex } from "../ui/SermonNavigateIndex";
+import {
+  usePreventTouchGestures,
+  touchPreventionStyles,
+} from "@/utils/touchGestures";
 import { useViewModeStore } from "@/store/view-mode-store";
+import { FullScreenViewSettingsBar } from "./FullScreenViewSettingsBar";
 
 const SermonPreachingView = ({ sermon, user }) => {
   const [fontSize, setFontSize] = useState(1.8);
   const [contentWidth, setContentWidth] = useState(80);
-  const [showSettings, setShowSettings] = useState(false);
   const viewRef = useRef(null);
 
   // store
@@ -102,7 +103,10 @@ const SermonPreachingView = ({ sermon, user }) => {
         <IoClose />
       </button>
 
-      <div className="overflow-y-auto flex-grow pt-16 pb-28" style={touchPreventionStyles}>
+      <div
+        className="overflow-y-auto flex-grow pt-16 pb-28"
+        style={touchPreventionStyles}
+      >
         <div
           className="sermon-preaching-view mx-auto font-sans text-gray-900 transition-all duration-300"
           style={{ maxWidth: `${contentWidth}%`, fontSize: `${fontSize}em` }}
@@ -208,51 +212,81 @@ const SermonPreachingView = ({ sermon, user }) => {
                                 <p className="text-gray-800 leading-relaxed whitespace-pre-line mb-4">
                                   {disparador.parrafo}
                                 </p>
-                                
+
                                 {/* Elementos de Apoyo del Disparador */}
-                                {disparador.elementosApoyo && disparador.elementosApoyo.length > 0 && (
-                                  <div className="mt-4 pt-4 border-t border-gray-200">
-                                    <h4 
-                                      className="font-semibold text-gray-600 mb-3 flex items-center gap-2"
-                                      style={{ fontSize: `${fontSize * 0.6}em` }}
-                                    >
-                                      <span className="text-blue-500"><FaBook /></span>
-                                      Elementos de Apoyo
-                                    </h4>
-                                    <div className="space-y-3">
-                                      {disparador.elementosApoyo.map((elemento, eIndex) => {
-                                        // Determinar clase de fondo basada en el tipo
-                                        let backgroundClass = "bg-gray-50";
-                                        if (elemento.tipo === 'testimonio') {
-                                          backgroundClass = "bg-purple-100";
-                                        } else if (elemento.tipo === 'ejemplo') {
-                                          backgroundClass = "bg-green-100";
-                                        }
-                                        
-                                        return (
-                                          <div key={elemento.id || eIndex} className={`${backgroundClass} rounded p-3`}>
-                                            <div 
-                                              className="font-medium text-gray-500 mb-1 uppercase italic"
-                                              style={{ fontSize: `${fontSize * 0.6}em` }}
-                                            >
-                                              {elemento.tipo === 'cita_biblica' && 'Cita Bíblica'}
-                                              {elemento.tipo === 'catecismo' && 'Catecismo CIC'}
-                                              {elemento.tipo === 'reflexion' && 'Reflexión'}
-                                              {elemento.tipo === 'ejemplo' && 'Ejemplo'}
-                                              {elemento.tipo === 'testimonio' && 'Testimonio'}
-                                            </div>
-                                            <p 
-                                              className="text-gray-700 whitespace-pre-line italic"
-                                              style={{ fontSize: `${fontSize * 0.55}em` }}
-                                            >
-                                              {elemento.contenido}
-                                            </p>
-                                          </div>
-                                        );
-                                      })}
+                                {disparador.elementosApoyo &&
+                                  disparador.elementosApoyo.length > 0 && (
+                                    <div className="mt-4 pt-4 border-t border-gray-200">
+                                      <h4
+                                        className="font-semibold text-gray-600 mb-3 flex items-center gap-2"
+                                        style={{
+                                          fontSize: `${fontSize * 0.6}em`,
+                                        }}
+                                      >
+                                        <span className="text-blue-500">
+                                          <FaBook />
+                                        </span>
+                                        Elementos de Apoyo
+                                      </h4>
+                                      <div className="space-y-3">
+                                        {disparador.elementosApoyo.map(
+                                          (elemento, eIndex) => {
+                                            // Determinar clase de fondo basada en el tipo
+                                            let backgroundClass = "bg-gray-50";
+                                            if (
+                                              elemento.tipo === "testimonio"
+                                            ) {
+                                              backgroundClass = "bg-purple-100";
+                                            } else if (
+                                              elemento.tipo === "ejemplo"
+                                            ) {
+                                              backgroundClass = "bg-green-100";
+                                            }
+
+                                            return (
+                                              <div
+                                                key={elemento.id || eIndex}
+                                                className={`${backgroundClass} rounded p-3`}
+                                              >
+                                                <div
+                                                  className="font-medium text-gray-500 mb-1 uppercase italic"
+                                                  style={{
+                                                    fontSize: `${
+                                                      fontSize * 0.6
+                                                    }em`,
+                                                  }}
+                                                >
+                                                  {elemento.tipo ===
+                                                    "cita_biblica" &&
+                                                    "Cita Bíblica"}
+                                                  {elemento.tipo ===
+                                                    "catecismo" &&
+                                                    "Catecismo CIC"}
+                                                  {elemento.tipo ===
+                                                    "reflexion" && "Reflexión"}
+                                                  {elemento.tipo ===
+                                                    "ejemplo" && "Ejemplo"}
+                                                  {elemento.tipo ===
+                                                    "testimonio" &&
+                                                    "Testimonio"}
+                                                </div>
+                                                <p
+                                                  className="text-gray-700 whitespace-pre-line italic"
+                                                  style={{
+                                                    fontSize: `${
+                                                      fontSize * 0.55
+                                                    }em`,
+                                                  }}
+                                                >
+                                                  {elemento.contenido}
+                                                </p>
+                                              </div>
+                                            );
+                                          }
+                                        )}
+                                      </div>
                                     </div>
-                                  </div>
-                                )}
+                                  )}
                               </div>
                             </Popover.Panel>
                           </Transition>
@@ -302,56 +336,13 @@ const SermonPreachingView = ({ sermon, user }) => {
         </div>
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-gray-100 p-4 border-t border-gray-300 z-10 flex justify-end items-center space-x-4">
-        <SermonExportButton sermon={sermon} />
-        <button
-          onClick={() => setShowSettings(!showSettings)}
-          className="bg-blue-500 hover:bg-blue-700 rounded-full p-3 text-white shadow flex items-center justify-center text-2xl transition-all"
-          aria-label="Configuración de vista"
-        >
-          <IoSettings size={20} />
-        </button>
-        {showSettings && (
-          <div className="absolute bottom-20 right-4 bg-white p-4 rounded-lg shadow-lg border border-gray-200 w-full sm:w-64 left-4 sm:left-auto">
-            <div className="mb-4">
-              <label
-                htmlFor="fontSizeSliderPred"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Tamaño de Letra: {fontSize.toFixed(1)}em
-              </label>
-              <input
-                id="fontSizeSliderPred"
-                type="range"
-                min="1.0"
-                max="2.5"
-                step="0.1"
-                value={fontSize}
-                onChange={(e) => setFontSize(parseFloat(e.target.value))}
-                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="contentWidthSliderPred"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Ancho de Contenido: {contentWidth}%
-              </label>
-              <input
-                id="contentWidthSliderPred"
-                type="range"
-                min="60"
-                max="100"
-                step="1"
-                value={contentWidth}
-                onChange={(e) => setContentWidth(parseInt(e.target.value, 10))}
-                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-              />
-            </div>
-          </div>
-        )}
-      </div>
+      <FullScreenViewSettingsBar
+        fontSize={fontSize}
+        setFontSize={setFontSize}
+        contentWidth={contentWidth}
+        setContentWidth={setContentWidth}
+        sermon={sermon}
+      />
     </div>
   );
 };

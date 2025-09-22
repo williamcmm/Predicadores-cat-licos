@@ -15,14 +15,21 @@ export const SermonNavigateIndex = ({ sermon }) => {
           {" "}
           Indice - <span className="italic">ideas principales</span>:
         </h2>
-        <button onClick={() => setIsOpen(!isOpen)} className="p-1 rounded hover:bg-gray-100">
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="p-1 rounded hover:bg-gray-100"
+        >
           {isOpen ? <IoChevronUp /> : <IoChevronDown />}
         </button>
       </div>
       <nav className="overflow-x-auto">
-        <ol className={`flex flex-col whitespace-nowrap gap-2 ${isOpen ? "max-h-96 overflow-y-auto mt-2" : "max-h-0 overflow-hidden"} transition-all`}>
-          {sermon.ideas.map((idea) => (
-            <li key={idea.id}>
+        <ol
+          className={`flex flex-col whitespace-nowrap gap-2 ${
+            isOpen ? "max-h-96 overflow-y-auto mt-2" : "max-h-0 overflow-hidden"
+          } transition-all`}
+        >
+          {sermon.ideas.map((idea, idx) => (
+            <li key={idea.id} className="list-inside">
               <a
                 className="inline-block p-1 px-2 rounded-md bg-gray-100 text-sm text-gray-700 border border-gray-200 hover:bg-gray-200 transition-all"
                 href={`#idea-${idea.id}`}
@@ -39,7 +46,7 @@ export const SermonNavigateIndex = ({ sermon }) => {
                   }
                 }}
               >
-                {idea.h1 || `Idea ${sermon.ideas.indexOf(idea) + 1}`}
+                {`${idx + 1}. ` + (idea.h1 || `Idea ${idx + 1}`)}
               </a>
             </li>
           ))}
