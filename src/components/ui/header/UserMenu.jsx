@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { FaUser, FaSignOutAlt, FaCog } from "react-icons/fa";
-import { useAuth } from "../../context/AuthContext";
-import UserLevelBadge from "./UserLevelBadge";
-import { useAccessControl } from "../../hooks/useAccessControl";
+import { useAuth } from "@/context/AuthContext";
+import UserLevelBadge from "../UserLevelBadge";
+import { useAccessControl } from "@/hooks/useAccessControl";
 
 const UserMenu = ({ onOpenAdminPanel }) => {
   const [showMenu, setShowMenu] = useState(false);

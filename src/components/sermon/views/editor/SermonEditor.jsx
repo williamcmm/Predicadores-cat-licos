@@ -5,7 +5,7 @@ import { EditorActionBar } from "@/components/sermon/views/editor/EditorActionBa
 import { ScrollToTopButton } from "@/components/ui/ScrollToTop";
 import { FloatingSaveButton } from "@/components/ui/FloatingSaveButton";
 import { useAuth } from "@/context/AuthContext";
-import { getEmptyIdea } from "@/models/sermonModel";
+import { getEmptyIdea, mergeSermonData } from "@/models/sermonModel";
 import { guardarSermon } from "@/services/database/firestoreService";
 import { SermonNavigateIndex } from "../../ui/SermonNavigateIndex";
 import {useViewModeStore} from "@/store/view-mode-store";
@@ -21,6 +21,7 @@ const SermonEditor = ({
   const [ideaToDelete, setIdeaToDelete] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState(null);
+  
 
   const { scrollTarget, clearScrollTarget } = useViewModeStore();
   
@@ -37,14 +38,13 @@ const SermonEditor = ({
 
   // Save to localStorage on every sermon change
   useEffect(() => {
-    if (currentUser) {
-      localStorage.setItem("currentSermon", JSON.stringify(sermon));
-    }
+    if (!currentUser || !sermon) return;
+    localStorage.setItem("currentSermon", JSON.stringify(sermon));
   }, [sermon, currentUser]);
 
   // Función de guardado interna
   const handleSave = useCallback(async () => {
-    if (!currentUser || !sermon.title) {
+    if (!currentUser || !sermon || !sermon.title) {
       return { success: false, error: "No hay usuario o título" };
     }
     setIsSaving(true);
@@ -63,22 +63,13 @@ const SermonEditor = ({
       const docId = await guardarSermon(sermonToSave);
       setLastSaved(new Date());
 
-      // IMPORTANTE: Actualizar el estado del sermón con el nuevo ID
-      if (!sermon.id || sermon.basadoEnSermonPublico) {
-        setSermon((prevSermon) => {
-          // Crear una copia limpia sin campos undefined
-          const {
-            basadoEnSermonPublico,
-            autorOriginalNombre,
-            ...sermonLimpio
-          } = prevSermon;
-          return {
-            ...sermonLimpio,
-            id: docId,
-            userId: currentUser.uid,
-          };
-        });
-      }
+      // IMPORTANTE: Actualizar el estado del sermón con la versión guardada
+      // Usar sermonToSave (normalizado) en lugar de prevSermon para evitar perder campos
+      const savedSermon = mergeSermonData({ ...sermonToSave, id: docId });
+      // Eliminar metadatos internos que no queremos en el editor
+      const { basadoEnSermonPublico, autorOriginalNombre, ...cleanSaved } =
+        savedSermon;
+      setSermon({ ...cleanSaved, id: docId, userId: currentUser.uid });
 
       return { success: true, docId };
     } catch (error) {
@@ -89,6 +80,15 @@ const SermonEditor = ({
     }
   }, [sermon, currentUser, setSermon]);
 
+  // If sermon hasn't been initialized yet, render a placeholder
+  if (!sermon) {
+    return (
+      <div className="p-6 bg-gray-50 rounded-lg">
+        <p className="text-gray-600">Cargando editor...</p>
+      </div>
+    );
+  }
+
   const handleInputChange = (e) => {
     const { id, value } = e.target;
     if (id === "sermonTitle") {
@@ -96,12 +96,12 @@ const SermonEditor = ({
     } else if (id === "presentation") {
       setSermon({
         ...sermon,
-        introduction: { ...sermon.introduction, presentation: value },
+        introduction: { ...(sermon.introduction || {}), presentation: value },
       });
     } else if (id === "motivation") {
       setSermon({
         ...sermon,
-        introduction: { ...sermon.introduction, motivation: value },
+        introduction: { ...(sermon.introduction || {}), motivation: value },
       });
     } else if (id === "imperatives") {
       setSermon({ ...sermon, imperatives: value });
@@ -112,14 +112,14 @@ const SermonEditor = ({
     const newIdea = getEmptyIdea();
     setSermon({
       ...sermon,
-      ideas: [...sermon.ideas, newIdea],
+      ideas: [...(sermon.ideas || []), newIdea],
     });
   };
 
   const updateIdea = (updatedIdea) => {
     setSermon({
       ...sermon,
-      ideas: sermon.ideas.map((idea) =>
+      ideas: (sermon.ideas || []).map((idea) =>
         idea.id === updatedIdea.id ? updatedIdea : idea
       ),
     });
@@ -128,7 +128,7 @@ const SermonEditor = ({
   const deleteIdea = (id) => {
     setSermon({
       ...sermon,
-      ideas: sermon.ideas.filter((idea) => idea.id !== id),
+      ideas: (sermon.ideas || []).filter((idea) => idea.id !== id),
     });
   };
 
@@ -184,7 +184,7 @@ const SermonEditor = ({
             id="sermonTitle"
             className="w-full p-4 border-2 border-gray-300 rounded-lg text-xl font-semibold text-gray-800 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
             placeholder="Escriba aquí un título atractivo para su sermón"
-            value={sermon.title}
+            value={sermon.title || ""}
             onChange={handleInputChange}
           />
         </div>
@@ -208,7 +208,7 @@ const SermonEditor = ({
                 rows="3"
                 className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Ponga aquí cómo va a presentar el tema a la audiencia"
-                value={sermon.introduction.presentation}
+                value={sermon.introduction?.presentation || ""}
                 onChange={handleInputChange}
               ></textarea>
             </div>
@@ -226,7 +226,7 @@ const SermonEditor = ({
                 rows="3"
                 className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Ponga aquí texto que genere expectativa e interés en los oyentes"
-                value={sermon.introduction.motivation}
+                value={sermon.introduction?.motivation || ""}
                 onChange={handleInputChange}
               ></textarea>
             </div>
@@ -239,7 +239,7 @@ const SermonEditor = ({
             IDEAS PRINCIPALES
           </label>
           <div className="space-y-8">
-            {sermon.ideas.map((idea, index) => (
+            {(sermon.ideas || []).map((idea, index) => (
               <SermonIdea
                 key={idea.id}
                 idea={idea}
@@ -270,7 +270,7 @@ const SermonEditor = ({
             rows="4"
             className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Ponga aquí acciones concretas que deben tomar (conclusión lógica, no moralismo)"
-            value={sermon.imperatives}
+            value={sermon.imperatives || ""}
             onChange={handleInputChange}
           ></textarea>
         </div>

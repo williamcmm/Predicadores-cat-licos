@@ -1,11 +1,10 @@
 import { useState, useEffect, useRef } from "react";
-import Header from "./components/ui/Header";
+import Header from "./components/ui/header/Header";
 import PanelResizer from "./components/ui/PanelResizer";
 import SermonEditor from "@/components/sermon/views/editor/SermonEditor";
 import ResourcePanel from "./components/resources/ResourcePanel";
 import SermonStudyView from "./components/sermon/views/full-screen/SermonStudyView";
 import SermonPreachingView from "./components/sermon/views/full-screen/SermonPreachingView";
-import Biblioteca from "./components/biblioteca/Biblioteca";
 import AdminPanel from "./components/admin/AdminPanel";
 import { BottomNavBar } from "./components/ui/BottomNavBar";
 import { MobileResourcesModal } from "./components/ui/MobileResourcesModal";
@@ -15,11 +14,11 @@ import {
   getEmptySermon,
   mergeSermonData,
   validateSermonStructure,
-  normalizeSermon,
 } from "./models/sermonModel";
 import { esAdministrador } from "./services/admin/userService";
 import { useViewModeStore } from "./store/view-mode-store";
 import { useScrollViewStore } from "./store/scroll-view-store";
+import { useSermonStore } from "./store/sermon-store";
 
 function App() {
   const { currentUser } = useAuth();
@@ -28,33 +27,9 @@ function App() {
     const storedWidth = localStorage.getItem("leftPanelWidth");
     return storedWidth ? parseFloat(storedWidth) : 60;
   });
-  const [showBiblioteca, setShowBiblioteca] = useState(false);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [showMobileResources, setShowMobileResources] = useState(false);
-
-  const [sermon, setSermon] = useState(() => {
-    if (!currentUser) {
-      localStorage.removeItem("currentSermon");
-      return getEmptySermon();
-    }
-    try {
-      const savedSermon = localStorage.getItem("currentSermon");
-      if (savedSermon) {
-        const parsed = JSON.parse(savedSermon);
-        if (
-          parsed &&
-          typeof parsed === "object" &&
-          parsed.title !== undefined
-        ) {
-          return normalizeSermon(parsed);
-        }
-      }
-    } catch (error) {
-      console.error("Error parsing sermon from localStorage:", error);
-    }
-    return getEmptySermon();
-  });
 
   // STORE
   const { mode, setMode } = useViewModeStore();
@@ -62,6 +37,14 @@ function App() {
   const setScrollElement = useScrollViewStore(
     (state) => state.setScrollElement
   );
+  const { sermon, setSermon, initSermon } = useSermonStore();
+
+  useEffect(() => {
+    // Initialize sermon when currentUser becomes available or changes
+    if (typeof initSermon === 'function') {
+      initSermon(currentUser);
+    }
+  }, [currentUser, initSermon]);
 
   // Manejo dinámico del responsive
   useEffect(() => {
@@ -175,38 +158,8 @@ function App() {
     setLeftPanelWidth(newWidth);
   };
 
-  const toggleBiblioteca = () => {
-    setShowBiblioteca(!showBiblioteca);
-  };
-
   const toggleAdminPanel = () => {
     setShowAdminPanel(!showAdminPanel);
-  };
-
-  const handleOpenSermon = (sermonToOpen) => {
-    // Si es un sermón público (tiene autorOriginal), crear una copia para el usuario actual
-    if (sermonToOpen.esPublico || sermonToOpen.autorOriginal) {
-      const sermonCopy = {
-        ...sermonToOpen,
-        // Remover identificadores del sermón original para crear una copia nueva
-        id: undefined,
-        userId: currentUser?.uid,
-        createdAt: new Date(),
-        // Mantener referencia al original para fines informativos
-        basadoEnSermonPublico: sermonToOpen.id,
-        autorOriginalNombre: sermonToOpen.nombreAutor || sermonToOpen.autor,
-        // Marcar como copia en el título si no está ya marcado
-        title: sermonToOpen.title.includes("[Copia]")
-          ? sermonToOpen.title
-          : `[Copia] ${sermonToOpen.title}`,
-      };
-      setSermon(sermonCopy);
-    } else {
-      // Sermón propio, abrir normalmente
-      setSermon(sermonToOpen);
-    }
-    setMode("edicion");
-    setShowBiblioteca(false);
   };
 
   const rightPanelWidth = isMobile ? 100 : 100 - leftPanelWidth;
@@ -214,7 +167,6 @@ function App() {
   return (
     <div className="h-screen flex flex-col bg-gray-100">
       <Header
-        onToggleBiblioteca={toggleBiblioteca}
         onOpenAdminPanel={toggleAdminPanel}
       />
       <div className="flex flex-1 overflow-hidden">
@@ -268,20 +220,8 @@ function App() {
         onClose={() => setShowMobileResources(false)}
       />
 
-      {mode === "estudio" && (
-        <SermonStudyView sermon={sermon} />
-      )}
-      {mode === "predicacion" && (
-        <SermonPreachingView
-          sermon={sermon}
-        />
-      )}
-      {showBiblioteca && (
-        <Biblioteca
-          onClose={toggleBiblioteca}
-          onOpenSermon={handleOpenSermon}
-        />
-      )}
+      {mode === "estudio" && <SermonStudyView sermon={sermon} />}
+      {mode === "predicacion" && <SermonPreachingView sermon={sermon} />}
       {showAdminPanel && esAdministrador(currentUser) && (
         <AdminPanel onClose={toggleAdminPanel} />
       )}

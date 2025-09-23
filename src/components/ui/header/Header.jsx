@@ -1,11 +1,23 @@
-import React from "react";
-import LoginButton from "../auth/LoginButton";
-import ShareButton from "./ShareButton";
+import { useState } from "react";
+import LoginButton from "../../auth/LoginButton";
+import ShareButton from "../ShareButton";
 import UserMenu from "./UserMenu";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "@/context/AuthContext";
+import Biblioteca from "@/components/biblioteca/Biblioteca";
+import { useSermonStore } from "@/store/sermon-store";
+import { useViewModeStore } from "@/store/view-mode-store";
 
-const Header = ({ onToggleBiblioteca, onOpenAdminPanel }) => {
+const Header = ({ onOpenAdminPanel }) => {
+  const [showBiblioteca, setShowBiblioteca] = useState(false);
   const { currentUser } = useAuth();
+  const { openSermon } = useSermonStore();
+  const { setMode } = useViewModeStore();
+
+  const handleOpenSermon = (sermonToOpen) => {
+    openSermon(sermonToOpen, currentUser);
+    setMode("edicion");
+    setShowBiblioteca(false);
+  };
 
   return (
     <header className="bg-gradient-to-r from-purple-700 to-purple-500 shadow-lg p-4 text-white">
@@ -25,7 +37,7 @@ const Header = ({ onToggleBiblioteca, onOpenAdminPanel }) => {
                 <div className="flex items-center gap-2">
                   <ShareButton />
                   <button
-                    onClick={onToggleBiblioteca}
+                    onClick={() => setShowBiblioteca(!showBiblioteca)}
                     className="custom-btn bg-white !text-purple-700 rounded-md hover:bg-gray-200 transition-colors font-semibold"
                   >
                     Biblioteca
@@ -40,6 +52,12 @@ const Header = ({ onToggleBiblioteca, onOpenAdminPanel }) => {
           </div>
         </div>
       </div>
+      {showBiblioteca && (
+        <Biblioteca
+          onClose={() => setShowBiblioteca(!showBiblioteca)}
+          onOpenSermon={handleOpenSermon}
+        />
+      )}
     </header>
   );
 };

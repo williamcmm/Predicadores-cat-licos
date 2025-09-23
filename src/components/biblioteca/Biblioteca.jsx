@@ -33,7 +33,7 @@ const Biblioteca = ({ onClose, onOpenSermon }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-40 flex justify-center items-center p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4 text-black">
       <div className="bg-white rounded-lg shadow-2xl w-full md:w-3/4 lg:w-2/3 h-5/6 p-6 flex flex-col">
         <div className="flex justify-between items-center border-b pb-4 mb-4">
           <h2 className="text-xl sm:text-2xl font-bold">Biblioteca</h2>

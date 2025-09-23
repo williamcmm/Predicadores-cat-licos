@@ -30,7 +30,8 @@ export async function guardarSermon(sermon) {
       introduction: sermon.introduction || { presentation: "", motivation: "" },
       ideas: sermon.ideas || [],
       imperatives: sermon.imperatives || "",
-      type: sermon.type || "Homilía",
+      type: sermon.type || "Sermón",
+      createdAt: sermon.createdAt || new Date(),
     };
 
     // Eliminar campos undefined que Firestore no acepta
