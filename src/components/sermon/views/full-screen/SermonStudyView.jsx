@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import SermonExportButton from "../../SermonExportButton";
-import { IoSettings, IoClose } from "react-icons/io5";
+import { IoClose } from "react-icons/io5";
 import { MdFlashOn, MdWork, MdGpsFixed } from "react-icons/md";
 import { FaBook } from "react-icons/fa";
 import { useViewModeStore } from "@/store/view-mode-store";
@@ -9,8 +8,8 @@ import { FullScreenViewSettingsBar } from "./FullScreenViewSettingsBar";
 const SermonStudyView = ({ sermon, user }) => {
   const [fontSize, setFontSize] = useState(2.0);
   const [contentWidth, setContentWidth] = useState(80);
-  const [showSettings, setShowSettings] = useState(false);
   const viewRef = useRef(null);
+  const { setScrollTarget } = useViewModeStore();
 
   // store
   const { setMode } = useViewModeStore();
@@ -138,9 +137,18 @@ const SermonStudyView = ({ sermon, user }) => {
                   key={idea.id || index}
                   className="p-6 border border-gray-200 rounded-lg shadow-sm"
                 >
-                  <h3 className="font-bold mb-4 text-blue-800 text-3xl">{`Idea ${
-                    index + 1
-                  }: ${idea.h1}`}</h3>
+                  <a
+                    href={`#idea-${idea.id}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setScrollTarget(`idea-${idea.id}`);
+                      setMode("edicion");
+                    }}
+                  >
+                    <h3 className="font-bold mb-4 text-blue-800 hover:underline text-3xl">{`Idea ${
+                      index + 1
+                    }: ${idea.h1}`}</h3>
+                  </a>
 
                   {/* Línea Inicial Impactante */}
                   {idea.lineaInicial && (

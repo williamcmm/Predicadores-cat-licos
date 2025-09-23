@@ -1,3 +1,4 @@
+import { scrollIntoView } from "@/utils/scrollIntoView";
 import { useState } from "react";
 import { IoChevronDown, IoChevronUp } from "react-icons/io5";
 
@@ -35,15 +36,7 @@ export const SermonNavigateIndex = ({ sermon }) => {
                 href={`#idea-${idea.id}`}
                 onClick={(e) => {
                   e.preventDefault();
-                  const el = document.getElementById(`idea-${idea.id}`);
-                  if (el) {
-                    el.scrollIntoView({ behavior: "smooth", block: "start" });
-                    // optionally focus the input inside the idea
-                    const input = el.querySelector(
-                      "input, textarea, [tabindex]"
-                    );
-                    if (input) input.focus({ preventScroll: true });
-                  }
+                  scrollIntoView(`idea-${idea.id}`);
                 }}
               >
                 {`${idx + 1}. ` + (idea.h1 || `Idea ${idx + 1}`)}

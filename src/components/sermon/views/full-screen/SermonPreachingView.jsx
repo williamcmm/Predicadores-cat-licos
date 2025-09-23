@@ -18,6 +18,7 @@ const SermonPreachingView = ({ sermon, user }) => {
 
   // store
   const { setMode } = useViewModeStore();
+  const { setScrollTarget } = useViewModeStore();
 
   useEffect(() => {
     const savedFontSize = localStorage.getItem("preachingViewFontSize");
@@ -135,9 +136,18 @@ const SermonPreachingView = ({ sermon, user }) => {
           <div className="space-y-12">
             {sermon.ideas?.map((idea, index) => (
               <div key={idea.id || index} className="p-6 border-t pt-8">
-                <h2 className="font-bold mb-5 text-blue-700 text-4xl">{`Idea ${
-                  index + 1
-                }: ${idea.h1}`}</h2>
+                <a
+                  href={`#idea-${idea.id}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setScrollTarget(`idea-${idea.id}`);
+                    setMode("edicion");
+                  }}
+                >
+                  <h2 className="font-bold mb-5 text-blue-700 text-4xl hover:underline">{`Idea ${
+                    index + 1
+                  }: ${idea.h1}`}</h2>
+                </a>
 
                 {/* Línea Inicial Impactante */}
                 {idea.lineaInicial && (

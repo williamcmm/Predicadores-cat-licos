@@ -8,12 +8,12 @@ import { useAuth } from "@/context/AuthContext";
 import { getEmptyIdea } from "@/models/sermonModel";
 import { guardarSermon } from "@/services/database/firestoreService";
 import { SermonNavigateIndex } from "../../ui/SermonNavigateIndex";
+import {useViewModeStore} from "@/store/view-mode-store";
+import { scrollIntoView } from "@/utils/scrollIntoView";
 
 const SermonEditor = ({ 
   sermon, 
   setSermon, 
-  modo, 
-  setModo, 
   onClearSermon
 }) => {
   const { currentUser } = useAuth();
@@ -21,6 +21,19 @@ const SermonEditor = ({
   const [ideaToDelete, setIdeaToDelete] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState(null);
+
+  const { scrollTarget, clearScrollTarget } = useViewModeStore();
+  
+  // Funcionalidad para scroll automatico al darle click a una idea en el preaching mode o study mode
+  useEffect(() => {
+    if (scrollTarget) {
+      // slight delay to allow DOM to update
+      setTimeout(() => {
+        scrollIntoView(scrollTarget);
+        clearScrollTarget();
+      }, 120);
+    }
+  }, [scrollTarget, clearScrollTarget]);
 
   // Save to localStorage on every sermon change
   useEffect(() => {
