@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FaUsers, FaChartBar, FaTimes, FaUserShield, FaTrash, FaBan, FaCheck } from 'react-icons/fa';
 import { obtenerTodosLosUsuarios, actualizarNivelUsuario, obtenerEstadisticasUsuarios, eliminarUsuario, bloquearUsuario } from '../../services/admin/userService';
 import { useAuth } from '../../context/AuthContext';
+import { userLevels } from '@/constants/user-levels';
 
 const AdminPanel = ({ onClose }) => {
   const { currentUser } = useAuth();
@@ -11,13 +12,6 @@ const AdminPanel = ({ onClose }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterLevel, setFilterLevel] = useState('todos');
   const [updatingUser, setUpdatingUser] = useState(null);
-
-  const niveles = [
-    { key: 'básico', label: 'Básico', color: 'text-gray-600', bg: 'bg-gray-100' },
-    { key: 'intermedio', label: 'Intermedio', color: 'text-blue-600', bg: 'bg-blue-100' },
-    { key: 'avanzado', label: 'Avanzado', color: 'text-green-600', bg: 'bg-green-100' },
-    { key: 'administrador', label: 'Administrador', color: 'text-purple-600', bg: 'bg-purple-100' }
-  ];
 
   const fetchData = async () => {
     try {
@@ -151,8 +145,8 @@ const AdminPanel = ({ onClose }) => {
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
-      <div className="bg-white rounded-lg shadow-2xl w-full max-w-6xl h-5/6 flex flex-col">
+    <div onClick={onClose} className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
+      <div className="bg-white rounded-lg shadow-2xl w-full max-w-6xl h-full md:h-5/6 flex flex-col overflow-auto z-50">
         
         {/* Header */}
         <div className="flex justify-between items-center p-6 border-b">
@@ -175,12 +169,12 @@ const AdminPanel = ({ onClose }) => {
             Estadísticas de Usuarios
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-            <div className="bg-white p-4 rounded-lg shadow text-center">
+            <div className="bg-white p-4 rounded-lg shadow-lg text-center">
               <div className="text-2xl font-bold text-gray-800">{estadisticas.total}</div>
               <div className="text-sm text-gray-600">Total</div>
             </div>
-            {niveles.map(nivel => (
-              <div key={nivel.key} className={`bg-white p-4 rounded-lg shadow text-center border-l-4 border-l-${nivel.color.split('-')[1]}-500`}>
+            {userLevels.map(nivel => (
+              <div key={nivel.key} className={`bg-white p-4 rounded-md shadow-lg text-center`}>
                 <div className={`text-2xl font-bold ${nivel.color}`}>
                   {estadisticas[nivel.key] || 0}
                 </div>
@@ -196,17 +190,17 @@ const AdminPanel = ({ onClose }) => {
             <input
               type="text"
               placeholder="Buscar por email o nombre..."
-              className="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500"
+              className="flex-1 px-4 py-2 border rounded-md focus:ring-2 focus:ring-purple-500"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
             <select
-              className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500"
+              className="px-4 py-2 border rounded-md focus:ring-2 focus:ring-purple-500"
               value={filterLevel}
               onChange={(e) => setFilterLevel(e.target.value)}
             >
               <option value="todos">Todos los niveles</option>
-              {niveles.map(nivel => (
+              {userLevels.map(nivel => (
                 <option key={nivel.key} value={nivel.key}>{nivel.label}</option>
               ))}
             </select>
@@ -214,11 +208,11 @@ const AdminPanel = ({ onClose }) => {
         </div>
 
         {/* Lista de usuarios */}
-        <div className="flex-1 overflow-y-auto p-6">
+        <div className="flex-1 p-6">
           <div className="space-y-4">
             {filteredUsers.map(usuario => (
               <div key={usuario.id} className="bg-white border rounded-lg p-4 shadow-sm">
-                <div className="flex items-center justify-between">
+                <div className="flex max-md:flex-col max-md:gap-3 items-center justify-between">
                   <div className="flex items-center gap-4">
                     {usuario.photoURL ? (
                       <img 
@@ -241,7 +235,7 @@ const AdminPanel = ({ onClose }) => {
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 flex-wrap">
                     {/* Indicador de estado bloqueado */}
                     {usuario.bloqueado && (
                       <span className="px-2 py-1 bg-red-100 text-red-600 text-xs rounded-full">
@@ -251,9 +245,9 @@ const AdminPanel = ({ onClose }) => {
 
                     {/* Nivel actual */}
                     <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                      niveles.find(n => n.key === usuario.userLevel)?.bg || 'bg-gray-100'
-                    } ${niveles.find(n => n.key === usuario.userLevel)?.color || 'text-gray-600'}`}>
-                      {niveles.find(n => n.key === usuario.userLevel)?.label || 'Básico'}
+                      userLevels.find(n => n.key === usuario.userLevel)?.bg || 'bg-gray-100'
+                    } ${userLevels.find(n => n.key === usuario.userLevel)?.color || 'text-gray-600'}`}>
+                      {userLevels.find(n => n.key === usuario.userLevel)?.label || 'Básico'}
                     </span>
 
                     {/* Selector de nivel */}
@@ -263,7 +257,7 @@ const AdminPanel = ({ onClose }) => {
                       onChange={(e) => handleUpdateLevel(usuario.id, e.target.value)}
                       disabled={updatingUser === usuario.id}
                     >
-                      {niveles.map(nivel => (
+                      {userLevels.map(nivel => (
                         <option key={nivel.key} value={nivel.key}>
                           {nivel.label}
                         </option>

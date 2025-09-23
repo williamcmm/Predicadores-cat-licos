@@ -1,36 +1,22 @@
 import { useState, useRef, useEffect } from "react";
-import { FaSync, FaPaste, FaTimes, FaGripVertical } from "react-icons/fa";
+import {
+  FaSync,
+  FaPaste,
+  FaTimes,
+  FaChevronDown,
+  FaChevronUp,
+} from "react-icons/fa";
 import {
   searchResourcesProgressive,
   generateGeneralSuggestions,
   generateSermon,
-} from "../../services/ai/geminiService";
-
-const PERSONAL_RESOURCE_CATEGORY = "RECURSOS PERSONALES";
-
-const INITIAL_CATEGORIES = [
-  "CITAS BÍBLICAS RELEVANTES",
-  "DOCTRINA CATÓLICA",
-  "CATECISMO",
-  "SANTORAL CATÓLICO",
-  "REFLEXIONES SOBRE EL TEMA",
-  "EJEMPLOS PRÁCTICOS",
-  "TESTIMONIOS Y EXPERIENCIAS",
-  "DATOS CIENTÍFICOS/HISTÓRICOS",
-  "REFERENCIAS DOCTRINALES",
-  "DOCUMENTOS OFICIALES DE LA IGLESIA",
+} from "@/services/ai/geminiService";
+import {
+  INITIAL_CATEGORIES,
   PERSONAL_RESOURCE_CATEGORY,
-].map((name) => {
-  const category = {
-    name,
-    active: false,
-  };
-
-  // Categorias activas por defecto
-  if (name === "CITAS BÍBLICAS RELEVANTES") category.active = true;
-
-  return category;
-});
+} from "@/constants/resources-categories";
+import { AiGenerateButtons } from "./AiGenerateButtons";
+import PersonalResourceModal from "./PersonalResourceModal";
 
 const initializeCategories = () => {
   try {
@@ -61,7 +47,6 @@ export default function ResourcePanel() {
   const [expandedResources, setExpandedResources] = useState({});
   const [categories, setCategories] = useState(initializeCategories);
   const [isPastingModalOpen, setIsPastingModalOpen] = useState(false);
-  const [pastedTextInput, setPastedTextInput] = useState("");
 
   const dropdownRef = useRef(null);
   const abortControllerRef = useRef(null);
@@ -70,11 +55,11 @@ export default function ResourcePanel() {
     localStorage.setItem("resourceCategories", JSON.stringify(categories));
   }, [categories]);
 
-  const handleSavePastedText = () => {
+  const handleSavePastedText = (text) => {
     const personalResource = {
       title: "Texto Personal",
       source: "Aporte del usuario",
-      content: [pastedTextInput],
+      content: [text],
       id: `personal-resource-${Date.now()}`,
     };
 
@@ -95,7 +80,6 @@ export default function ResourcePanel() {
       return newResults;
     });
 
-    setPastedTextInput("");
     setIsPastingModalOpen(false);
   };
 
@@ -171,6 +155,25 @@ export default function ResourcePanel() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // When all categoryLoading entries become false (i.e. all categories finished),
+  // make sure the global isLoading flag is cleared so the search button re-enables.
+  useEffect(() => {
+    const keys = Object.keys(categoryLoading || {});
+    if (keys.length === 0) return;
+    const anyLoading = keys.some((k) => categoryLoading[k] === true);
+    if (!anyLoading) {
+      setIsLoading(false);
+      // clear controller since work finished
+      if (abortControllerRef.current) {
+        try {
+          abortControllerRef.current = null;
+        } catch (e) {
+          // noop
+        }
+      }
+    }
+  }, [categoryLoading]);
   const mapCategory = (incoming) => {
     if (!incoming) return incoming;
     const up = (incoming || "").toUpperCase();
@@ -251,8 +254,16 @@ export default function ResourcePanel() {
     }
   };
   const handleStopSearch = () => {
-    if (abortControllerRef.current) abortControllerRef.current.abort();
+    if (abortControllerRef.current) {
+      try {
+        abortControllerRef.current.abort();
+      } catch (e) {
+        console.error("Error aborting search controller", e);
+      }
+      abortControllerRef.current = null;
+    }
     setIsLoading(false);
+    setCategoryLoading({});
   };
 
   const handleClearSearch = () => {
@@ -279,121 +290,39 @@ export default function ResourcePanel() {
   const handleToggleReadMore = (rid) =>
     setExpandedResources((prev) => ({ ...prev, [rid]: !prev[rid] }));
 
-  const handleGenerateSermon = async () => {
-    const activeCategories = categories.filter((c) => c.active);
-    const activeCategoryNames = activeCategories.map((c) => c.name);
-    const filteredResults = (searchResults || []).filter((res) =>
-      activeCategoryNames.includes(res.category)
-    );
-
-    if (
-      !filteredResults ||
-      filteredResults.length === 0 ||
-      filteredResults.every((c) => !c.resources || c.resources.length === 0)
-    ) {
-      alert(
-        "Por favor, activa y busca en algunas categorías, o añade un recurso personal antes de generar un sermón."
-      );
-      return;
-    }
-
-    const isStillLoading = Object.values(categoryLoading).some(
-      (status) => status === true
-    );
-    if (isStillLoading) {
-      const confirmation = window.confirm(
-        "La búsqueda de recursos aún no ha terminado.\n\nGeneraremos el sermón solo con los recursos encontrados hasta el momento.\n\n¿Desea continuar?"
-      );
-      if (!confirmation) return;
-    }
-
-    setGenerating(true);
-    try {
-      const sermonData = await generateSermon(
-        searchTerm || "Sermón basado en recursos",
-        filteredResults
-      );
-
-      if (sermonData) {
-        window.dispatchEvent(
-          new CustomEvent("insertSermonIntoEditor", { detail: sermonData })
-        );
-        try {
-          localStorage.setItem(
-            "lastGeneratedSermon",
-            JSON.stringify(sermonData)
-          );
-        } catch (e) {
-          console.error("Error guardando el sermón en localStorage", e);
-        }
-      }
-    } catch (err) {
-      console.error("generateSermon error", err);
-      alert(`Error al generar sermón: ${err.message}`);
-    } finally {
-      setGenerating(false);
-    }
-  };
-
   const hasContent = () =>
     searchResults &&
     searchResults.some((c) => c.resources && c.resources.length > 0);
 
   return (
     <div className="p-4 rounded-lg shadow-md h-full flex flex-col">
-      {isPastingModalOpen && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[80vh] flex flex-col">
-            <div className="flex justify-between items-center p-4 border-b">
-              <h3 className="text-lg font-semibold">Añadir Recurso Personal</h3>
-              <button
-                onClick={() => setIsPastingModalOpen(false)}
-                className="text-2xl"
-              >
-                <FaTimes />
-              </button>
-            </div>
-            <div className="p-4 overflow-y-auto flex-1">
-              <textarea
-                className="w-full h-full p-2 border rounded-md min-h-[300px]"
-                placeholder="Copia y pega aquí tu texto. Este texto se tratará como un recurso más para la generación del sermón."
-                value={pastedTextInput}
-                onChange={(e) => setPastedTextInput(e.target.value)}
-              ></textarea>
-            </div>
-            <div className="flex justify-end p-4 border-t space-x-4">
-              <button
-                onClick={() => setIsPastingModalOpen(false)}
-                className="px-4 py-2 rounded-md bg-gray-200"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleSavePastedText}
-                className="px-4 py-2 rounded-md bg-blue-500 text-white"
-              >
-                Usar este Texto
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <PersonalResourceModal
+        isOpen={isPastingModalOpen}
+        onClose={() => setIsPastingModalOpen(false)}
+        onSave={handleSavePastedText}
+        generating={generating}
+      />
 
       <div className="flex flex-col sm:flex-row mb-4 items-start sm:items-center">
         <div className="flex-1 w-full sm:w-auto">
           <div className="flex">
             <input
               type="text"
-              className="flex-1 shadow appearance-none border rounded-l w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              className={`${
+                generating ? "btn-disabled" : ""
+              } flex-1 shadow appearance-none border rounded-l w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline`}
               placeholder="Buscar temas y recursos para predicación"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSearch(searchTerm)}
+              onKeyDown={(e) =>
+                e.key === "Enter" && !generating && handleSearch(searchTerm)
+              }
+              disabled={generating}
             />
             <button
-              onClick={() => handleSearch(searchTerm)}
+              onClick={() => !generating && handleSearch(searchTerm)}
               className="custom-btn bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 !rounded-l-none"
-              disabled={isLoading || isSuggesting}
+              disabled={isLoading || isSuggesting || generating}
             >
               {isLoading
                 ? "Buscando..."
@@ -405,17 +334,25 @@ export default function ResourcePanel() {
             </button>
             <button
               onClick={handleClearSearch}
-              className="custom-btn bg-red-500 hover:bg-red-600 ml-2"
+              className={`${
+                generating ? "btn-disabled" : ""
+              } custom-btn bg-red-500 hover:bg-red-600 ml-2`}
               title="Limpiar tema y resultados"
+              disabled={generating}
             >
               Limpiar
             </button>
           </div>
-          <div className="text-sm text-gray-600 mt-2 flex flex-col gap-2">
+          <div
+            className={`${
+              generating ? "btn-disabled" : ""
+            } text-sm text-gray-600 mt-2 flex flex-col gap-2`}
+          >
             {isLoading && (
               <button
                 onClick={handleStopSearch}
                 className="custom-btn bg-red-500 hover:bg-red-600 self-start"
+                disabled={generating}
               >
                 Detener Búsqueda
               </button>
@@ -453,34 +390,15 @@ export default function ResourcePanel() {
         )}
 
         {hasContent() && (
-          <div className="mb-4 p-4 bg-green-50 border border-green-300 rounded">
-            <div className="text-sm text-gray-700 font-medium">
-              ¿Cómo quieres continuar?
-            </div>
-            <div className="mt-3 flex flex-col sm:flex-row gap-3">
-              <button
-                className="custom-btn bg-green-500 hover:bg-green-600"
-                onClick={handleGenerateSermon}
-                disabled={generating}
-              >
-                {generating
-                  ? "Generando..."
-                  : "Pedir a la IA que te sugiera un sermón"}
-              </button>
-              <button
-                className="custom-btn border border-green-500 !text-green-700 hover:bg-green-100"
-                onClick={() =>
-                  window.dispatchEvent(
-                    new CustomEvent("startManualSermonFromResources", {
-                      detail: { topic: searchTerm },
-                    })
-                  )
-                }
-              >
-                Crear el sermón tú mismo
-              </button>
-            </div>
-          </div>
+          <AiGenerateButtons
+            categories={categories}
+            searchResults={searchResults}
+            categoryLoading={categoryLoading}
+            generateSermon={generateSermon}
+            searchTerm={searchTerm}
+            generating={generating}
+            setGenerating={setGenerating}
+          />
         )}
 
         <p className="text-base font-semibold text-gray-700 mb-2">
@@ -504,30 +422,34 @@ export default function ResourcePanel() {
                 }`}
               >
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
-                  <div className="flex items-center mb-2 sm:mb-0 gap-2">
+                  <div className="flex items-center mb-2 sm:mb-0 gap-2 md:gap-4">
                     <input
                       type="checkbox"
                       checked={cat.active}
                       onChange={() => handleToggleCategoryActive(cat.name)}
-                      className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 flex-shrink-0"
+                      className={`${
+                        generating ? "btn-disabled" : ""
+                      } w-4 h-4 rounded text-blue-600 focus:ring-blue-500 flex-shrink-0`}
+                      disabled={generating}
                     />
-                    <div className="flex items-center text-gray-400 mr-3">
-                      <FaGripVertical />
-                    </div>
                     <div className="flex flex-col mr-2">
                       <button
-                        onClick={() => handleMoveCategory(index, -1)}
-                        disabled={index === 0}
+                        onClick={() =>
+                          !generating && handleMoveCategory(index, -1)
+                        }
+                        disabled={index === 0 || generating}
                         className="disabled:opacity-25 text-gray-600 hover:text-blue-600"
                       >
-                        ▲
+                        <FaChevronUp size={13} />
                       </button>
                       <button
-                        onClick={() => handleMoveCategory(index, 1)}
-                        disabled={index === categories.length - 1}
+                        onClick={() =>
+                          !generating && handleMoveCategory(index, 1)
+                        }
+                        disabled={index === categories.length - 1 || generating}
                         className="disabled:opacity-25 text-gray-600 hover:text-blue-600"
                       >
-                        ▼
+                        <FaChevronDown size={13} />
                       </button>
                     </div>
                     <div
@@ -536,21 +458,27 @@ export default function ResourcePanel() {
                     >
                       {cat.name}
                     </div>
-                    {isPersonalResource && (
+                    {isPersonalResource ? (
                       <button
-                        onClick={() => setIsPastingModalOpen(true)}
-                        className="mr-2 px-3 py-1.5 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600 flex items-center"
+                        onClick={() =>
+                          !generating && setIsPastingModalOpen(true)
+                        }
+                        className={`${
+                          generating || cat.active === false
+                            ? "btn-disabled"
+                            : ""
+                        } mr-2 px-3 py-1.5 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600 flex items-center`}
+                        disabled={generating || cat.active === false}
                       >
                         <FaPaste className="mr-2" />
                         Añadir Texto
                       </button>
-                    )}
-                  </div>
-                  <div className="flex items-center space-x-2 self-end sm:self-center">
-                    {!isPersonalResource && (
+                    ) : (
                       <button
-                        onClick={() => handleFetchSingleCategory(cat.name)}
-                        disabled={isLoadingCat || !cat.active}
+                        onClick={() =>
+                          !generating && handleFetchSingleCategory(cat.name)
+                        }
+                        disabled={isLoadingCat || !cat.active || generating}
                         className="p-1 mx-1 text-gray-400 hover:text-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
                         title="Buscar en esta categoría"
                       >
@@ -559,6 +487,8 @@ export default function ResourcePanel() {
                         />
                       </button>
                     )}
+                  </div>
+                  <div className="flex items-center space-x-2 self-end sm:self-center">
                     <div className="text-sm text-gray-600">({count})</div>
                     {isLoadingCat && (
                       <div className="text-sm text-yellow-600">Buscando...</div>

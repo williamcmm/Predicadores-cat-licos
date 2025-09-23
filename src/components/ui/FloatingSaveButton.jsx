@@ -49,7 +49,7 @@ export const FloatingSaveButton = ({ onSave, isSaving }) => {
   return (
     <button
       onClick={handleSave}
-      className={`sticky bottom-20 left-full p-3 rounded-full opacity-40 hover:opacity-100 z-40 transition-all duration-300 hover:scale-110 ${getButtonStyle()}`}
+      className={`sticky bottom-20 left-full p-3 rounded-full opacity-40 hover:opacity-100 z-30 transition-all duration-300 hover:scale-110 ${getButtonStyle()}`}
       disabled={isSaving}
       aria-label="Guardar sermón"
       title="Guardar sermón"

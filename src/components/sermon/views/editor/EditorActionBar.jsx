@@ -44,7 +44,7 @@ export const EditorActionBar = ({
   return (
     <div
       ref={sidebarRef}
-      className="flex justify-between items-center p-3 border-b bg-white rounded-md shadow  gap-4"
+      className="flex justify-between items-center p-3 border-b bg-white rounded-md shadow gap-4 overflow-visible"
     >
       {displayMode === "collapsed" ? (
         <Popover className="relative">
@@ -60,7 +60,7 @@ export const EditorActionBar = ({
             leaveFrom="opacity-100 translate-y-0"
             leaveTo="opacity-0 translate-y-1"
           >
-            <Popover.Panel className="absolute z-10 mt-2 w-52 bg-white shadow-lg rounded-lg ring-1 ring-black ring-opacity-5">
+            <Popover.Panel className="absolute z-30 mt-2 w-52 bg-white shadow-lg rounded-lg ring-1 ring-black ring-opacity-5">
               <div className="p-2 flex flex-col items-center gap-2">
                 <ModeButtons isPopover displayMode={displayMode} />
                 <ActionButtons

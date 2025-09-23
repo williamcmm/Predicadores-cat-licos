@@ -6,7 +6,7 @@ import ResourcePanel from "../resources/ResourcePanel";
 export const MobileResourcesModal = ({ isOpen, onClose }) => {
   return (
     <Transition.Root show={isOpen} as={Fragment}>
-      <Dialog as="div" className="relative z-50" onClose={onClose}>
+      <Dialog as="div" className="relative z-30" onClose={onClose}>
         <div className="fixed inset-0 overflow-hidden">
           <div className="absolute inset-0 overflow-hidden">
             <div className="pointer-events-none fixed inset-y-0 right-0 flex">

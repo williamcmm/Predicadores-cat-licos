@@ -17,7 +17,7 @@ export const ScrollToTopButton = () => {
   return (
     <button
       onClick={scrollToTop}
-      className="sticky bottom-5 left-full text-4xl text-blue-600 opacity-40 hover:opacity-100 hover:text-blue-800 z-50 transition-all duration-300 hover:scale-110"
+      className="sticky bottom-5 left-full text-4xl text-blue-600 opacity-40 hover:opacity-100 hover:text-blue-800 z-30 transition-all duration-300 hover:scale-110"
       aria-label="Scroll to top"
     >
       <div>

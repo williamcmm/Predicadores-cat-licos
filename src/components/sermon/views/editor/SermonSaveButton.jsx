@@ -1,13 +1,7 @@
 import { useState } from "react";
 import { FaSave, FaSpinner, FaCheck, FaTimes } from "react-icons/fa";
 
-const SermonSaveButton = ({
-  onSave,
-  isSaving,
-  lastSaved,
-  className = "",
-  compact = false,
-}) => {
+const SermonSaveButton = ({ onSave, isSaving, lastSaved, compact = false }) => {
   const [saveStatus, setSaveStatus] = useState(null);
 
   const handleSave = async () => {
@@ -81,10 +75,10 @@ const SermonSaveButton = ({
   };
 
   return (
-    <div className="flex flex-col items-center relative">
+    <div className="w-full relative">
       <button
         onClick={handleSave}
-        className={`custom-btn w-full ${className} ${getButtonStyle()}`}
+        className={`custom-btn w-full md:min-w-48 justify-center text-nowrap ${getButtonStyle()}`}
         disabled={isSaving}
         title={compact ? (isSaving ? "Guardando..." : "Guardar") : ""}
       >
@@ -92,7 +86,7 @@ const SermonSaveButton = ({
       </button>
 
       {lastSaved && !compact && (
-        <div className="text-gray-500 text-xs hidden sm:block">
+        <div className="text-gray-500 text-xs hidden sm:block w-full truncate absolute mt-1">
           Último guardado: {new Date(lastSaved).toLocaleTimeString()}
         </div>
       )}

@@ -182,7 +182,18 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider value={value}>
-      {!loading && children}
+      {loading ? (
+        <div className="h-screen flex flex-col gap-3 items-center justify-center bg-gray-100">
+          <div
+            className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"
+            aria-hidden="true"
+          >
+          </div>
+            <div className="font-semibold">Cargando...</div>
+        </div>
+      ) : (
+        children
+      )}
     </AuthContext.Provider>
   );
 };
