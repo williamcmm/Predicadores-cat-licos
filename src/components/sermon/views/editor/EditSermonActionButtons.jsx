@@ -14,7 +14,7 @@ export const ActionButtons = ({
   const isCompact = displayMode === "collapsed";
 
   return (
-    <div className={`flex ${isCompact ? "gap-2 flex-col w-full" : "gap-4 w-auto"} items-center relative md:py-10 overflow-auto`}>
+    <div className={`flex ${isCompact ? "gap-2 flex-col w-full" : "gap-4 w-auto"} items-center relative md:py-5 overflow-auto`}>
       <button
         onClick={onClearSermon}
         className={`custom-btn justify-center w-full bg-transparent !text-red-600 hover:bg-red-50 border border-red-200 hover:border-red-400`}
