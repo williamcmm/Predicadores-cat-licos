@@ -54,7 +54,7 @@ const Header = ({ onOpenAdminPanel }) => {
       </div>
       {showBiblioteca && (
         <Biblioteca
-          onClose={() => setShowBiblioteca(!showBiblioteca)}
+          onCloseBiblioteca={() => setShowBiblioteca(!showBiblioteca)}
           onOpenSermon={handleOpenSermon}
         />
       )}

@@ -47,7 +47,7 @@ const UserMenu = ({ onOpenAdminPanel }) => {
         className="flex items-center space-x-2 text-white hover:text-purple-200 transition-colors duration-200 p-2"
         aria-label="Menu de usuario"
       >
-        <FaCog size={18} />
+        <FaUser size={18} />
       </button>
 
       {showMenu && (

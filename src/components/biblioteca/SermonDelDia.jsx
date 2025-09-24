@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { obtenerSermonesPublicos } from "../../services/database/firestoreService";
 import { FaSpinner } from "react-icons/fa";
+import { IoBook } from "react-icons/io5";
 
-const SermonDelDia = ({ onOpenSermon, onClose }) => {
+const SermonDelDia = ({ onOpenSermon, onCloseBiblioteca }) => {
   const [sermonesPublicos, setSermonesPublicos] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -43,7 +44,7 @@ const SermonDelDia = ({ onOpenSermon, onClose }) => {
 
   const handleOpenSermon = (sermon) => {
     onOpenSermon(sermon);
-    onClose();
+    onCloseBiblioteca();
   };
 
   return (
@@ -112,7 +113,7 @@ const SermonDelDia = ({ onOpenSermon, onClose }) => {
                     onClick={() => handleOpenSermon(sermon)}
                     className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors text-sm font-medium flex items-center gap-2"
                   >
-                    <span>📖</span> Abrir
+                    <IoBook size={20} /> Abrir
                   </button>
                 </div>
               </div>
