@@ -1,3 +1,4 @@
+import { aiModel } from '@/constants/ai-model';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // geminiService: consolidated, single-definition module
@@ -66,7 +67,7 @@ const extractAndParseJson = (text) => {
 };
 
 export async function searchResources(query) {
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+  const model = genAI.getGenerativeModel({ model: aiModel });
   const prompt = `Busca recursos católicos para el tema: '${query}'. Devuelve SOLO JSON válido. La estructura esperada: { "categories": [ { "category": "...", "resources": [ { "title": "...", "source": "...", "description": "...", "excerpt": "...", "content": ["párrafo1", "párrafo2"] } ] } ] }.`;
   try {
     const result = await model.generateContent(prompt);
@@ -77,7 +78,7 @@ export async function searchResources(query) {
 }
 
 export async function searchResourcesProgressive(query, onCategory, categories = null) {
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+  const model = genAI.getGenerativeModel({ model: aiModel });
   const DEFAULT_CATS = [
     'DOCTRINA CATÓLICA','CATECISMO','SANTORAL CATÓLICO','CITAS BÍBLICAS RELEVANTES','REFLEXIONES SOBRE EL TEMA',
     'EJEMPLOS PRÁCTICOS','TESTIMONIOS Y EXPERIENCIAS','DATOS CIENTÍFICOS/HISTÓRICOS','VIDEOS DE YOUTUBE','REFERENCIAS DOCTRINALES','DOCUMENTOS OFICIALES DE LA IGLESIA'
@@ -122,7 +123,7 @@ export async function searchResourcesProgressive(query, onCategory, categories =
 }
 
 export async function generateGeneralSuggestions() {
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+  const model = genAI.getGenerativeModel({ model: aiModel });
   const prompt = `Genera exactamente 10 sugerencias de temas para sermones católicos, una por línea.`;
   const parseSuggestions = (text) => {
     if (!text || typeof text !== 'string') return [];
@@ -170,7 +171,7 @@ async function generateDisparadoresForIdea(idea, topic, model) {
 }
 
 export async function generateSermon(topic = '', searchResults = {}, liturgyContext = null) {
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+  const model = genAI.getGenerativeModel({ model: aiModel });
 
   // Step 1: Generate the main structure of the sermon
   const structurePrompt = `
@@ -208,7 +209,7 @@ export async function generateSermon(topic = '', searchResults = {}, liturgyCont
 }
 
 export async function generateDisparador(paragraph) {
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+  const model = genAI.getGenerativeModel({ model: aiModel });
   const prompt = `Dada el siguiente párrafo de un sermón: "${paragraph}".\n\nGenera una única frase corta (máximo 10 palabras) que actúe como un "disparador mental" para recordar el contenido de este párrafo. La respuesta debe ser únicamente la frase, sin comillas ni texto adicional.`;
   try {
     const result = await model.generateContent(prompt);

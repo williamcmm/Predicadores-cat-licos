@@ -1,0 +1,1 @@
+export const aiModel = "gemini-2.5-flash"; // or "gemini-1.5-flash"
